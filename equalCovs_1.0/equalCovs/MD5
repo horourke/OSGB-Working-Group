@@ -1,0 +1,11 @@
+de76d26e77cd968d3692ffa60e720d65 *DESCRIPTION
+7621908abff6fdb65ced8c9c057a5ce0 *NAMESPACE
+bff3e5f01785489d18b5b971d0a2e63b *R/equalCovs.R
+ed02aabaf3a32f1dae8abe07a96f617e *man/equalCovs.Rd
+bf9bd36d39f916db5308e37787306358 *src/code1.f90
+95920a16b00fe4de6e70640845197ec0 *src/code2.f90
+ff135014cbf984ba8f3c723137edc616 *src/code3.f90
+60b4dacfd8be581ca7b14ac934c3fcf5 *src/code4.f90
+b2a4650d63524769e27effcbb09411b5 *src/code5.f90
+9c145df90ddf0ce8a06a7328c1560caf *src/code6.f90
+9b3a1d301a606d90af2414386edb3723 *src/init.c

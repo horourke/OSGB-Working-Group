@@ -1,0 +1,3 @@
+useDynLib(equalCovs, .registration = TRUE)
+export(equalCovs)
+importFrom("stats", "pnorm")
