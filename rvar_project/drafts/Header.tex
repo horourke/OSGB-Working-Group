@@ -1,0 +1,420 @@
+
+% For including theorem environment
+\usepackage[utf8]{inputenc}
+\usepackage{amsthm}
+% References
+\usepackage{natbib}
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+\usepackage[depth=2]{bookmark}
+% To add algorithms 
+\usepackage[ruled,vlined]{algorithm2e}
+% To edit the line spacing of different sections of the document.
+\usepackage{setspace}
+% To use declaremathoperator/equation references 
+\usepackage{amsmath}
+% Using english language
+\usepackage[english]{babel}
+% To include captions
+\usepackage{caption}
+% For labeled lists
+\usepackage{enumerate}
+\usepackage{enumitem}
+% For multiline comments
+\usepackage{comment}
+% For bold symbols
+\usepackage{bm}
+% To automatize the environments you reference to.
+\usepackage{cleveref}
+% for figures
+\usepackage{tikz}
+% For indicator functions
+\usepackage{dsfont}
+% For having \bbfonts.
+\usepackage{amsfonts}
+% For other important symbols
+\usepackage{amssymb}
+% For the double-hat symbol
+\usepackage{accents}
+% To improve tables:
+\usepackage{multirow}
+% To rotate a table in a full page:
+\usepackage{rotating}
+% To add vertical tables.
+\usepackage{pdflscape}
+% To use hyperlinks to emails and papers.
+\usepackage{hyperref}
+%\hypersetup{
+%	colorlinks=true,
+%	linkcolor=red,0
+%	urlcolor=blue,
+%	citecolor=blue
+%}
+% Packages necessary for pretty plots
+\usepackage{lmodern}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{etoolbox}
+\usepackage{caption}
+% To display inequalities in text.
+\usepackage[T1]{fontenc}
+
+% Define the floor and ceiling operators.
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+% Block matrix tool:
+\newcommand{\bigzero}{\mbox{\normalfont\Large\bfseries 0}}
+\newcommand{\rvline}{\hspace*{-\arraycolsep}\vline\hspace*{-\arraycolsep}}
+
+%% Theorem/definition environments.
+\newtheorem{thm}{Theorem}
+\newtheorem{cor}{Corollary}
+\newtheorem{ex}{Example}
+\newtheorem{prop}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{assumption}{Assumption}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+
+\newtheorem*{thm*}{Theorem}
+\newtheorem*{cor*}{Corollary}
+\newtheorem*{ex*}{Example}
+\newtheorem*{prop*}{Proposition}
+\newtheorem*{lemma*}{Lemma}
+\newtheorem*{assumption*}{Assumption}
+
+\theoremstyle{definition}
+\newtheorem*{definition*}{Definition}
+\newtheorem*{remark*}{Remark}
+
+
+
+
+% Constantly used operators
+\newcommand{\adj}{\mathrm{adj}}
+\newcommand{\mt}{\top}
+
+% Other useful operators
+\newcommand{\norm}[2]{\left\lVert#1\right\rVert_{#2}}
+\newcommand{\indv}[1]{\mathds{1}_{#1}}
+\newcommand{\ind}[1]{\mathds{1}\left(#1\right)}
+\newcommand{\bone}{{\mathbf{1}}}		% zero vector
+\newcommand{\bzero}{{\mathbf{0}}}		% zero vector
+\newcommand{\calO}{\mathcal{O}}
+
+% Command for positive definite matrices.
+\newcommand{\pdset}[1]{\cS^{#1 \times #1}_{+}}
+\newcommand{\matset}[2]{\bbR^{#1 \times #2}}
+\newcommand{\bhat}[1]{\widehat{#1}}
+\newlength{\dhatheight}
+\newcommand{\bbhat}[1]{%
+	\settoheight{\dhatheight}{\ensuremath{\hat{#1}}}%
+	\addtolength{\dhatheight}{-0.35ex}%
+	\hat{\vphantom{\rule{1pt}{\dhatheight}}%
+		\smash{\hat{#1}}}}
+
+% To make large parenthesis.
+\newcommand{\pare}[3]{\left#1 #2\right#3}
+\newcommand{\abs}[1]{\left| #1\right|}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%----- bold fonts -----%
+
+\newcommand{\ab}{\mathbf{a}}
+\newcommand{\bbb}{\mathbf{b}}
+\newcommand{\cbb}{\mathbf{c}}
+\newcommand{\db}{\mathbf{d}}
+\newcommand{\eb}{\mathbf{e}}
+\newcommand{\fb}{\mathbf{f}}
+\newcommand{\gb}{\mathbf{g}}
+\newcommand{\hb}{\mathbf{h}}
+\newcommand{\ib}{\mathbf{i}}
+\newcommand{\jb}{\mathbf{j}}
+\newcommand{\kb}{\mathbf{k}}
+\newcommand{\lb}{\mathbf{l}}
+\newcommand{\mb}{\mathbf{m}}
+\newcommand{\nbb}{\mathbf{n}}
+\newcommand{\ob}{\mathbf{o}}
+\newcommand{\pb}{\mathbf{p}}
+\newcommand{\qb}{\mathbf{q}}
+\newcommand{\rb}{\mathbf{r}}
+\newcommand{\sbb}{\mathbf{s}}
+\newcommand{\tb}{\mathbf{t}}
+\newcommand{\ub}{\mathbf{u}}
+\newcommand{\vb}{\mathbf{v}}
+\newcommand{\wb}{\mathbf{w}}
+\newcommand{\xb}{\mathbf{x}}
+\newcommand{\yb}{\mathbf{y}}
+\newcommand{\zb}{\mathbf{z}}
+
+% denote vectors
+\newcommand{\ba}{\bm{a}}
+\newcommand{\bb}{\bm{b}}
+\newcommand{\bc}{\bm{c}}
+\newcommand{\bd}{\bm{d}}
+\newcommand{\be}{\bm{e}}
+\newcommand{\bbf}{\bm{f}}
+\newcommand{\bg}{\bm{g}}
+\newcommand{\bh}{\bm{h}}
+\newcommand{\bi}{\bmf{i}}
+\newcommand{\bj}{\bm{j}}
+\newcommand{\bk}{\bm{k}}
+\newcommand{\bl}{\bm{l}}
+\newcommand{\bbm}{\bm{m}}
+\newcommand{\bn}{\bm{n}}
+\newcommand{\bo}{\bm{o}}
+\newcommand{\bp}{\bm{p}}
+\newcommand{\bq}{\bm{q}}
+\newcommand{\br}{\bm{r}}
+\newcommand{\bs}{\bm{s}}
+\newcommand{\bt}{\bm{t}}
+\newcommand{\bu}{\bm{u}}
+\newcommand{\bv}{\bm{v}}
+\newcommand{\bw}{\bm{w}}
+\newcommand{\bx}{\bm{x}}
+\newcommand{\by}{\bm{y}}
+\newcommand{\bz}{\bm{z}}
+
+% denote random matrices
+\newcommand{\Ab}{\mathbf{A}}
+\newcommand{\Bb}{\mathbf{B}}
+\newcommand{\Cb}{\mathbf{C}}
+\newcommand{\Db}{\mathbf{D}}
+\newcommand{\Eb}{\mathbf{E}}
+\newcommand{\Fb}{\mathbf{F}}
+\newcommand{\Gb}{\mathbf{G}}
+\newcommand{\Hb}{\mathbf{H}}
+\newcommand{\Ib}{\mathbf{I}}
+\newcommand{\Jb}{\mathbf{J}}
+\newcommand{\Kb}{\mathbf{K}}
+\newcommand{\Lb}{\mathbf{L}}
+\newcommand{\Mb}{\mathbf{M}}
+\newcommand{\Nb}{\mathbf{N}}
+\newcommand{\Ob}{\mathbf{O}}
+\newcommand{\Pb}{\mathbf{P}}
+\newcommand{\Qb}{\mathbf{Q}}
+\newcommand{\Rb}{\mathbf{R}}
+\newcommand{\Sbb}{\mathbf{S}}
+\newcommand{\Tb}{\mathbf{T}}
+\newcommand{\Ub}{\mathbf{U}}
+\newcommand{\Vb}{\mathbf{V}}
+\newcommand{\Wb}{\mathbf{W}}
+\newcommand{\Xb}{\mathbf{X}}
+\newcommand{\Yb}{\mathbf{Y}}
+\newcommand{\Zb}{\mathbf{Z}}
+
+% denote non-random matrices
+\newcommand{\Ar}{\mathrm{A}}
+\newcommand{\Br}{\mathrm{B}}
+\newcommand{\Cr}{\mathrm{C}}
+\newcommand{\Dr}{\mathrm{D}}
+\newcommand{\Er}{\mathrm{E}}
+\newcommand{\Fr}{\mathrm{F}}
+\newcommand{\Gr}{\mathrm{G}}
+\newcommand{\Hr}{\mathrm{H}}
+\newcommand{\Ir}{\mathrm{I}}
+\newcommand{\Jr}{\mathrm{J}}
+\newcommand{\Kr}{\mathrm{K}}
+\newcommand{\Lr}{\mathrm{L}}
+\newcommand{\Mr}{\mathrm{M}}
+\newcommand{\Nr}{\mathrm{N}}
+\newcommand{\Or}{\mathrm{O}}
+\newcommand{\Prr}{\mathrm{P}}
+\newcommand{\Qr}{\mathrm{Q}}
+\newcommand{\Rr}{\mathrm{R}}
+\newcommand{\Srr}{\mathrm{S}}
+\newcommand{\Trr}{\mathrm{T}}
+\newcommand{\Ur}{\mathrm{U}}
+\newcommand{\Vr}{\mathrm{V}}
+\newcommand{\Wr}{\mathrm{W}}
+\newcommand{\Xr}{\mathrm{X}}
+\newcommand{\Yr}{\mathrm{Y}}
+\newcommand{\Zr}{\mathrm{Z}}
+
+
+% denote random vectors
+\newcommand{\bA}{\bm{A}}
+\newcommand{\bB}{\bm{B}}
+\newcommand{\bC}{\bm{C}}
+\newcommand{\bD}{\bm{D}}
+\newcommand{\bE}{\bm{E}}
+\newcommand{\bF}{\bm{F}}
+\newcommand{\bG}{\bm{G}}
+\newcommand{\bH}{\bm{H}}
+\newcommand{\bI}{\bm{I}}
+\newcommand{\bJ}{\bm{J}}
+\newcommand{\bK}{\bm{K}}
+\newcommand{\bL}{\bm{L}}
+\newcommand{\bM}{\bm{M}}
+\newcommand{\bN}{\bm{N}}
+\newcommand{\bO}{\bm{O}}
+\newcommand{\bP}{\bm{P}}
+\newcommand{\bQ}{\bm{Q}}
+\newcommand{\bR}{\bm{R}}
+\newcommand{\bS}{\bm{S}}
+\newcommand{\bT}{\bm{T}}
+\newcommand{\bU}{\bm{U}}
+\newcommand{\bV}{\bm{V}}
+\newcommand{\bW}{\bm{W}}
+\newcommand{\bX}{\bm{X}}
+\newcommand{\bY}{\bm{Y}}
+\newcommand{\bZ}{\bm{Z}}
+
+% denote vectors
+\newcommand{\bbeta}{\bm{\beta}}
+\newcommand{\bmeta}{\bm{\eta}}
+\newcommand{\balpha}{\bm{\alpha}}
+\newcommand{\bsigma}{\bm{\sigma}}
+\newcommand{\bgamma}{\bm{\gamma}}
+\newcommand{\blambda}{\bm{\lambda}}
+\newcommand{\bomega}{\bm{\omega}}
+\newcommand{\bmu}{\bm{\mu}}
+\newcommand{\bepsilon}{\bm{\epsilon}}
+\newcommand{\btheta}{\bm{\theta}}
+\newcommand{\bxi}{\bm{\xi}}
+\newcommand{\bpi}{\bm{\pi}}
+
+% denote matrices
+\newcommand{\bGamma}{\bm{\Gamma}}
+\newcommand{\bLambda}{\bm{\Lambda}}
+\newcommand{\bSigma}{\bm{\Sigma}}
+\newcommand{\bTheta}{\bm{\Theta}}
+\newcommand{\bXi}{\bm{\Xi}}
+\newcommand{\bPsi}{\bm{\Psi}}
+
+% others
+\newcommand{\bcE}{\bm{\mathcal{E}}}	% exchangeable
+
+%----- double fonts -----%
+
+\newcommand{\bbC}{\mathbb{C}}
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbE}{\mathbb{E}}
+\newcommand{\bbF}{\mathbb{F}}
+\newcommand{\bbG}{\mathbb{G}}
+\newcommand{\bbN}{\mathbb{N}}
+\newcommand{\bbP}{\mathbb{P}}
+\newcommand{\bbI}{\mathbb{I}}
+\newcommand{\bbV}{\mathbb{V}}
+\newcommand{\bbQ}{\mathbb{Q}}
+\newcommand{\bbZ}{\mathbb{Z}}
+
+
+%----- script fonts -----%
+
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cB}{\mathcal{B}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cD}{\mathcal{D}}
+\newcommand{\cE}{\mathcal{E}}
+\newcommand{\cF}{\mathcal{F}}
+\newcommand{\cG}{\mathcal{G}}
+\newcommand{\cH}{\mathcal{H}}
+\newcommand{\cI}{\mathcal{I}}
+\newcommand{\cJ}{\mathcal{J}}
+\newcommand{\cK}{\mathcal{K}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cM}{\mathcal{M}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cO}{\mathcal{O}}
+\newcommand{\cP}{\mathcal{P}}
+\newcommand{\cQ}{\mathcal{Q}}
+\newcommand{\cR}{\mathcal{R}}
+\newcommand{\cS}{\mathcal{S}}
+\newcommand{\cT}{\mathcal{T}}
+\newcommand{\cU}{\mathcal{U}}
+\newcommand{\cV}{\mathcal{V}}
+\newcommand{\cW}{\mathcal{W}}
+\newcommand{\cX}{\mathcal{X}}
+\newcommand{\cY}{\mathcal{Y}}
+\newcommand{\cZ}{\mathcal{Z}}
+
+\newcommand{\sL}{\mathscr{L}}
+\newcommand{\sM}{\mathscr{M}}
+\newcommand{\sR}{\mathscr{R}}
+\newcommand{\sP}{\mathscr{P}}
+\newcommand{\sfR}{\mathsf{R}}
+\newcommand{\sfM}{\mathsf{M}}
+\newcommand{\fC}{\mathfrak{C}}
+
+\newcommand\smallcO{
+	\mathchoice
+	{{\scriptstyle\mathcal{O}}}% \displaystyle
+	{{\scriptstyle\mathcal{O}}}% \textstyle
+	{{\scriptscriptstyle\mathcal{O}}}% \scriptstyle
+	{\scalebox{.5}{$\scriptscriptstyle\mathcal{O}$}}%\scriptscriptstyle
+}
+
+%----- special operators -----%
+
+\newcommand{\argmin}{\mathop{\mathrm{argmin}}}
+\newcommand{\argmax}{\mathop{\mathrm{argmax}}}
+\newcommand{\rd}{\mathrm{d}}
+
+\newcommand{\var}{\mathrm{var}}
+\newcommand{\bvar}{\textbf{Var}}
+\newcommand{\bcov}{\textbf{Cov}}
+\newcommand{\cov}{\mathrm{cov}}
+\newcommand{\bcor}{\textbf{Cor}}
+\newcommand{\corr}{\mathrm{cor}}
+\newcommand{\brank}{\textbf{rank}}
+\newcommand{\bsign}{\textbf{sign}}
+\newcommand{\bdiag}{\textbf{diag}}	% diagonal
+\newcommand{\bdim}{\textbf{dim}}	% dimension
+\newcommand{\btr}{\textbf{tr}}	    	% trace
+\newcommand{\bspan}{\textbf{span}}	% linear span
+
+\newcommand{\GLASSO}{\mathrm{GLASSO}}
+\newcommand{\HWGL}{\mathrm{HWGL}}
+\newcommand{\HGL}{\mathrm{HGL}}
+\newcommand{\STEP}{\mathrm{2-step}}
+\newcommand{\SPCAHD}{\mathrm{IPC-HD}}
+\newcommand{\id}{\mathrm{id}}
+
+\newcommand{\AUC}{\mathrm{AUC}}
+\newcommand{\TPR}{\mathrm{TPR}}
+\newcommand{\FPR}{\mathrm{FPR}}
+
+
+\newcommand\indep{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}	% independence
+
+%\newcommand{\ubar}{\underaccent{\bar}}	% underbar
+\def\ubar#1{\underbar{$ #1 $}}
+
+%----- distribution name -----%
+
+\newcommand{\Exp}{\textbf{Exponential}}
+\newcommand{\Pois}{\textbf{Poisson}}
+\newcommand{\Gumb}{\textbf{Gumbel}}
+\newcommand{\Bern}{\textbf{Bernoulli}}
+\newcommand{\Bin}{\textbf{Binomial}}
+\newcommand{\NBin}{\textbf{Negative-Binomial}}
+\newcommand{\Multi}{\textbf{Multinomial}}
+\newcommand{\Geo}{\textbf{Geometric}}
+\newcommand{\Hyper}{\textbf{Hypergeometric}}
+\newcommand{\Cauchy}{\textbf{Cauchy}}
+\newcommand{\Levy}{\textbf{L\'{e}vy}}
+\newcommand{\Unif}{\textbf{Uniform}}
+
+
+%----- Annotations -----%
+
+\newcommand{\todo}[1]{\textcolor{red}{\bf #1}}
+\newcommand{\done}[1]{\textcolor{green}{\bf #1}}
+\newcommand{\jose}[1]{\textcolor{orange}{#1}}
+\newcommand{\yufeng}[1]{\textcolor{blue}{\bf #1}}
+\newcommand{\weibin}[1]{\textcolor{violet}{\bf #1}}
+\newcommand{\junlong}[1]{\textcolor{limegreen}{\bf #1}}
+
+
+
+\newcommand{\vertiii}[1]{{\left\vert\kern-0.25ex\left\vert\kern-0.25ex\left\vert #1 
+		\right\vert\kern-0.25ex\right\vert\kern-0.25ex\right\vert}}
+

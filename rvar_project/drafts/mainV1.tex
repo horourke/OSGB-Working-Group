@@ -1,0 +1,151 @@
+
+
+\section{Introduction}
+
+
+\begin{itemize}
+	\item There is a growing availability of longitudinal data, which allows for an increase in the breath and depth of research regarding how specific psychometric measurements influence behavior, well-being and daily progress.
+	
+	\item Often, this data takes the form of a set of time-series, each associated with an individual patient. When modeling, we must take into account both the temporal dependency of the data (prior psychological states are likely to influence future states), and the dependencies among the psychometric measurements.
+	
+	\item Many methods have been proposed for the estimation of such dependencies such as sparse vector auto-regression models \citep{basu2015regularized}, dynamic factor analysis \citep{stock2002forecasting}, and the universal structural equation modeling (USEM) \citep{kim2007unified}.
+	
+	\item In psychometric research, it is vital to recognize the effect that individual characteristics of each subject can have in the overall fit of the model and interpretation. From this, a variety of works have focused on the estimation of a common (or nomothetic) structure across all individuals, as well as individual (or idiographic) structure that is exclusive to each subject. The GIMME method \citep{gates2012group} performs the estimation of the network of psychometric relationships via the estimation of multiple USEM model, with a variable selection procedure that estimates model overlaps. More recently, the MultiVAR method \citep{fisher2022penalized} estimates the individual and common structure through a penalized optimization approach. Further extensions to consider the potential structure of subgroups has been considered for both approaches \citep{lane2019uncovering,crawford2024penalized}.
+	
+	
+	\item Often, in psychometric or MRI studies, our subject-specific time series data is accompanied by additional clinical data. The incorporation of this additional information may provide further insight into behavior, but its use has been largely ignored.
+	
+	
+	\item One important omission from these approaches is to explain \textit{why} each individual has a particular idiographic structure. While the common network has a straightforward interpretation, the individual structures are not necessarily easy to interpret or process. Therefore, the output of GIMME or MultiVAR can only measure the existence of this idiographic structure, without explaining in any way the origin or motivation of potential underlying patterns.
+	
+	\item In the current writeup, we propose a method for estimating the nomothetic and idiographic structure of multi-subject time series, where the time dependence of each individual depends on a set of underlying covariates. This way, the idiographic effects are not simply unexplained individual structure, but are instead linked to the patients' individual characteristics. This allows for an actual interpretation of the idiographic structure. 
+	
+	\item \textbf{Main advantages}: while other methods allow for modeling nomothetic and idiographic structure, the motivation for why such variations occur remains largely unknown. The explanation is simply: there is variation across individuals. This method connects the individual variation to underlying features, allowing us to determine the nature of the nomothetic structure, and to provide potential explanations for the origin of the idiographic structure. This can then be used as useful knowledge for further research or downstream statistical analysis.
+\end{itemize}
+
+
+\section{Description of the Model}
+
+
+\begin{itemize}
+	\item Consider we have a study with $N$ subjects. For each subject $1\leq k\leq N$, we have access to two data modes: (\textit{i}) a $p$-dimensional vector of covariates $\bY_k\in\bbR^{p}$, and (\textit{ii}) a $d$-dimensional time series of length $T_k$, given as $\{\bX_t^{(k)}\in\bbR^{d} \,:\, 1\leq t\leq T_k\}$.
+	
+	\item In the usual GIMME or MultiVAR frameworks \citep{gates2012group,fisher2022penalized}, the aim is to model the time-series with a common+individual decomposition, usually of the form:
+	\begin{align*}
+		\bX^{(k)}_t &= \sum_{\ell=1}^{q} (\Psi_\ell^{c} + \Psi_\ell^{(k)}) \bX_{t-\ell}^{(k)} + \be^{(k)}_{t}.\hspace{40mm} \text{(MultiVAR)};\\
+		\bX^{(k)}_t &= (\Ar^{c} + \Ar^{(k)}) \bX^{(k)}_t + \sum_{\ell=1}^{q} (\Phi_\ell^{c} + \Phi_\ell^{(k)}) \bX_{t-\ell}^{(k)} + \varepsilon^{(k)}_{t}.\hspace{10mm} \text{(GIMME)}.
+	\end{align*}
+	
+	\item While these approaches are useful at extracting common and individual structure, they miss the opportunity to exploit the potentially useful additional information contained in $\{\bY_k\}_{k=1}^N$. 
+	
+	\item To exploit it, we assume that the time-series model coefficients depend on the values of $Y$. We consider the following models: 
+	\begin{align}
+		\bX^{(k)}_t &= \sum_{\ell=1}^{q} \Psi_\ell(\bY_k) \bX_{t-\ell}^{(k)} + \be^{(k)}_{t}.\hspace{40mm} \text{(MultiVAR)}; \label{eq:rvar}\\
+		\bX^{(k)}_t &= \Ar(\bY_k) \bX^{(k)}_t + \sum_{\ell=1}^{q} \Phi_\ell(\bY_k) \bX_{t-\ell}^{(k)} + \varepsilon^{(k)}_{t}.\hspace{17mm} \text{(GIMME)}.
+	\end{align}
+	Notice that, instead of being fixed, the set of coefficients $\Psi_\ell(Y_k), \Ar(Y_k), \Phi_\ell(Y_k)$ now depend on the individual covariate data. From this, the individual structure of each cannot be arbitrary, but it now depends on the specific features $Y_k$.
+	
+	\item As a first approach, lets assume that these parameters have a \textit{additive} relationship to the underlying covariates. For a vector $\by=(y_1,y_2,\ldots ,y_p)\in\bbR^p$
+	\begin{align*}
+		\Psi_\ell(\by) &= \Psi_{\ell 0} + y_1 \Psi_{\ell 1} + y_2 \Psi_{\ell 2} + \ldots + y_p \Psi_{\ell p} ;\\
+		\Ar(\by) &= \Ar_0 + y_1 \Ar_1 + y_2 \Ar_2 + \ldots + y_p \Ar_p ;\\
+		\Phi_\ell(\by) &= \Phi_{\ell0} + y_1 \Phi_{\ell1} + y_2 \Phi_{\ell2} + \ldots + y_p \Phi_{\ell p}. \\
+	\end{align*}
+	Here, the matrices $\{\Psi_{\ell 0}\}_{\ell=1}^q, \Ar_0, \{\Phi_{\ell 0}\}_{\ell = 1}^q$ represent the structure that is common (nomothetic) among all subjects. The remaining parameters are affected by $y$, so they are dependent on the individual characteristics of each subject.
+
+	\item \textbf{Example:} We consider a VAR model, where there is a single lagged relationship, \textit{i.e.} $q = 1$, and two subject-level covariates $p = 2$. In that case, given that $\bY_k = (Y_{k1},Y_{k2})^\mt$ our equations simplify to:
+	\begin{align*}
+		\bX^{(k)}_t &= \Psi(\bY_k) X_{t-1}^{(k)} + \be^{(k)}_{t}\\
+		&= [\Psi_{0} + Y_{k1} \Psi_{1} + Y_{k2} \Psi_{2}] \cdot \bX_{t-1}^{(k)} + \be^{(k)}_{t}
+	\end{align*}
+	Notice that each subject $k$ will have their own VAR structure. This structure will incorporate a common structure shared across all subjects $\Psi_0\in\bbR^{d\times d}$. It also has individual structure. Now, instead of having this individual structure vary arbitrarily, it has the form $Y_{k1} \Psi_{1} + Y_{k2} \Psi_{2}$. Therefore, it depends on known information $Y_k = (Y_{k1}, Y_{k2})^{'}$ about each subject.
+	
+	\item In Figure \ref{fig:rvarCoeffsExample}, we provide an example of how common and individual effects in a VAR time series model can relate to underlying subject-level covariates.	Here, the dimension of our time series is $ d = 5 $, the number of subject-level covariates is $ p = 2 $, and the lag in the model is $ q = 1 $. We generate data for $N = 50$ subjects, all with a total of $T = 100$ time points.
+
+
+	\begin{figure}
+		\centering
+		\includegraphics[width = \linewidth]{figures/2_VisRvarTrueEstPars}
+		\caption{Illustration of the true and estimated Regression VAR parameters. For very large sample sizes, the traditional OLS method is successful. It would now be interesting to explore how regularization or model selection can help in higher dimension.}\label{fig:rvar_TrueEstimatedPars}
+	\end{figure}
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width = \linewidth]{figures/1_VisParExample}
+		\caption{Illustration of the Regression VAR framework with 2 covariate-dependent effects. Top-panels: visualization of the joint effects that are common across all subjects. We also visualize the effects that are individual to variables $Y_1$ and $Y_2$. Center-left panel: Visualization of the covariate information for $N = 50$ subjects. We highlight the covariate information of the first 5 subjects. Remaining panels: Visualization of the effects for the first 5 subjects. We observe that, as subject 1 has nearly zero for both $Y_1$ and $Y_2$, the effects are mostly just the joint effects. Subject 3 has a high $Y_2$ covariate, but low $Y_1$ covariate, and therefore its effects are a mixture of the joint and $Y_2$ effects. Subject 2 has large covariates for both $Y_1$ and $Y_2$, so its time series effects are a mixture of all.}\label{fig:rvarCoeffsExample}
+	\end{figure}
+	
+	
+	\item For this same example, we performed a traditional LS fitting, to see if we could successfully recover the common/individual structure of the time series. As we see in Figure \ref{fig:rvar_TrueEstimatedPars}, our estimation for very large sample sizes is successful.
+	
+
+	
+	
+\end{itemize}
+
+\newpage
+
+\section{Fitting the RVAR Model with LASSO Penalty}\label{section:rvar}
+
+
+In this section, we describe the fitting of the RVAR model of the form \eqref{eq:rvar}, with 1-lag relationships, \textit{i.e.} $q = 1$. Assuming that, for each individual $k=1,...,N$, we can capture the VAR relationships in matrix form as:
+{\footnotesize
+\begin{equation*}
+	\underbrace{\begin{bmatrix} 
+		(X_{T_k}^k)^{'} \\ (X_{T_k-1}^k)^{'} \\ \vdots \\ (X_{2}^k)^{'}
+	\end{bmatrix}}_{\Zb^{k}} = 
+	\underbrace{\begin{bmatrix} 
+		(X_{T_k-1}^{k})^{'}  & Y_{k1} (X_{T_k-1}^{k})^{'} &  Y_{k2} (X_{T_k-1}^{k})^{'} & \ldots & Y_{kp} (X_{T_k-1}^{k})^{'} \\
+		(X_{T_k-2}^{k})^{'}  & Y_{k1} (X_{T_k-2}^{k})^{'} &  Y_{k2} (X_{T_k-2}^{k})^{'} & \ldots & Y_{kp} (X_{T_k-2}^{k})^{'} \\
+		 \vdots      &     \vdots      & \ddots & \vdots 		  \\
+		(X_{1}^{k})^{'}  & Y_{k1} (X_{1}^{k})^{'} &  Y_{k2} (X_{1}^{k})^{'} & \ldots & Y_{kp} (X_{1}^{k})^{'} \\
+	\end{bmatrix}}_{\Wb^k} 
+	\underbrace{\begin{bmatrix}
+		\Psi_{0}^{'} \\ \Psi_{1}^{'} \\ \vdots \\ \Psi_{p}^{'}
+	\end{bmatrix}}_{\Psi} +  
+	\underbrace{\begin{bmatrix} 
+		(\varepsilon_T^{k})^{'} \\ (\varepsilon_{T-1}^{k})^{'} \\ \vdots \\ (\varepsilon_{T-q+1}^{k})^{'}
+	\end{bmatrix}}_{\Eb^{k}}.
+\end{equation*}
+}%
+This can be simplified to matrix form as
+\begin{equation}\label{eq:rvar_kmat}
+	\Zb^{k} = \Wb^{k} \bPsi + \Eb^{k}
+\end{equation}
+The equation \eqref{eq:rvar_kmat} represents the VAR relationships for individual $k$. Then, we can model the behavior for all individuals via the equation
+\begin{equation*}
+	%\underbrace{\begin{bmatrix}  \Zb^1 \\ \Zb^2 \\ \vdots \\  \Zb^k \\ \vdots \\ \Zb^N \end{bmatrix}}_{\Zb} = 
+	\underbrace{\begin{bmatrix}  \Zb^1 \\ \Zb^2  \\ \vdots \\ \Zb^N \end{bmatrix}}_{\Zb} = 
+	%\underbrace{\begin{bmatrix}  \Wb^1 \\ \Wb^2 \\ \vdots \\  \Wb^k \\ \vdots \\ \Wb^N \end{bmatrix}}_{\Wb}  
+	\underbrace{\begin{bmatrix}  \Wb^1 \\ \Wb^2  \\ \vdots \\ \Wb^N \end{bmatrix}}_{\Wb}  
+	\bPsi + 
+	%\underbrace{\begin{bmatrix}  \Eb^1 \\ \Eb^2 \\ \vdots \\  \Eb^k \\ \vdots \\ \Eb^N \end{bmatrix}}_{\Eb} 
+	\underbrace{\begin{bmatrix}  \Eb^1 \\ \Eb^2 \\ \vdots \\ \Eb^N \end{bmatrix}}_{\Eb} 
+\end{equation*}
+We can finally summarize the VAR equation model for all individuals simultaneously with the reduced matrix equation:
+\begin{equation}\label{eq:rvar_mat}
+	\Zb = \Wb \bPsi + \bE.
+\end{equation}
+To solve for the parameter $\bPsi\in\bbR^{d (p+1) \times d}$, we propose performing the following optimization,
+\begin{equation}\label{eq:rvar_matreg_lasso}
+	\bhat\bPsi := \argmin_{\bPsi\in \bbR^{d (p+1) \times d}} \vertiii{ \Zb - \Wb \bPsi }_{F}^2 + \lambda_1 \vertiii{\Psi_{0}}_1 +  \lambda_2 \vertiii{[\Psi_1 \, \Psi_2 \, \ldots \, \Psi_p]}_1,
+\end{equation}
+where the hyperparameter $\lambda_1$ serves to penalize the common structure of all VAR models, and $\lambda_2$ penalizes the $Y$ covariate dependent portion of the model. We can interpret \eqref{eq:rvar_matreg_lasso} as a matrix regression problem. To solve the optimization problem \eqref{eq:rvar_matreg_lasso}, we use the \texttt{glmnet} package, which allows for solving matrix regression problems directly. The \texttt{glmnet} implementation  solves the problem by reducing the matrix regression problem to solving the regression problems of their individual columns.  
+\begin{equation*}
+	\bhat\bPsi^{\ell}(\lambda_1,\lambda_2) = \argmin_{\bPsi^{(\ell)} \in \bbR^{d (p+1)}} \vertiii{ \Zb_{\cdot \ell} - \Wb \bPsi^{(\ell)} }_{F}^2 + \lambda_1 \|{[\bPsi^{(\ell)}]_{1:d}}\|_1 +  \lambda_2 \|{[\bPsi^{(\ell)}]_{(d+1):(dp)}}\|_1.
+\end{equation*}
+Finally, we set the estimated parameter $\bhat\bPsi(\lambda_1,\lambda_2) := \left[\bhat\bPsi^{1}\, \bhat\bPsi^{2}\,\ldots \, \bhat\bPsi^{d}\right](\lambda_1,\lambda_2)\in\bbR^{d(p+1)\times d}$. Figure \ref{fig:rvar_TrueEstimatedPars} in the previous section was derived with $\lambda_1 = \lambda_2 = 0$.
+
+The current implementation only allows for a single lagged relationship, \textit{i.e.} $q = 1$. We aim to create a more general implementation with lag $q> 1$ in the future.
+
+\section{Fitting RUSEM}
+
+
+The implementation of the RVAR model described in Section \ref{section:rvar} is simply a generalization of the optimization problem considered in the \citet{fisher2022penalized}. Notice that the RVAR focuses the estimation on the lagged effects $\bPsi$. For the GIMME model, we are also interested in recovering contemporaneous effects. The GIMME model cannot easily be extended to the regression setting. Therefore, we need to explore a different procedure for recovering the USEM structure in the regression setting. This will require thought and research...
+
+I explored the original GIMME reference \citet{gates2012group}, which points towards the modification index described in \citet{sorbom1989model}. I am still trying to understand how the GIMME adapts the estimation of USEM described in \citet{sorbom1989model} to scenarios with time dependence. This will be the next task.
+
+
+
+
+

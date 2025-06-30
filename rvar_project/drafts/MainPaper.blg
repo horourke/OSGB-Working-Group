@@ -1,0 +1,55 @@
+This is BibTeX, Version 0.99d
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: MainPaper.aux
+Reallocating 'name_of_file' (item size: 1) to 8 items.
+The style file: apalike.bst
+Reallocating 'name_of_file' (item size: 1) to 4 items.
+Database file #1: ref.bib
+I was expecting a `,' or a `}'---line 15 of file ref.bib
+ :   
+ :   journal={The Annals of Statistics},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+Warning--empty journal in basu2015regularized
+You've used 8 entries,
+            1935 wiz_defined-function locations,
+            528 strings with 5304 characters,
+and the built_in function-call counts, 3306 in all, are:
+= -- 317
+> -- 158
+< -- 4
++ -- 54
+- -- 54
+* -- 305
+:= -- 589
+add.period$ -- 23
+call.type$ -- 8
+change.case$ -- 67
+chr.to.int$ -- 8
+cite$ -- 9
+duplicate$ -- 110
+empty$ -- 216
+format.name$ -- 68
+if$ -- 623
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 8
+newline$ -- 42
+num.names$ -- 24
+pop$ -- 53
+preamble$ -- 1
+purify$ -- 67
+quote$ -- 0
+skip$ -- 85
+stack$ -- 0
+substring$ -- 227
+swap$ -- 7
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 48
+warning$ -- 1
+while$ -- 27
+width$ -- 0
+write$ -- 102
+(There was 1 error message)

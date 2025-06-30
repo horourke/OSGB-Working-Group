@@ -1,0 +1,49 @@
+\begin{thebibliography}{}
+
+\bibitem[Basu and Michailidis, 2015]{basu2015regularized}
+Basu, S. and Michailidis, G. (2015).
+\newblock Regularized estimation in sparse high-dimensional time series models.
+
+\bibitem[Crawford et~al., 2024]{crawford2024penalized}
+Crawford, C.~M., Park, J.~J., Chow, S.-M., Ernst, A.~F., Pipiras, V., and
+  Fisher, Z.~F. (2024).
+\newblock Penalized subgrouping of heterogeneous time series.
+\newblock {\em arXiv preprint arXiv:2409.03085}.
+
+\bibitem[Fisher et~al., 2022]{fisher2022penalized}
+Fisher, Z.~F., Kim, Y., Fredrickson, B.~L., and Pipiras, V. (2022).
+\newblock Penalized estimation and forecasting of multiple subject intensive
+  longitudinal data.
+\newblock {\em psychometrika}, 87(2):403--431.
+
+\bibitem[Gates and Molenaar, 2012]{gates2012group}
+Gates, K.~M. and Molenaar, P.~C. (2012).
+\newblock Group search algorithm recovers effective connectivity maps for
+  individuals in homogeneous and heterogeneous samples.
+\newblock {\em NeuroImage}, 63(1):310--319.
+
+\bibitem[Kim et~al., 2007]{kim2007unified}
+Kim, J., Zhu, W., Chang, L., Bentler, P.~M., and Ernst, T. (2007).
+\newblock Unified structural equation modeling approach for the analysis of
+  multisubject, multivariate functional mri data.
+\newblock {\em Human brain mapping}, 28(2):85--93.
+
+\bibitem[Lane et~al., 2019]{lane2019uncovering}
+Lane, S.~T., Gates, K.~M., Pike, H.~K., Beltz, A.~M., and Wright, A.~G. (2019).
+\newblock Uncovering general, shared, and unique temporal patterns in
+  ambulatory assessment data.
+\newblock {\em Psychological methods}, 24(1):54.
+
+\bibitem[S{\"o}rbom, 1989]{sorbom1989model}
+S{\"o}rbom, D. (1989).
+\newblock Model modification.
+\newblock {\em Psychometrika}, 54(3):371--384.
+
+\bibitem[Stock and Watson, 2002]{stock2002forecasting}
+Stock, J.~H. and Watson, M.~W. (2002).
+\newblock Forecasting using principal components from a large number of
+  predictors.
+\newblock {\em Journal of the American statistical association},
+  97(460):1167--1179.
+
+\end{thebibliography}
