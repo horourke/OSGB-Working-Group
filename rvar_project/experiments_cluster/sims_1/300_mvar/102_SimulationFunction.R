@@ -77,7 +77,7 @@ FullSimulation <- function(args) {
       
       # Generate data.
       data      <- simulate_rvar_data_1(
-        Phi_list = Phi_list, X_covar =  args$sigma2 * diag(p), 
+        Phi_list = Phi_list, X_covar =  args$sigma2 * diag(args$d), 
         Y = Y, N = args$N, T = args$T)
       
       Xlist <- data$X_list
@@ -87,7 +87,7 @@ FullSimulation <- function(args) {
     {
       ## COR
       start_time                  <- Sys.time()
-      model <- multivar::constructModel(data = dat_multivar_sim$data)
+      model <- multivar::constructModel(data = Xlist)
       fit <- multivar::cv.multivar(model)
       end_time                    <- Sys.time()
 

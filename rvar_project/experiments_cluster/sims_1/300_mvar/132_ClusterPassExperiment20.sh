@@ -19,7 +19,7 @@ echo a
 
 echo aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 echo 1 Importing R and Rscript:
-module load r/4.1.3
+module load r/4.4.0
 echo aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 echo a
 echo a

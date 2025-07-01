@@ -182,7 +182,8 @@ generate_rvar_models_1 <- function(
 ##
 .verify_stab_1 <- function(Phi_list, y) {
   
-  mat_aggr <- 1:p %>% 
+  p         <- length(y) 
+  mat_aggr  <- 1:p %>% 
   
     lapply(
       function(k, mat_list, y) {

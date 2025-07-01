@@ -50,10 +50,11 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
   ##  corresponds to a reduced experiment that is useful
   ##  for debugging the code.
   if(id_task == 0) {
-    args <- expand.grid(
+    args <- list(
+    running_days  = 2,
     entry_min     = 0.1,        ## entry_min : minimum entry magnitude
     entry_max     = 0.9,        ## entry_max : maximum entry magnitude
-    signed        = TRUE        ## signed   : are entries signed or all positive?
+    signed        = TRUE,       ## signed   : are entries signed or all positive?
     
     prob_c        = 0.5,        ## prob_c   : proportion of common entries.
     prob_tot      = 0.05,       ## prob_tot : total proportion of non-zero entries.
@@ -75,6 +76,7 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
 
   ## TABLE OF ALL PARAMETER COMBINATIONS.
   sim_par_table <- expand.grid(
+    running_days  = 2,
     entry_min     = 0.1,                            ## entry_min : minimum entry magnitude
     entry_max     = 0.9,                            ## entry_max : maximum entry magnitude
     signed        = c(TRUE, FALSE),                 ## signed   : are entries signed or all positive?
