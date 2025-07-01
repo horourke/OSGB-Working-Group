@@ -1,0 +1,115 @@
+---
+output:
+  reprex::reprex_document:
+    venue: "gh"
+    advertise: FALSE
+    session_info: TRUE
+    style: TRUE
+    comment: "#;-)"
+    tidyverse_quiet: FALSE
+    std_out_err: TRUE
+knit: reprex::reprex_render
+---
+
+This template demonstrates many of the bells and whistles of the `reprex::reprex_document()` output format. The YAML sets many options to non-default values, such as using `#;-)` as the comment in front of output.
+
+## Code style
+
+Since `style` is `TRUE`, this difficult-to-read code (look at the `.Rmd` source file) will be restyled according to the Tidyverse style guide when it's rendered. Whitespace rationing is not in effect!
+
+```{r}
+if(!require(multivar)) {
+    install.packages("multivar")
+    library(multivar)
+}
+if(!require(tidyverse)) {
+    install.packages("tidyverse")
+    library(tidyverse)
+}
+```
+
+## MULTI-VAR:
+
+STEP 1: Simulated data with time-series structure.
+
+Here, we generate simulations for 9 different individuals, over 10 variables, with 100 times, which are gathered at regular intervals.
+
+The following is a plot that shows the common structure across all simulated models.
+
+```{r}
+
+plot_sim(dat_multivar_sim, plot_type = "common")
+
+```
+
+Now, the plot below provides the time-series parameters for all 9 individuals. Through the plot, we can observe the common and individual structure
+
+```{r}
+
+plot_sim(dat_multivar_sim, plot_type = "total")
+
+```
+
+
+STEP 2: Construct a Multi-VAR model.
+
+To create a multi-VAR model, we use the function `multivar::constructModel(data)`. Here, the `data` argument must be a $k$-list, where each element is a time series corresponding to each individual.
+
+Here we explore the example of the object `dat_multivar_sim$data` loaded in the `"multivar"` package.
+
+```{r}
+class(dat_multivar_sim$data)
+lapply(dat_multivar_sim$data, dim)
+
+
+model <- multivar::constructModel(data = dat_multivar_sim$data)
+class(model)
+
+```
+
+To fit, we perform cross-validation. This is done with the function `multivar::cv.multivar(model)`: 
+```{r}
+
+fit <- multivar::cv.multivar(model)
+
+```
+
+We can plot the result of the common structure with the function `plot_results(fit, plot_type = "common")`: 
+
+```{r}
+
+plot_results(fit, plot_type = "common")
+
+```
+
+We can go into further detail to visualize the individual models using the function `plot_results(fit, plot_type = "total")`:
+
+```{r}
+
+plot_results(fit, plot_type = "total")
+
+```
+
+
+
+
+
+## GIMME:
+
+```{r}
+
+install.packages("gimme")
+library(gimme)
+
+```
+
+```{r}
+
+data("simData", package = "gimme") 
+# Run gimme with all the defaults 
+outGIMME <- gimme(data = simData, )
+
+plot(outGIMME)
+
+```
+
