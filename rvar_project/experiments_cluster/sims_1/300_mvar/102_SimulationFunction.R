@@ -91,7 +91,7 @@ FullSimulation <- function(args) {
       fit <- multivar::cv.multivar(model)
       end_time                    <- Sys.time()
 
-      ## Saving things!
+      ## Saving things! bla bla bla
       #output[count, 2]      <- "COR_Scr_IPCHD"
       #output[count, 3]      <- "inf_meas"
       #output[count, 4]      <- sim_ind
