@@ -30,7 +30,9 @@ FullSimulation <- function(args) {
   #####################################################
   
   ## What methods do you want to run?
-  method_names  <- c("mvar")
+  method_names  <- c(
+    "var_standard", "var_adaptive",
+    "mvar_standard", "mvar_adaptive")
   n_methods     <- length(method_names)
 
   ## Output of simulation:
@@ -60,7 +62,7 @@ FullSimulation <- function(args) {
     ############################
     ## Generate data:
     {
-      print(paste("Generating PM/IC and data (",
+      print(paste("Generating Model and Data (",
                   round(100 * (sim_ind - 1) / args$nsim, 2),
                   "%", ")"))
       
@@ -68,7 +70,7 @@ FullSimulation <- function(args) {
       model        <- generate_rvar_models_1(
         d = args$d, p = args$p, 
         prob_tot = args$prob_tot, prob_c = args$prob_c,
-        entry_min = args$entry_min, entry_max = args$entry_min, 
+        entry_min = args$entry_min, entry_max = args$entry_max, 
         signed = args$signed,
         N = args$N, max_iter = 1000)
 
@@ -79,15 +81,20 @@ FullSimulation <- function(args) {
       data      <- simulate_rvar_data_1(
         Phi_list = Phi_list, X_covar =  args$sigma2 * diag(args$d), 
         Y = Y, N = args$N, T = args$T)
-      
-      Xlist <- data$X_list
+
+      Xlist <- lapply(data$X_list, t)
+  
     }
     ############################
-    ######## Scr + IPCHD
+    ######## Sparse VAR: STANDARD
     {
-      ## COR
+      ## 
       start_time                  <- Sys.time()
-      model <- multivar::constructModel(data = Xlist)
+      lambda2 = 10^(seq(2, -3, length.out = 30))
+      model <- multivar::constructModel(
+        data = Xlist, 
+        lambda1 = c(1e20), lambda2 = lambda2,
+        lassotype = "standard")
       fit <- multivar::cv.multivar(model)
       end_time                    <- Sys.time()
 
@@ -102,6 +109,53 @@ FullSimulation <- function(args) {
       
       count <- count + 1
     }
+    ############################
+    ######## Sparse VAR: ADAPTIVE
+    {
+      ## 
+      start_time                  <- Sys.time()
+      lambda2 = 10^(seq(2, -3, length.out = 30))
+      model <- multivar::constructModel(
+        data = Xlist, 
+        lambda1 = c(1e20), lambda2 = lambda2,
+        lassotype = "adaptive")
+      fit <- multivar::cv.multivar(model)
+      end_time                    <- Sys.time()
+
+      ## Saving things! bla bla bla
+      #output[count, 2]      <- "COR_Scr_IPCHD"
+      #output[count, 3]      <- "inf_meas"
+      #output[count, 4]      <- sim_ind
+      #output[count, 5]      <- difftime(
+      #    time1 = end_time, time2 = start_time, units = "s") %>%
+      #    as.numeric()
+      #output[count, -(1:5)] <- result_cor
+      
+      count <- count + 1
+    }
+    ############################
+    ######## Sparse VAR:
+    {
+      ## 
+      start_time                  <- Sys.time()
+      lambda2 = 10^(seq(2, -3, length.out = 30))
+      model <- multivar::constructModel(data = Xlist, lambda1 = c(1e20), lambda2 = lambda2)
+      fit <- multivar::cv.multivar(model)
+      end_time                    <- Sys.time()
+
+      ## Saving things! bla bla bla
+      #output[count, 2]      <- "COR_Scr_IPCHD"
+      #output[count, 3]      <- "inf_meas"
+      #output[count, 4]      <- sim_ind
+      #output[count, 5]      <- difftime(
+      #    time1 = end_time, time2 = start_time, units = "s") %>%
+      #    as.numeric()
+      #output[count, -(1:5)] <- result_cor
+      
+      count <- count + 1
+    }
+
+
     ############################
     ######## Time analysis:
     {
