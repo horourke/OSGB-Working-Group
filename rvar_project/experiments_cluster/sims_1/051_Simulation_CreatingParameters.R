@@ -62,7 +62,7 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
     nsim          = 2,          ## nsim     : no of simulation repetitions.
     sigma2        = 0.05,       ## sigma2   : variance o VAR error term.
     N             = 5,          ## N        : No. of individuals
-    T             = 10,         ## T        : timepoints per individual.
+    T             = 30,         ## T        : timepoints per individual.
     p             = 2,          ## p        : covariate dimension
     d             = 5)          ## d        : Time series dimension
 
