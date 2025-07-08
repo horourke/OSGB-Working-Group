@@ -31,7 +31,6 @@ FullSimulation <- function(args) {
   
   ## What methods do you want to run?
   method_names  <- c(
-    "var_standard", "var_adaptive",
     "mvar_standard", "mvar_adaptive")
   n_methods     <- length(method_names)
 
@@ -86,15 +85,13 @@ FullSimulation <- function(args) {
   
     }
     ############################
-    ######## Sparse VAR: STANDARD
+    ############################
+    ############################
+    ######## Sparse Multi-VAR: adaptive
     {
       ## 
       start_time                  <- Sys.time()
-      lambda2 = 10^(seq(2, -3, length.out = 30))
-      model <- multivar::constructModel(
-        data = Xlist, 
-        lambda1 = c(1e20), lambda2 = lambda2,
-        lassotype = "standard")
+      model <- multivar::constructModel(data = Xlist, lassotype = "adaptive")
       fit <- multivar::cv.multivar(model)
       end_time                    <- Sys.time()
 
@@ -110,36 +107,13 @@ FullSimulation <- function(args) {
       count <- count + 1
     }
     ############################
-    ######## Sparse VAR: ADAPTIVE
-    {
-      ## 
-      start_time                  <- Sys.time()
-      lambda2 = 10^(seq(2, -3, length.out = 30))
-      model <- multivar::constructModel(
-        data = Xlist, 
-        lambda1 = c(1e20), lambda2 = lambda2,
-        lassotype = "adaptive")
-      fit <- multivar::cv.multivar(model)
-      end_time                    <- Sys.time()
-
-      ## Saving things! bla bla bla
-      #output[count, 2]      <- "COR_Scr_IPCHD"
-      #output[count, 3]      <- "inf_meas"
-      #output[count, 4]      <- sim_ind
-      #output[count, 5]      <- difftime(
-      #    time1 = end_time, time2 = start_time, units = "s") %>%
-      #    as.numeric()
-      #output[count, -(1:5)] <- result_cor
-      
-      count <- count + 1
-    }
     ############################
-    ######## Sparse VAR:
+    ############################
+    ######## Sparse Multi-VAR: standard
     {
       ## 
       start_time                  <- Sys.time()
-      lambda2 = 10^(seq(2, -3, length.out = 30))
-      model <- multivar::constructModel(data = Xlist, lambda1 = c(1e20), lambda2 = lambda2)
+      model <- multivar::constructModel(data = Xlist, lassotype = "standard")
       fit <- multivar::cv.multivar(model)
       end_time                    <- Sys.time()
 
