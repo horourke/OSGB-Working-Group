@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.3.7)  30 JUN 2025 10:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.3.7)  3 JUL 2025 13:08
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1127,18 +1127,18 @@ LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1
  (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-[7]) (MainPaper.bbl [8]) [9] (MainPaper.aux)
+[7] [8]) (MainPaper.bbl [9]) [10] (MainPaper.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 32172 strings out of 474457
- 646318 string characters out of 5742755
+ 32178 strings out of 474457
+ 646374 string characters out of 5742755
  1948190 words of memory out of 5000000
- 53923 multiletter control sequences out of 15000+600000
- 655429 words of font info for 118 fonts, out of 8000000 for 9000
+ 53926 multiletter control sequences out of 15000+600000
+ 658427 words of font info for 119 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  94i,16n,96p,984b,1066s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
@@ -1169,9 +1169,9 @@ m/lmsy7.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm
 /lmsy8.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/
 lmtt12.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/symbols/msbm10.pfb>
-Output written on MainPaper.pdf (9 pages, 424521 bytes).
+Output written on MainPaper.pdf (10 pages, 430532 bytes).
 PDF statistics:
- 274 PDF objects out of 1000 (max. 8388607)
- 30 named destinations out of 1000 (max. 500000)
- 55 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 287 PDF objects out of 1000 (max. 8388607)
+ 33 named destinations out of 1000 (max. 500000)
+ 71 words of extra memory for PDF output out of 10000 (max. 10000000)
 

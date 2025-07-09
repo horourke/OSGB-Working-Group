@@ -138,6 +138,20 @@ Finally, we set the estimated parameter $\bhat\bPsi(\lambda_1,\lambda_2) := \lef
 
 The current implementation only allows for a single lagged relationship, \textit{i.e.} $q = 1$. We aim to create a more general implementation with lag $q> 1$ in the future.
 
+
+\subsection{Tuning Parameter Selection}
+
+One of the main concerns when fitting a penalized model is to determine the best procedure for selecting tuning parameters. In particular, due to the dependence present in time series data, direct sample splitting is not feasible, leading to sophisticated procedures of data splitting to obtain a reasonable cross-validation procedure. For example \jose{add references, and what they do.}
+
+In our particular modeling, due to the independence across individuals, it is possible for us to perform cross validation as follows. Given a number of subjects $N$ and s number of folds $K< N$, we divide the set of individuals $\{1,2,\ldots, N\} $into $K$ groups $\cG_1,\ldots, \cG_K$. Then, for each $k\in[K]$, the $k$-th fold consist of the union of all the data corresponding to the individuals in $\cG_k$. 
+
+While simple, this approach for cross-validation cannot be used in usual VAR models, or even the Multi-VAR and GIMME methods. The main reason is that our model assumes a structural relationship between the exogenous covariates and the individual time-series model. Therefore, the training on a set of individuals $\cG\subset [N]$ can be used to infer the time-series coefficients for a new individual $i\in [N] \setminus \cG$. In contrast, methods like GIMME, Multi-VAR and their extensions must train individual coefficients for each model separately. Therefore, fitting the time-series models for a subset of individuals $\cG\subset [N]$ cannot be exploited to determine the coefficients of a new individual $i\in [N] \setminus \cG$, or at least not directly.
+
+On our case, since we assume that there is an underlying additive structure that connects all the individual time-series models, it is possible to train both the invidiual and common structure simultaneously. Furthermore, since our model determines how exogenous covariates relate to the coefficients in the model, fitting our model on a set of $N'$ individuals in fact 
+
+
+
+
 \section{Fitting RUSEM}
 
 
@@ -148,4 +162,7 @@ I explored the original GIMME reference \citet{gates2012group}, which points tow
 
 
 
+\section{Simulation Study for R-VAR}
+
+To explore the performance of our proposed RVAR model, and to compare to other methods found in the literature, we perform a numerical simulation study. 
 
