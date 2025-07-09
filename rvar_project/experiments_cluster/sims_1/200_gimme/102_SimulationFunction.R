@@ -22,7 +22,7 @@
 ##
 FullSimulation <- function(args) {
 
-  main_folder <- "300_mvar/"
+  main_folder <- "200_gimme/"
 
 
   #####################################################
@@ -31,7 +31,7 @@ FullSimulation <- function(args) {
   
   ## What methods do you want to run?
   method_names  <- c(
-    "mvar_standard", "mvar_adaptive")
+    "gimme_standard", "gimme_adaptive")
   n_methods     <- length(method_names)
 
   ## Output of simulation:
@@ -87,12 +87,26 @@ FullSimulation <- function(args) {
     ############################
     ############################
     ############################
-    ######## Sparse Multi-VAR: adaptive
+    ######## GIMME:
     {
       ## 
       start_time                  <- Sys.time()
-      model <- multivar::constructModel(data = Xlist, lassotype = "adaptive")
-      fit <- multivar::cv.multivar(model)
+      
+      ## Setting AC paths to zero:
+      #mat1 <- matrix(rep(paste0("V",1:args$d, " ~ "), args$d), 
+      #               ncol = args$d, byrow = FALSE)
+      #mat2 <- matrix(rep(paste0("0*V",1:args$d), args$d), 
+      #               ncol = args$d, byrow = TRUE)
+      #paths_list <- paste0(mat1, mat2)
+      
+      paths_sep <- lapply(1:d, function(i) {
+        covs <- paste0("0*V", (1:d)[-i], collapse = " + ")
+        val <- paste0("V", i, " ~ ", covs)
+        })
+      paths_full <- paste0(paths_sep, collapse = " \n")
+      model <- gimme(
+        data = Xlist, paths = paths_full,
+        subgroup = FALSE)
       end_time                    <- Sys.time()
 
       ## Saving things! bla bla bla
@@ -109,12 +123,26 @@ FullSimulation <- function(args) {
     ############################
     ############################
     ############################
-    ######## Sparse Multi-VAR: standard
+    ######## SG-GIMME:
     {
       ## 
       start_time                  <- Sys.time()
-      model <- multivar::constructModel(data = Xlist, lassotype = "standard")
-      fit <- multivar::cv.multivar(model)
+      
+      ## Setting AC paths to zero:
+      #mat1 <- matrix(rep(paste0("V",1:args$d, " ~ "), args$d), 
+      #               ncol = args$d, byrow = FALSE)
+      #mat2 <- matrix(rep(paste0("0*V",1:args$d), args$d), 
+      #               ncol = args$d, byrow = TRUE)
+      #paths_list <- paste0(mat1, mat2)
+      
+      paths_sep <- lapply(1:d, function(i) {
+        covs <- paste0("0*V", (1:d)[-i], collapse = " + ")
+        val <- paste0("V", i, " ~ ", covs)
+        })
+      paths_full <- paste0(paths_sep, collapse = " \n")
+      model <- gimme(
+        data = Xlist, paths = paths_full,
+        subgroup = TRUE, sub_method = "Walktrap")
       end_time                    <- Sys.time()
 
       ## Saving things! bla bla bla
@@ -128,7 +156,6 @@ FullSimulation <- function(args) {
       
       count <- count + 1
     }
-
 
     ############################
     ######## Time analysis:

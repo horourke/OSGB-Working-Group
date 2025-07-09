@@ -22,7 +22,7 @@
 ##
 FullSimulation <- function(args) {
 
-  main_folder <- "300_mvar/"
+  main_folder <- "400_rvar/"
 
 
   #####################################################
@@ -31,7 +31,7 @@ FullSimulation <- function(args) {
   
   ## What methods do you want to run?
   method_names  <- c(
-    "mvar_standard", "mvar_adaptive")
+    "rvar_standard", "rvar_adaptive")
   n_methods     <- length(method_names)
 
   ## Output of simulation:
@@ -91,30 +91,14 @@ FullSimulation <- function(args) {
     {
       ## 
       start_time                  <- Sys.time()
-      model <- multivar::constructModel(data = Xlist, lassotype = "adaptive")
-      fit <- multivar::cv.multivar(model)
-      end_time                    <- Sys.time()
-
-      ## Saving things! bla bla bla
-      #output[count, 2]      <- "COR_Scr_IPCHD"
-      #output[count, 3]      <- "inf_meas"
-      #output[count, 4]      <- sim_ind
-      #output[count, 5]      <- difftime(
-      #    time1 = end_time, time2 = start_time, units = "s") %>%
-      #    as.numeric()
-      #output[count, -(1:5)] <- result_cor
-      
-      count <- count + 1
-    }
-    ############################
-    ############################
-    ############################
-    ######## Sparse Multi-VAR: standard
-    {
-      ## 
-      start_time                  <- Sys.time()
-      model <- multivar::constructModel(data = Xlist, lassotype = "standard")
-      fit <- multivar::cv.multivar(model)
+      lambda.seq      <- 10^(seq(1, -5, length.out = 20))
+      penalty.factor  <- 10^(seq(3, -3, length.out = 20))
+      model <- cv.solve_rvar_glmnet(
+        d = args$d, p = args$p, 
+        X_list = data$X_list, Y = Y, 
+        lambda.seq = lambda.seq, 
+        penalty.factor = penalty.factor, 
+        nfolds = 5, verbose = FALSE)
       end_time                    <- Sys.time()
 
       ## Saving things! bla bla bla
