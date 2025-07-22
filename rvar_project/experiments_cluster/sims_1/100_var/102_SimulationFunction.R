@@ -68,7 +68,7 @@ FullSimulation <- function(args) {
       # Generate PM.
       model        <- generate_rvar_models_1(
         d = args$d, p = args$p, 
-        prob_tot = args$prob_tot, prob_c = args$prob_c,
+        prob_tot = args$prob_tot, prob_c = args$prob_c, prob_y = args$prob_y,
         entry_min = args$entry_min, entry_max = args$entry_max, 
         signed = args$signed,
         N = args$N, max_iter = 1000)

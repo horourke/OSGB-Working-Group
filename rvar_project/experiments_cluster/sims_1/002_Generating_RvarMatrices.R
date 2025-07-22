@@ -56,7 +56,7 @@ generate_rvar_matrices_1 <- function(
 
   mat_list <- lapply(
     c(-1, 1:p),
-    function(ind, ind_mat, signs) {
+    function(ind, ind_mat, signs, entry_min, entry_max) {
       nmat <- matrix(
         runif(d*d, min = entry_min, max = entry_max) * 
           sample(signs, d*d, replace = TRUE),
@@ -67,7 +67,8 @@ generate_rvar_matrices_1 <- function(
       return(nmat)
       
     },
-    ind_mat, signs)
+    ind_mat, signs, 
+    entry_min, entry_max)
 
   output <- list(
     Phi_c = mat_list[[1]],
@@ -76,18 +77,19 @@ generate_rvar_matrices_1 <- function(
   return(output)
 }
 
-example = FALSE
+example <- FALSE
 if (example) {
 
   library(plot.matrix)
 
-  d = 5
-  p = 2
-  prob_tot = 0.5
-  prob_c   = 0.5
+  d <- 5
+  p <- 2
+  prob_tot <- 0.5
+  prob_c   <- 0.5
+  prob_y   <- 0.75
 
-  entry_min = 0.1
-  entry_max = 0.9
+  entry_min <- 0.1
+  entry_max <- 0.9
 
   mats <- generate_rvar_matrices_1(d,p,prob_tot,prob_c,entry_min,entry_max)
 
@@ -129,16 +131,27 @@ rm(example)
 ##    Y         : matrix of covariates for each individual.
 ##
 generate_rvar_models_1 <- function(
-  d, p, prob_tot, prob_c,
+  d, p, prob_tot, prob_c, prob_y,
   entry_min, entry_max,  signed = FALSE,
   N, max_iter) {
 
   count <- 0 
   is.unstable <- TRUE
+
+  signs <- NULL
+  if (signed) {
+    signs <- c(0, -1, 1)
+    probs_y  <- c(1 - probs_y, probs_y / 2, probs_y / 2)
+  } else {
+    signs <- c(0, 1)
+    probs_y  <- c(1 - probs_y, probs_y)
+  }
+
   while(count < max_iter & is.unstable) {
     
     Phi_list  <- generate_rvar_matrices_1(d, p, prob_tot, prob_c, entry_min, entry_max, signed) 
-    Y         <- rmvnorm(N, mean = rep(0,p)) / 2
+    Y         <- matrix(sample(signs, p * N, prob = probs_y, TRUE) * runif(p * N, 0.5, 1),
+                        ncol = p, nrow = N)
 
     unstable_count <- sum(verify_stab_1(Phi_list, Y))
 
@@ -257,6 +270,7 @@ if (example) {
 
   prob_tot <- 0.2
   prob_c   <- 0.5
+  prob_y   <- 0.75
 
   entry_min <- 0.1
   entry_max <- 0.5
@@ -288,7 +302,7 @@ if (example) {
   max_iter <- 1000
 
   model <- generate_rvar_models_1(
-    d, p, prob_tot, prob_c,
+    d, p, prob_tot, prob_c, prob_y,
     entry_min, entry_max, signed = FALSE,
     N, max_iter)
 
@@ -310,7 +324,7 @@ if (example) {
   max_iter <- 1000
 
   model <- generate_rvar_models_1(
-    d, p, prob_tot, prob_c,
+    d, p, prob_tot, prob_c, prob_y
     entry_min, entry_max, signed = TRUE,
     N, max_iter)
 
