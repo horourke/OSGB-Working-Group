@@ -220,7 +220,7 @@ if (example) {
   u_min     <- 0.2
   u_max     <- 1
   signed    <- TRUE
-  nz_prob   <- 0.9
+  nz_x_prob   <- 0.9
 
   output <- generate_rvar_pars(d, p, 
                                prob_phi0, prob_phip, 
@@ -238,7 +238,7 @@ if (example) {
   N <- 100
   X         <- simulate_exogenous_vars(p = p, N = N, type = "unif",
                                        u_min = u_min, u_max = u_max,
-                                       signed = signed, nz_prob = nz_prob)
+                                       signed = signed, nz_x_prob = nz_x_prob)
   sims_data <- simulate_rvar1(output, X = X, N = N, Ti = rep(100, N))
   
   
@@ -264,8 +264,9 @@ if (example) {
   plot(sims_data$X[,1], sims_data$X[,2], 
        xlab = "X1", ylab = "X2", main = "Exogenous Covariates X",
        xlim = xrange, ylim = xrange, col = rep(c("red","black"), c(5, N-5)))
-  text(x = sims_data$X[,1], y = 0.3 + sims_data$X[,2],  # Fine-tune the position
-       label = c(1:5, rep("", N-5)), col = rep(c("red","black"), c(5, N-5))) 
+  text(x = sims_data$X[,1], y = sims_data$X[,2],  # Fine-tune the position
+       label = c(1:5, rep("", N-5)), col = rep(c("red","black"), c(5, N-5)),
+       pos = 3) 
   
   plot(sims_data$B_list[[1]], main = "Sample 1", breaks = col_lims)
   plot(sims_data$B_list[[2]], main = "Sample 2", breaks = col_lims)
@@ -302,7 +303,7 @@ if (example) {
     
     pivot_longer(cols = t1:t100,
                  names_to = "time",
-                 names_prefix = "t", 
+                 names_prefix = "t",
                  values_to = "value") %>%
     
     mutate(time = as.numeric(time),
@@ -325,7 +326,7 @@ if (example) {
   penalty.factor  <- 10^(seq(3, -3, length.out = 20))
   verbose <- TRUE
   cv_model <- bic.solve_rvar_glmnet_vectorized(
-    d = d, p = p, sims_data$Y_list, sims_data$X, sims_data$p, 
+    d = d, p = p, sims_data$Y_list, sims_data$X, sims_data$p,
     lambda.seq = lambda.seq, nfolds = 10,
     penalty.factor = penalty.factor, verbose = verbose)
   
@@ -358,23 +359,7 @@ if (example) {
         {log(abs(.) + 1e-10, base = 10)} %>%
         as.matrix() %>%
         hist(breaks = 100)
-  
-  
-  B_data %>% select(lambda1, lambda2) %>%
-    as.matrix() %>%
-    {.[1:100,]} %>%
-    log() %>%
-    plot(border = NA, breaks = 30)
-  
-  
-  par(mfrow = c(1,1))  
-  B_data %>% 
-    filter(lambda1 == lambda.seq[6]) %>%
-    select(-lambda1, -lambda2, -var) %>%
-    
-    as.matrix() %>%
-    
-    plot(border = NA, breaks = 11)
+
   
 }
 

@@ -122,26 +122,26 @@ if (example) {
 ##    u_max   : used if type = "unif".  
 ##    u_sd    : used if type = "gaussian". 
 ##    signed  : whether we want only positive effects or signed effects.
-##    nz_prob : probability of non-zero entries.
+##    nz_x_prob : probability of non-zero entries.
 ##
 ##  OUTPUT:
 ##    X       : N x p matrix of numeric exogenous time invariant covariates.
 ##
 simulate_exogenous_vars <- function(p, N, type,
                                     u_min = 0.5, u_max = 1, g_sd = 0.25,
-                                    signed = FALSE, nz_prob) {
+                                    signed = FALSE, nz_x_prob) {
   
   ## Generate the signed 
   signs <- NULL
-  nz_probs <- NULL
+  nz_x_probs <- NULL
   if (signed) {
     signs <- c(0, -1, 1)
-    nz_probs  <- c(1 - nz_prob, nz_prob / 2, nz_prob / 2)
+    nz_x_probs  <- c(1 - nz_x_prob, nz_x_prob / 2, nz_x_prob / 2)
   } else {
     signs <- c(0, 1)
-    nz_probs  <- c(1 - nz_prob, nz_prob)
+    nz_x_probs  <- c(1 - nz_x_prob, nz_x_prob)
   }
-  mat_signs <- sample(signs, p * N, prob = nz_probs, TRUE)
+  mat_signs <- sample(signs, p * N, prob = nz_x_probs, TRUE)
   
 
   ## Generate entry magnitudes:
@@ -263,7 +263,7 @@ if (example) {
   u_min     <- 0.5
   u_max     <- 1
   signed    <- TRUE
-  nz_prob   <- 0.7
+  nz_x_prob   <- 0.7
 
   output <- generate_rvar_pars(d, p, 
                                prob_phi0, prob_phip, 
@@ -281,7 +281,7 @@ if (example) {
   N <- 50
   X         <- simulate_exogenous_vars(p = p, N = N, type = "unif",
                                        u_min = u_min, u_max = u_max,
-                                       signed = signed, nz_prob = nz_prob)
+                                       signed = signed, nz_x_prob = nz_x_prob)
   sims_data <- simulate_rvar1(output, X = X, N = N, Ti = rep(100, N))
   
   
