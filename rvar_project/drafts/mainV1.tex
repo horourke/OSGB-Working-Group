@@ -139,6 +139,9 @@ Finally, we set the estimated parameter $\bhat\bPsi(\lambda_1,\lambda_2) := \lef
 The current implementation only allows for a single lagged relationship, \textit{i.e.} $q = 1$. We aim to create a more general implementation with lag $q> 1$ in the future.
 
 
+Unfortunately, we are not really able to use the \texttt{glmnet} package for implementing our solution to the R-VAR problem. This is in part because the multi-task regression option provided by the \texttt{glmnet} package defaults to applying a row-wise group LASSO penalty, instead of the desired entry-wise penalty. I explored the possibility of using a different package for fitting the multi-task learning problem, such as the  \texttt{RMTL} package. Despite my efforts, I realized that the package would not help since it does not allow for weighted problems. This leaves me in the realization that we need to optimize the problem with our own functions. I think this is doable, but will require effort.
+
+
 \subsection{Tuning Parameter Selection}
 
 One of the main concerns when fitting a penalized model is to determine the best procedure for selecting tuning parameters. In particular, due to the dependence present in time series data, direct sample splitting is not feasible, leading to sophisticated procedures of data splitting to obtain a reasonable cross-validation procedure. For example \jose{add references, and what they do.}
