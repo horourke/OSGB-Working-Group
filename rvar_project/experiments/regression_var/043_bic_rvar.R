@@ -1,172 +1,9 @@
-######################################################################
-######################################################################
-## rearrange rVAR: 
-##
-## Function to rearrange data to the regression format:
-rearrange_rvar_data <- function(X_list, Y, p) {
-  
-  d <- nrow(X_list[[1]])
-  p <- ncol(Y)
-  N <- length(X_list)
-  
-  ## We generate the covariates
-  covariate_mat <- lapply(
-    1:N, 
-    function(k, X_list, Y) {
-      p   <- ncol(Y)
-      yk  <- Y[k,]
-      xk  <- t(X_list[[k]])
-      
-      xk_y <- lapply(
-        1:(p+1),
-        function(i, x, y) {
-          xy <- y[i] * x 
-          name <- c(0, 1:length(y))
-          colnames(xy) <- paste0("var",1:ncol(xy), "_",name[i])
-          return(xy)
-        }, 
-        x = xk, y = c(1,yk)) %>%
-        {Reduce(cbind, .)}
-      
-      xk_y <- xk_y %>%
-        as_tibble() %>%
-        {mutate(., 
-                subject = k,
-                time = 1:nrow(.),
-                .before = 1)} %>%
-        filter(time != max(time))
-      
-      #par(mfrow = c(1,1))
-      #xk_y %>% select(-subject, -time) %>% cor() %>% abs() %>% plot()
-      #plot(abs(cor(xk_y)))
-      
-      return(xk_y)
-    },
-    X_list, Y) %>%
-    {Reduce(rbind, .)}
-  
-  
-  response_mat <- lapply(
-    1:N, 
-    function(k, X_list) {
-      xk <- t(X_list[[k]])
-      
-      colnames(xk) <- paste0("var", 1:ncol(xk))
-      
-      x_clean <- xk %>%
-        as_tibble() %>%
-        {mutate(., 
-                subject = k,
-                time = 1:nrow(.),
-                .before = 1)} %>%
-        filter(time != min(time))
-      
-      return(x_clean)
-    }, X_list) %>%
-    {Reduce(rbind, .)}
-  
-  output <- list(response = response_mat, covariates = covariate_mat)
-  
-  return(output)
-}
-
-
-######################################################################
-######################################################################
-## Solve rvar:
-##
-## Function to calculate the solutions with LM (no regularization)
-solve_rvar_lm <- function(X_list, Y, p) {
-  rdata <- rearrange_rvar_data(X_list, Y, p)
-  d <- nrow(X_list[[1]])
-  
-  B <- NULL
-  for(var in 1:d) {
-    lm <- lm(unlist(rdata$response[,2 + var]) ~ as.matrix(rdata$covariates[, -c(1,2)]))  
-    B <- rbind(B, lm$coefficients)
-  }
-  
-  return(B)
-  
-}
-
-
-
-## Function to calculate the solutions with GLMNET (regularization)
-solve_rvar_glmnet <- function(d, p, X_list, Y, 
-                              lambda.seq, penalty.factor , ...) {
-  rdata <- rearrange_rvar_data(X_list, Y, p)
-  rdata$response
-  n_pf <- length(penalty.factor)
-  
-  B_tibble <- tibble()
-  for (pf_val in penalty.factor) {
-    alpha <- (p + 1) / (p * pf_val + 1)
-    beta <- (p * pf_val + pf_val) / (p * pf_val + 1)
-    
-    glmnet_sparse <- glmnet(
-      x = as.matrix(rdata$covariates[, -c(1,2)]),
-      y = rdata$response[,-c(1:2)], family = "mgaussian",
-      lambda  = lambda.seq,
-      penalty.factor = rep(c(alpha, beta), c(d, d * p)), intercept = FALSE)#,...)
-    
-    B_tibble <- process_coeffs(d, p, B_tibble, glmnet_sparse, pf_val = pf_val)
-    
-  }
-  B_tibble <- B_tibble %>% arrange(lambda1, lambda2, var)
-  return(B_tibble)
-  
-}
-
-
-process_coeffs <- function(d, p, B_tibble, glmnet_sparse, pf_val) {
-  
-  nlambda <- length(glmnet_sparse$lambda)
-  
-  B_update <- B_tibble
-  
-  for(lambda_ind in 1:nlambda) {
-    
-    ## Calculating penalty values:
-    alpha <- (p + 1) / (p * pf_val + 1)
-    beta <- (p * pf_val + pf_val) / (p * pf_val + 1)
-    lambda1 <- glmnet_sparse$lambda[lambda_ind]
-    lambda2 <- lambda1 * pf_val
-    
-    ## Merging B
-    B_update <- sapply(glmnet_sparse$beta, 
-                       function(x, ind) {return(x[, ind])}, ind = lambda_ind) %>%
-      t() %>%
-      as_tibble() %>%
-      
-      mutate(lambda1 = lambda1,
-             lambda2 = lambda2,
-             var     = 1:d,
-             .before = 1) %>%
-      
-      rbind(B_update)
-  }
-  
-  return(B_update)
-}
-
-
-
-
-
-
-
-
-
-
-
-
 
 #################################################
 #################################################
 #################################################
 #################################################
-## cv.solve_rvar_glmnet: 
+## biccv.solve_rvar_glmnet: 
 ##    For data Xlist and Y, perform cross-validation
 ##    and model selection for the R-VAR model. 
 ##
@@ -180,6 +17,8 @@ process_coeffs <- function(d, p, B_tibble, glmnet_sparse, pf_val) {
 ##                      lambda1/lambda2 for the model.
 ##    nfolds         : number of folds in our CV procedure. Must be 
 ##                      less than the number of subjects in the study.
+##    type.measure   : if "bic", selects models with BIC criterion. 
+##                      If "aic" selects model with AIC criteron.
 ##    
 ##  OUTPUT
 ##    lambda          : Sequence of lambda used.
@@ -195,9 +34,11 @@ process_coeffs <- function(d, p, B_tibble, glmnet_sparse, pf_val) {
 ##    rvar_opt_coeffs : matrix of optimal RVAR coefficients for PF and lambda.
 ##    rvar_glmnet_fit : unprocessed glmnet output for the rvar fit.
 ##
-cv.solve_rvar_glmnet <- function(d, p, X_list, Y, 
-                                 lambda.seq, penalty.factor , 
-                                 nfolds = 5, verbose = FALSE, ...) { ## nfolds < N-individuals.
+biccv.solve_rvar_glmnet <- function(
+    d, p, X_list, Y, 
+    lambda.seq, penalty.factor , 
+    type.measure = "bic",
+    nfolds = 5, verbose = FALSE, ...) { ## nfolds < N-individuals.
   
   ###################
   ## Initializing:
@@ -207,40 +48,39 @@ cv.solve_rvar_glmnet <- function(d, p, X_list, Y,
   
   ###################
   ## CV-fold selection/setup:
-  subject_folds <- sample(1:nfolds, size = N, replace = TRUE, )
-  foldid <- subject_folds[rdata$covariates$subject]
+  bic_fit_error <- matrix(NA, 
+                          ncol = length(penalty.factor),
+                          nrow = length(lambda.seq))
   
-  cv_fit_error_m <- matrix(NA, 
-                           nrow = length(penalty.factor), 
-                           ncol = length(lambda.seq))
-  cv_fit_error_sd <- matrix(NA, 
-                            nrow = length(penalty.factor), 
-                            ncol = length(lambda.seq))
-  
-  ###################
-  ## CV runs:
   for (pf_val_ind in seq_along(penalty.factor)) {
+    
     pf_val <- penalty.factor[pf_val_ind]
     alpha <- (p + 1) / (p * pf_val + 1)
     beta <- (p * pf_val + pf_val) / (p * pf_val + 1)
     
-    glmnet_sparse <- cv.glmnet(
-      x = as.matrix(rdata$covariates[, -c(1,2)]),
-      y = as.matrix(rdata$response[,-c(1:2)]), family = "mgaussian",
+    
+    x_train <- as.matrix(rdata$covariates[-c(1,2)])
+    y_train <- as.matrix(rdata$response[-c(1:2)])
+    
+    glmnet_sparse <- glmnet(
+      x = x_train,
+      y = y_train, family = "mgaussian",
       lambda  = lambda.seq,
-      foldid = foldid,
-      
-      penalty.factor = rep(c(alpha, beta), c(d, d * p)), intercept = FALSE)#,...)
+      penalty.factor = rep(c(alpha, beta), c(d, d * p)), 
+      intercept = FALSE)
     
-    cv_fit_error_m[pf_val_ind, ]  <- glmnet_sparse$cvm
-    cv_fit_error_sd[pf_val_ind, ] <- glmnet_sparse$cvsd
-    
+    n_obs <- glmnet_sparse$nobs
+    dfs   <- glmnet_sparse$df
+    dev   <- glmnet_sparse$nulldev * glmnet_sparse$dev.ratio
+
+    bic_fit_error[pf_val_ind, ] <- dfs * log(n_obs) - dev
+           
     if(verbose) print(pf_val_ind)
 
   }
   
   if(verbose) {
-    plot(log(cv_fit_error_m  - min(cv_fit_error_m) + 1e-4) , 
+    plot(log(bic_fit_error  - min(bic_fit_error) + 1e-4) , 
          breaks = 100, 
          border = NA,
          main = "Cross-Validation log-mean Error",
@@ -250,7 +90,7 @@ cv.solve_rvar_glmnet <- function(d, p, X_list, Y,
   
   ###################
   ## Optimal parameters:
-  min_ind_arr <- which(cv_fit_error_m == min(cv_fit_error_m), arr.ind = TRUE)
+  min_ind_arr <- which(bic_fit_error == min(bic_fit_error), arr.ind = TRUE)
   
   lambda_min_ind <- min_ind_arr[1,2]
   lambda_opt_val <- lambda.seq[lambda_min_ind]
@@ -265,14 +105,14 @@ cv.solve_rvar_glmnet <- function(d, p, X_list, Y,
   beta_opt  <- (p * pf_opt_val + pf_opt_val) / (p * pf_opt_val + 1)
   
   glmnet_sparse <- glmnet(
-    x = as.matrix(rdata$covariates[, -c(1,2)]),
-    y = rdata$response[,-c(1:2)], family = "mgaussian",
+    x = x_train,
+    y = y_train, family = "mgaussian",
     lambda  = lambda.seq,
     penalty.factor = rep(c(alpha_opt, beta_opt), c(d, d * p)), intercept = FALSE)
   
   glmnet_sparse_opt <- glmnet(
-    x = as.matrix(rdata$covariates[, -c(1,2)]),
-    y = rdata$response[,-c(1:2)], family = "mgaussian",
+    x = x_train,
+    y = y_train, family = "mgaussian",
     lambda  = lambda_opt_val,
     penalty.factor = rep(c(alpha_opt, beta_opt), c(d, d * p)), intercept = FALSE)
   
@@ -291,8 +131,7 @@ cv.solve_rvar_glmnet <- function(d, p, X_list, Y,
   output <- list(
     lambda          = lambda.seq,        ## lambda          : Sequence of lambda used.
     penalty_factor  = penalty.factor,    ## penalty_factor  : Sequence of penalty factors used.
-    cv_error_m      = cv_fit_error_m,    ## cv_error_m      : cross-validation mean error.
-    cv_error_sd     = cv_fit_error_sd,   ## cv_error_sd     : cross-validation SD of error.
+    bic_error       = bic_fit_error,     ## cv_error_m      : cross-validation mean error.
     lambda_opt_val  = lambda_opt_val,    ## lambda_opt_val  : optimal lambda according to cross-validation error.
     pf_opt_val      = pf_opt_val,        ## pf_opt_val      : optimal Pen. Fact., according to cross-validation error.
     rvar_coeffs     = B_tibble,          ## rvar_coeffs     : matrix of RVAR coefficients corresponding to optimal Penalty Factors.
@@ -305,13 +144,28 @@ cv.solve_rvar_glmnet <- function(d, p, X_list, Y,
   
 
 
+
+#################################################
+#################################################
+#################################################
+#################################################
+### EXAMPLES:
+
+example <- FALSE
 if (example) {
   
   #########################
   ## Generate parameters:
   #########################
   
+  source("003_Generating_RvarData.R")
+  source("041_rvar_supps.R")
+  source("042_cv_rvar.R")
+  source("043_bic_rvar.R")
+  
+  
   set.seed(20)
+  #set.seed(40)
   d         <- 5
   p         <- 2
   prob_phi0 <- 0.35
@@ -438,8 +292,12 @@ if (example) {
   #########################
   lambda.seq      <- 10^(seq(1, -5, length.out = 20))
   penalty.factor  <- 10^(seq(3, -3, length.out = 20))
+  X_list <- sims_data$X_list
+  Y      <- sims_data$Y
   verbose <- TRUE
-  cv_model <- cv.solve_rvar_glmnet(d = d, p = p, sims_data$X_list, sims_data$Y, sims_data$p, 
+  
+  cv_model <- biccv.solve_rvar_glmnet(d = d, p = p, 
+                                   X_list = X_list, Y = Y, 
                                    lambda.seq = lambda.seq, nfolds = 10,
                                    penalty.factor = penalty.factor, verbose = verbose)
   
@@ -451,39 +309,30 @@ if (example) {
              5,5,5), 
            byrow = T, ncol = 3))
   
-  plot(sims_data$B_dcmp$phi0, main = "Joint Effect", breaks = col_lims)
-  plot(sims_data$B_dcmp$phip_list[[1]], main = "Individual Effect Y1", breaks = col_lims)
-  plot(sims_data$B_dcmp$phip_list[[2]], main = "Individual Effect Y2", breaks = col_lims)
+  sims_data$B_dcmp$phi0 %>% 
+    #abs() %>%
+    plot(main = "Joint Effect", breaks = 30)
+  sims_data$B_dcmp$phip_list[[1]]%>% 
+    #abs() %>%
+    plot(main = "Individual Effect Y1", breaks = 30)
+  sims_data$B_dcmp$phip_list[[2]] %>% 
+    #abs() %>%
+    plot(main = "Individual Effect Y2", breaks = 30)
   
   cv_model$rvar_opt_coeffs %>% 
     select(-lambda1, -lambda2, -var) %>%
     as.matrix() %>%
-    plot(breaks = 100, border = NA)
+    #abs() %>%
+    plot(breaks = 30, border = NA)
+  
   cv_model$rvar_opt_coeffs %>% 
     select(-lambda1, -lambda2, -var) %>%
     as.matrix() %>%
-    {abs(.) > 1e-2} %>%
+    {abs(.) > 5e-5} %>%
     plot(border = NA)
   
   
-  
-  B_data %>% select(lambda1, lambda2) %>%
-    as.matrix() %>%
-    {.[1:100,]} %>%
-    log() %>%
-    plot(border = NA, breaks = 30)
-  
-  
-  par(mfrow = c(1,1))  
-  B_data %>% 
-    filter(lambda1 == lambda.seq[6]) %>%
-    select(-lambda1, -lambda2, -var) %>%
-    
-    as.matrix() %>%
-    
-    plot(border = NA, breaks = 11)
-  
-  
-  
-  
 }
+
+
+rm(example)
