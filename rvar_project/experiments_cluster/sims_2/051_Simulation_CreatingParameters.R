@@ -54,11 +54,15 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
     running_days  = 2,
     entry_min     = 0.1,        ## entry_min : minimum entry magnitude
     entry_max     = 0.9,        ## entry_max : maximum entry magnitude
-    nz_x_prob     = 0.75,       ## nz_x_prob : proportion of entries of Y observations non-zero.
+    
+    g_sd          = 0.3,        ## g_sd  : 
+    u_min         = 0.2,        ## u_min : minimum entry of exogenous X for type = "unif".
+    u_max         = 1,          ## u_max : maximum entry of exogenous X for type = "unif".
+    type          = "unif",     ## type  : distribution of exogenous variables.
+    nz_x_prob     = 0.75,       ## nz_x_prob : proportion of entries in exogenous
+                                ##              data matrix X with non-zero values.
+    signed        = TRUE,       ## signed    : are entries signed or all positive?
 
-    g_sd          = 0.3,
-    u_min         = 0.2,
-    u_max         = 1,
 
     signed        = TRUE,       ## signed   : are entries signed or all positive?
     prob_c        = 0.5,        ## prob_c   : proportion of common entries.
