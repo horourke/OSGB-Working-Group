@@ -40,6 +40,9 @@ runtype              <- as.numeric(input[2])
 
 args <- CreateParameters(id_task, runtype)
 print("#----------------------Verifying Inputs")
+print(paste("id_original:", id_original))
+print(paste("id_task:", id_task))
+print(paste("id_mircorun:", id_mircorun))
 print(args)
 
 #################################################

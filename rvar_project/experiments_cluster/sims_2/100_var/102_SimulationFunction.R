@@ -86,13 +86,9 @@ FullSimulation <- function(args) {
         rvar_pars1 = rvar_model_pars, 
         X = X, 
         N = args$N, 
-        Ti = rep(args$T, N))
-        
-      
-  
-    
+        Ti = rep(args$T, args$N))
 
-      Y_list <- lapply(data$Y_list, t)
+      Y_list <- data$Y_list
   
     }
     ############################
