@@ -39,14 +39,14 @@ FullSimulation <- function(args) {
   output <- data.frame(
     ID      = 1:(args$nsim * n_methods),
     method  = character(args$nsim * n_methods),
-    measure = rep("inf_meas", args$nsim * n_methods),
     sim     = numeric(args$nsim * n_methods),
-    time    = numeric(args$nsim * n_methods))
-  
-  for (var in 1:args$p) {
-    output[[var + 5]] <- numeric(args$nsim * n_methods)
-    colnames(output)[var + 5] <- paste0("var", var)
-  }
+    time    = numeric(args$nsim * n_methods),
+    l0_est  = numeric(args$nsim * n_methods),
+    l0_true = numeric(args$nsim * n_methods),
+    TPR     = numeric(args$nsim * n_methods),
+    FPR     = numeric(args$nsim * n_methods),
+    l1      = numeric(args$nsim * n_methods),
+    Fr      = numeric(args$nsim * n_methods))
   attach(output)
 
   #################################################
@@ -111,13 +111,12 @@ FullSimulation <- function(args) {
       end_time                    <- Sys.time()
 
       ## Saving things! bla bla bla
-      #output[count, 2]      <- "COR_Scr_IPCHD"
-      #output[count, 3]      <- "inf_meas"
-      #output[count, 4]      <- sim_ind
-      #output[count, 5]      <- difftime(
-      #    time1 = end_time, time2 = start_time, units = "s") %>%
-      #    as.numeric()
-      #output[count, -(1:5)] <- result_cor
+      output[count, 2]      <- "rvar_bic"
+      output[count, 3]      <- sim_ind
+      output[count, 4]      <- difftime(
+          time1 = end_time, time2 = start_time, units = "s") %>%
+          as.numeric()
+      output[count, -(1:4)] <- eval_msr(data$B_list, model$var_ind_coeffs)
       
       count <- count + 1
     }
@@ -126,29 +125,43 @@ FullSimulation <- function(args) {
     ############################
     ######## Sparse Multi-VAR: adaptive
     {
-      ## 
-      #print(paste0("Step ", sim_ind,": cv.solve_rvar"))
-      #start_time                  <- Sys.time()
-      #lambda.seq      <- 10^(seq(1, -5, length.out = 20))
-      #penalty.factor  <- 10^(seq(3, -3, length.out = 20))
-      #model <- cv.solve_rvar_glmnet_vectorized(
-      #  d = args$d, p = args$p,
-      #  Y_list = Y_list, X = X,
-      #  lambda.seq = lambda.seq,
-      #  penalty.factor = penalty.factor,
-      #  nfolds = 5,
-      #  verbose = FALSE)
-      #print(model$rvar_opt_coeffs)
-      #end_time                    <- Sys.time()
+      print(paste0("Step ", sim_ind,": cv.solve_rvar"))
+      start_time                  <- Sys.time()
+      lambda.seq      <- 10^(seq(1, -5, length.out = 20))
+      penalty.factor  <- 10^(seq(3, -3, length.out = 20))
+
+
+      #################
+      #################
+      ## REMOVE LATER
+      ##
+      #d <- args$d
+      #p <- args$p
+      #nfolds <- 5
+      #verbose <- FALSE
+      #cnt <- count
+      ##
+      ## REMOVE LATER
+      #################
+      #################
+
+      model <- cv.solve_rvar_glmnet_vectorized(
+        d = args$d, p = args$p,
+        Y_list = Y_list, X = X,
+        lambda.seq = lambda.seq,
+        penalty.factor = penalty.factor,
+        nfolds = 5,
+        verbose = FALSE)
+      print(model$rvar_opt_coeffs)
+      end_time                    <- Sys.time()
 
       ## Saving things! bla bla bla
-      #output[count, 2]      <- "COR_Scr_IPCHD"
-      #output[count, 3]      <- "inf_meas"
-      #output[count, 4]      <- sim_ind
-      #output[count, 5]      <- difftime(
-      #    time1 = end_time, time2 = start_time, units = "s") %>%
-      #    as.numeric()
-      #output[count, -(1:5)] <- result_cor
+      output[count, 2]      <- "rvar_cv"
+      output[count, 3]      <- sim_ind
+      output[count, 4]      <- difftime(
+          time1 = end_time, time2 = start_time, units = "s") %>%
+          as.numeric()
+      output[count, -(1:4)] <- eval_msr(data$B_list, model$var_ind_coeffs)
       
       count <- count + 1
     }
@@ -183,6 +196,8 @@ FullSimulation <- function(args) {
 
   #################################################
   ## Return output:
+
+  print(output)
 
   return(output)
 
