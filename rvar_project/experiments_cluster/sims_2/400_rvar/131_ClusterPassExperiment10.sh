@@ -7,7 +7,7 @@
 #SBATCH --mem-per-cpu=1gb
 #SBATCH --time=2-00:00:00
 #SBATCH --output=400_rvar/experiments1/logs/output%a.out
-#SBATCH --array=10-2169
+#SBATCH --array=10-3299
 
 pwd; hostname; date
 
