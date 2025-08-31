@@ -161,6 +161,25 @@ bic.solve_rvar_glmnet_vectorized <- function(
                                  pf_val = pf_val, 
                                  y_var_names, x_var_names)
   B_tibble_opt <- B_tibble_opt %>% arrange(lambda1, lambda2, var)
+
+  ###################
+  ## Creating individual VAR coefficient matrices
+  Bmat <- B_tibble_opt %>%
+    select(-lambda1, -lambda2, -var) %>%
+    as.matrix() %>%
+    {abs(.) > 1e-10}
+
+  B_total <- list()
+  for (ind in 1:N) {
+    x <- X[ind, ]
+    prod_mat <- diag(d)
+    for (ent_ind in 1:p) 
+      prod_mat <- rbind(prod_mat, x[ent_ind] * diag(d))
+
+    B_total[[ind]] <- Bmat %*% prod_mat
+  }
+
+
   
   output <- list(
     lambda          = lambda.seq,        ## lambda          : Sequence of lambda used.
@@ -170,7 +189,8 @@ bic.solve_rvar_glmnet_vectorized <- function(
     pf_opt_val      = pf_opt_val,        ## pf_opt_val      : optimal Pen. Fact., according to cross-validation error.
     rvar_coeffs     = B_tibble,          ## rvar_coeffs     : matrix of RVAR coefficients corresponding to optimal Penalty Factors.
     rvar_opt_coeffs = B_tibble_opt,      ## rvar_opt_coeffs : matrix of optimal RVAR coefficients for PF and lambda.
-    rvar_glmnet_fit = glmnet_sparse)     ## rvar_glmnet_fit : unprocessed glmnet output for the rvar fit.
+    rvar_glmnet_fit = glmnet_sparse,     ## rvar_glmnet_fit : unprocessed glmnet output for the rvar fit.
+    var_ind_coeffs  = B_total)           ## var_ind_coeffs  : individual VAR models for each subject. 
   
   return(output)
   

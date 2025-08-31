@@ -38,15 +38,12 @@ cv.solve_rvar_glmnet_vectorized <- function(
     lambda.seq, penalty.factor , 
     nfolds = 5, verbose = FALSE, ...) { ## nfolds < N-individuals.
   
-  print("step1")
   ###################
   ## Initializing:
   N     <- nrow(X)
   rdata <- vectorize_rvar_data(Y_list, X)
   n_pf  <- length(penalty.factor)
   
-  
-  print("step2")
   ###################
   ## Preparing variable names:
   ## Setting names of variables for Y
@@ -58,7 +55,6 @@ cv.solve_rvar_glmnet_vectorized <- function(
   }
   
   
-  print("step3")
   ## Setting names of variables for X
   x_var_names <- NULL 
   if (is.null(colnames(X))) {
@@ -67,8 +63,6 @@ cv.solve_rvar_glmnet_vectorized <- function(
     x_var_names <- c("x0", colnames(X))
   }
 
-  
-  print("step4")
   ###################
   ## Consistency check:
   response_ids   <- rdata$response_vectorized[, c(1,2)]
@@ -77,11 +71,12 @@ cv.solve_rvar_glmnet_vectorized <- function(
     stop("Error: Compatibility problem between covariates and response. Explore issue.")
   }
 
-  
-  print("step5")
   ###################
   ## CV-fold selection/setup:
-  subject_folds <- sample(1:nfolds, size = N, replace = TRUE)
+  res     <- N %% nfolds 
+  cv_ind  <- rep(1:nfolds, floor(N / nfolds))
+  if (res > 0) cv_ind <- c(cv_ind, 1:res)
+  subject_folds <- cv_ind[sample(1:N, N, replace = FALSE)]
   foldid <- subject_folds[rdata$covariates$subject]
   
   cv_fit_error_m <- matrix(NA, 
@@ -91,13 +86,10 @@ cv.solve_rvar_glmnet_vectorized <- function(
                             nrow = length(penalty.factor), 
                             ncol = length(lambda.seq))
   
-  
-  print("step6")
   ###################
   ## CV runs:
   for (pf_val_ind in seq_along(penalty.factor)) {
 
-    print(paste0("step6.", 1))
     pf_val <- penalty.factor[pf_val_ind]
     alpha <- (p + 1) / (p * pf_val + 1)
     beta <- (p * pf_val + pf_val) / (p * pf_val + 1)
@@ -107,33 +99,26 @@ cv.solve_rvar_glmnet_vectorized <- function(
             string = colnames(rdata$covariates_vectorized[, -c(1:2)]),
             pattern = "x0"), 
         alpha, beta)
-        
 
-
-    print(paste0("step6.", 2))
     #print((rdata$response_vectorized[,4])[[1]])
     #print(dim(as.matrix(rdata$covariates_vectorized[, -c(1:2)])))
 
     glmnet_sparse <- cv.glmnet(
       x = as.matrix(rdata$covariates_vectorized[, -c(1:2)]),
-      y = as.matrix(rdata$response_vectorized[,4][[1]]),
+      y = unlist(rdata$response_vectorized[,4][[1]]),
       family = "gaussian",
       lambda  = lambda.seq,
       foldid = foldid,
-      
+      #nfolds = 5,
       penalty.factor = pf_vec,
       intercept = FALSE, standardize = FALSE)
     
-    print(paste0("step6.", 3))
     cv_fit_error_m[pf_val_ind, ]  <- glmnet_sparse$cvm
     cv_fit_error_sd[pf_val_ind, ] <- glmnet_sparse$cvsd
     
     if(verbose) print(pf_val_ind)
-
-    print(paste0("step6.", 4))
   }
   
-  print("step7")
   if(verbose) {
     plot(log(cv_fit_error_m  - min(cv_fit_error_m) + 1e-4) , 
          breaks = 100, 
@@ -143,7 +128,6 @@ cv.solve_rvar_glmnet_vectorized <- function(
          ylab = "Penalty Factor") 
   }
   
-  print("step8")
   ###################
   ## Optimal parameters:
   min_ind_arr <- which(cv_fit_error_m == min(cv_fit_error_m), arr.ind = TRUE)
@@ -154,7 +138,6 @@ cv.solve_rvar_glmnet_vectorized <- function(
   pf_min_ind <- min_ind_arr[1,1]
   pf_opt_val <- penalty.factor[pf_min_ind]
   
-  print("step9")
   ###################
   ## Fitting model with selected penalty factor:
   alpha_opt <- (p + 1) / (p * pf_opt_val + 1)
@@ -165,7 +148,6 @@ cv.solve_rvar_glmnet_vectorized <- function(
             pattern = "x0"), 
         alpha_opt, beta_opt)
 
-  print("step10")
   glmnet_sparse <- glmnet(
     x = as.matrix(rdata$covariates_vectorized[, -c(1:2)]),
     y = (rdata$response_vectorized[,4])[[1]], family = "gaussian",
@@ -180,7 +162,6 @@ cv.solve_rvar_glmnet_vectorized <- function(
     penalty.factor = pf_vec_opt,
     intercept = FALSE, standardize = FALSE)
   
-  print("step11")
   ###################
   ## Cleaning output:
   B_tibble <- tibble()
@@ -195,7 +176,23 @@ cv.solve_rvar_glmnet_vectorized <- function(
                                  y_var_names, x_var_names)
   B_tibble_opt <- B_tibble_opt %>% arrange(lambda1, lambda2, var)
   
-  print("step12")
+  ###################
+  ## Creating individual VAR coefficient matrices
+  Bmat <- B_tibble_opt %>%
+    select(-lambda1, -lambda2, -var) %>%
+    as.matrix() %>%
+    {abs(.) > 1e-10}
+
+  B_total <- list()
+  for (ind in 1:N) {
+    x <- X[ind, ]
+    prod_mat <- diag(d)
+    for (ent_ind in 1:p) 
+      prod_mat <- rbind(prod_mat, x[ent_ind] * diag(d))
+
+    B_total[[ind]] <- Bmat %*% prod_mat
+  }
+
   output <- list(
     lambda          = lambda.seq,        ## lambda          : Sequence of lambda used.
     penalty_factor  = penalty.factor,    ## penalty_factor  : Sequence of penalty factors used.
@@ -205,8 +202,8 @@ cv.solve_rvar_glmnet_vectorized <- function(
     pf_opt_val      = pf_opt_val,        ## pf_opt_val      : optimal Pen. Fact., according to cross-validation error.
     rvar_coeffs     = B_tibble,          ## rvar_coeffs     : matrix of RVAR coefficients corresponding to optimal Penalty Factors.
     rvar_opt_coeffs = B_tibble_opt,      ## rvar_opt_coeffs : matrix of optimal RVAR coefficients for PF and lambda.
-    rvar_glmnet_fit = glmnet_sparse)     ## rvar_glmnet_fit : unprocessed glmnet output for the rvar fit.
-  
+    rvar_glmnet_fit = glmnet_sparse,     ## rvar_glmnet_fit : unprocessed glmnet output for the rvar fit.
+    var_ind_coeffs  = B_total)           ## var_ind_coeffs  : individual VAR models for each subject. 
   return(output)
   
 }
@@ -222,6 +219,7 @@ cv.solve_rvar_glmnet_vectorized <- function(
 example <- FALSE
 if (example) {
   
+  source("001_requirements.R")
   source("003_Generating_RvarData.R")
   source("041_rvar_supps_vect.R")
 
@@ -261,15 +259,17 @@ if (example) {
   plot(output$phi0, breaks = 10)
   plot(output$phip_list[[1]], breaks = 10)
   plot(output$phip_list[[2]], breaks = 10)
+  dev.off()
   
   #########################
   ## Generate Data:
   #########################
   N <- 100
+  Ti <- 100
   X         <- simulate_exogenous_vars(p = p, N = N, type = "unif",
                                        u_min = u_min, u_max = u_max,
                                        signed = signed, nz_x_prob = nz_x_prob)
-  sims_data <- simulate_rvar1(output, X = X, N = N, Ti = rep(100, N))
+  sims_data <- simulate_rvar1(output, X = X, N = N, Ti = rep(Ti, N))
   
   
   lapply(sims_data$Y_list, dim)
@@ -277,7 +277,30 @@ if (example) {
   lapply(sims_data$B_list, dim)
   lapply(sims_data$B_list, function(x) {sum(x != 0)})
   
+
+  #rdata <- vectorize_rvar_data(sims_data$Y_list, sims_data$X)
+  #rdata$covariates_vectorized %>% 
+  #  select(-subject, -time) %>%
+  #  as.matrix() %>% dim()
   
+  #par(mfrow = c(1,1))
+  #rdata$covariates_vectorized %>% 
+  #  select(-subject, -time) %>%
+  #  as.matrix() %>%
+  #  {.[1:45,1:15]} %>%
+  #  plot()
+  #dev.off()
+
+  #par(mfrow = c(1,1), mar = c(5.1, 4.1, 4.1, 4.1))
+  #rdata$covariates_vectorized %>% 
+  #  select(subject, time) %>%
+  #  mutate(subject = subject / max(subject),
+  #         time = time / max(time)) %>%
+  #  as.matrix() %>%
+  #  {.[1:45,1:15]} %>%
+  #  plot(border = NA, breaks = 50)
+  #dev.off()
+
   #########################
   ## Visualizing parameters:
   #########################
