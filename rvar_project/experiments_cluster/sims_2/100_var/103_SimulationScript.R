@@ -18,6 +18,7 @@ source("001_requirements.R"); search()
 source("003_Generating_RvarData.R")
 
 source("051_Simulation_CreatingParameters.R")
+source("052_Simulation_EvaluatingMeasures.r")
 
 index  <- 1
 main_folder <- "100_var/"

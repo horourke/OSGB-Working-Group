@@ -25,6 +25,7 @@ source("046_bic.glmnet_rvar_vectorized.r")
 
 
 source("051_Simulation_CreatingParameters.R")
+source("052_Simulation_EvaluatingMeasures.r")
 
 index  <- 1
 main_folder <- "400_rvar/"
