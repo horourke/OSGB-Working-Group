@@ -23,10 +23,20 @@ if(!require(magrittr, lib = req_lib_dir)){
   install.packages("magrittr", repos = "https://archive.linux.duke.edu/cran/")
   library(magrittr)
 }
+if(!require(lubridate, lib = req_lib_dir)){
+  .libPaths(req_lib_dir)
+  install.packages("lubridate", repos = "https://archive.linux.duke.edu/cran/")
+  library(lubridate)
+}
 if(!require(tidyverse, lib = req_lib_dir)){
   .libPaths(req_lib_dir)
   install.packages("tidyverse", repos = "https://archive.linux.duke.edu/cran/")
   library(tidyverse)
+}
+if(!require(lobstr, lib = req_lib_dir)){
+  .libPaths(req_lib_dir)
+  install.packages("lobstr", repos = "https://archive.linux.duke.edu/cran/")
+  library(lobstr)
 }
 
 ## Model fitting packages:
