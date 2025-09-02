@@ -113,7 +113,7 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
     prob_c        = c(2/3, 1/3),                    ## prob_c   : proportion of common entries.
     prob_tot      = 0.05,                           ## prob_tot : total proportion of non-zero entries.
 
-    nsim          = ifelse(runtype <= 2, 2, 5),    ## nsim     : no of simulation repetitions.
+    nsim          = ifelse(runtype <= 2, 2, 10),    ## nsim     : no of simulation repetitions.
     sigma2        = c(0.05, 0.1),                  ## sigma2   : variance o VAR error term.
     N             = c(50, 100),                    ## N        : No. of individuals
     T             = c(50, 100),                    ## T        : timepoints per individual.
