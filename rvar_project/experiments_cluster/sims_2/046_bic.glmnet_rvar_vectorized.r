@@ -71,6 +71,8 @@ bic.solve_rvar_glmnet_vectorized <- function(
                           ncol = length(penalty.factor),
                           nrow = length(lambda.seq))
   
+  memory_in_bytes <- mem_used()
+  print(paste0("BIC_B:", memory_in_bytes / (1024^3), "GB"))
   ###################
   ## CV runs:
   for (pf_val_ind in seq_along(penalty.factor)) {
@@ -100,6 +102,12 @@ bic.solve_rvar_glmnet_vectorized <- function(
     bic_fit_error[pf_val_ind, ] <- dfs * log(n_obs) - dev
            
     if(verbose) print(pf_val_ind)
+
+
+    memory_in_bytes <- mem_used()
+    print(paste0("BIC_", pf_val_ind, ":", memory_in_bytes / (1024^3), "GB"))
+
+    rm(glmnet_sparse)
 
   }
   
@@ -134,12 +142,12 @@ bic.solve_rvar_glmnet_vectorized <- function(
         alpha_opt, beta_opt)
 
 
-  glmnet_sparse <- glmnet(
-    x = as.matrix(rdata$covariates_vectorized[, -c(1:2)]),
-    y = (rdata$response_vectorized[,4])[[1]], family = "gaussian",
-    lambda  = lambda.seq,
-    penalty.factor = pf_vec_opt,
-    intercept = FALSE, standardize = FALSE)
+  #glmnet_sparse <- glmnet(
+  #  x = as.matrix(rdata$covariates_vectorized[, -c(1:2)]),
+  #  y = (rdata$response_vectorized[,4])[[1]], family = "gaussian",
+  #  lambda  = lambda.seq,
+  #  penalty.factor = pf_vec_opt,
+  #  intercept = FALSE, standardize = FALSE)
   
   glmnet_sparse_opt <- glmnet(
     x = as.matrix(rdata$covariates_vectorized[, -c(1:2)]),
@@ -148,19 +156,25 @@ bic.solve_rvar_glmnet_vectorized <- function(
     penalty.factor = pf_vec_opt,
     intercept = FALSE, standardize = FALSE)
   
+  memory_in_bytes <- mem_used()
+  print(paste0("BIC_F1:", memory_in_bytes / (1024^3), "GB"))
+
   ###################
   ## Cleaning output:
-  B_tibble <- tibble()
-  B_tibble <- process_coeffs(d, p, B_tibble, glmnet_sparse,
-                             pf_val = pf_val, 
-                             y_var_names, x_var_names)
-  B_tibble <- B_tibble %>% arrange(lambda1, lambda2, var)
+  #B_tibble <- tibble()
+  #B_tibble <- process_coeffs(d, p, B_tibble, glmnet_sparse,
+  #                           pf_val = pf_val, 
+  #                           y_var_names, x_var_names)
+  #B_tibble <- B_tibble %>% arrange(lambda1, lambda2, var)
   
   B_tibble_opt <- tibble()
   B_tibble_opt <- process_coeffs(d, p, B_tibble_opt, glmnet_sparse_opt, 
                                  pf_val = pf_val, 
                                  y_var_names, x_var_names)
   B_tibble_opt <- B_tibble_opt %>% arrange(lambda1, lambda2, var)
+
+  memory_in_bytes <- mem_used()
+  print(paste0("BIC_F2:", memory_in_bytes / (1024^3), "GB"))
 
   ###################
   ## Creating individual VAR coefficient matrices
@@ -187,11 +201,15 @@ bic.solve_rvar_glmnet_vectorized <- function(
     bic_error       = bic_fit_error,     ## cv_error_m      : cross-validation mean error.
     lambda_opt_val  = lambda_opt_val,    ## lambda_opt_val  : optimal lambda according to cross-validation error.
     pf_opt_val      = pf_opt_val,        ## pf_opt_val      : optimal Pen. Fact., according to cross-validation error.
-    rvar_coeffs     = B_tibble,          ## rvar_coeffs     : matrix of RVAR coefficients corresponding to optimal Penalty Factors.
+    #rvar_coeffs     = B_tibble,         ## rvar_coeffs     : matrix of RVAR coefficients corresponding to optimal Penalty Factors.
     rvar_opt_coeffs = B_tibble_opt,      ## rvar_opt_coeffs : matrix of optimal RVAR coefficients for PF and lambda.
-    rvar_glmnet_fit = glmnet_sparse,     ## rvar_glmnet_fit : unprocessed glmnet output for the rvar fit.
+    rvar_glmnet_fit = glmnet_sparse_opt, ## rvar_glmnet_fit : unprocessed glmnet output for the rvar fit.
     var_ind_coeffs  = B_total)           ## var_ind_coeffs  : individual VAR models for each subject. 
   
+  memory_in_bytes <- mem_used()
+  print(paste0("BIC_F3:", memory_in_bytes / (1024^3), "GB"))
+
+
   return(output)
   
 }

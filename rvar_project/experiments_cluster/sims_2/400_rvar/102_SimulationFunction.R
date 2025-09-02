@@ -118,6 +118,9 @@ FullSimulation <- function(args) {
           as.numeric()
       output[count, -(1:4)] <- eval_msr(data$B_list, model$var_ind_coeffs)
       
+      memory_in_bytes <- mem_used()
+      print(paste0("Memory used BIC:", memory_in_bytes / (1024^3), "GB"))
+      
       count <- count + 1
     }
     ############################
@@ -129,21 +132,6 @@ FullSimulation <- function(args) {
       start_time                  <- Sys.time()
       lambda.seq      <- 10^(seq(1, -5, length.out = 20))
       penalty.factor  <- 10^(seq(3, -3, length.out = 20))
-
-
-      #################
-      #################
-      ## REMOVE LATER
-      ##
-      #d <- args$d
-      #p <- args$p
-      #nfolds <- 5
-      #verbose <- FALSE
-      #cnt <- count
-      ##
-      ## REMOVE LATER
-      #################
-      #################
 
       model <- cv.solve_rvar_glmnet_vectorized(
         d = args$d, p = args$p,
@@ -163,6 +151,9 @@ FullSimulation <- function(args) {
           as.numeric()
       output[count, -(1:4)] <- eval_msr(data$B_list, model$var_ind_coeffs)
       
+      memory_in_bytes <- mem_used()
+      print(paste0("Memory used CV:", memory_in_bytes / (1024^3), "GB"))
+
       count <- count + 1
     }
     ############################

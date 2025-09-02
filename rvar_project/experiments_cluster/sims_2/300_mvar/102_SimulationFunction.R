@@ -111,6 +111,9 @@ FullSimulation <- function(args) {
           as.numeric()
       output[count, -(1:4)] <- eval_msr(data$B_list, (fit$mats)$total)
       
+      memory_in_bytes <- mem_used()
+      print(paste0("Memory used ADAPTIVE:", memory_in_bytes / (1024^3), "GB"))
+
       count <- count + 1
     }
     ############################
@@ -133,6 +136,9 @@ FullSimulation <- function(args) {
           as.numeric()
       output[count, -(1:4)] <- eval_msr(data$B_list, (fit$mats)$total)
       
+      memory_in_bytes <- mem_used()
+      print(paste0("Memory used STANDARD:", memory_in_bytes / (1024^3), "GB"))
+
       count <- count + 1
     }
 

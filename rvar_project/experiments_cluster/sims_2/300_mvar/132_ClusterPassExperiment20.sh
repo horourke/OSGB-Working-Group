@@ -4,7 +4,7 @@
 #SBATCH --mail-user=josesa@ucr.edu
 #SBATCH --cpus-per-task=1
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=2gb
+#SBATCH --mem-per-cpu=8gb
 #SBATCH --time=2-00:00:00
 #SBATCH --output=300_mvar/experiments1/logs/output%a.out
 #SBATCH --array=330-649
