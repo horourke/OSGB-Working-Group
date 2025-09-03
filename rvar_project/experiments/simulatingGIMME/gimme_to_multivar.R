@@ -212,11 +212,39 @@ if (example) {
 
   #######################################
   ## Based on gimme data example: 
-  paths <- 'V2 ~ V2
+  paths_2 <- 'V2 ~ V1
             V3 ~ V4lag'
-  outGIMME <- gimmeSEM(data = X_list, paths = paths_full, 
+  outGIMME2 <- gimmeSEM(data = X_list, paths = paths_2, 
                        subgroup = FALSE, out = ".")
-  plot(outGIMME)
+  plot(outGIMME2)
+
+    #######################################
+  ## Setting GIMME equal to VAR with only lagged effects
+  paths_3 <- '
+V2 ~ V1lag
+V3 ~ V1lag
+V4 ~ V1lag
+V5 ~ V1lag
+V3 ~ V2lag
+V4 ~ V2lag
+V5 ~ V2lag
+V4 ~ V3lag
+V5 ~ V3lag
+V5 ~ V4lag
+V2 ~ V1lag
+
+V3 ~ 0*V1
+V4 ~ 0*V1
+V5 ~ 0*V1
+V3 ~ 0*V2
+V4 ~ 0*V2
+V5 ~ 0*V2
+V4 ~ 0*V3
+V5 ~ 0*V3
+V5 ~ 0*V4'
+  outGIMME3 <- gimmeSEM(data = X_list, paths = paths_3, 
+                       subgroup = FALSE, out = ".")
+  plot(outGIMME3)
   
   
   #######################################
