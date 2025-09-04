@@ -113,7 +113,10 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
     prob_c        = c(2/3, 1/3),                    ## prob_c   : proportion of common entries.
     prob_tot      = 0.05,                           ## prob_tot : total proportion of non-zero entries.
 
-    nsim          = ifelse(runtype <= 2, 2, 10),   ## nsim     : no of simulation repetitions.
+    nsim          = ifelse(
+                      runtype == 1, 
+                      1, 
+                      ifelse(runtype == 2, 2, 10)),## nsim     : no of simulation repetitions.
     sigma2        = c(0.05, 0.1),                  ## sigma2   : variance o VAR error term.
     N             = c(50, 100),                    ## N        : No. of individuals
     T             = c(50, 100),                    ## T        : timepoints per individual.
@@ -149,3 +152,31 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
 
 }
 
+
+
+
+example <- FALSE
+
+if (example) {
+
+  wd <- getwd()
+  req_lib_dir <- paste0(wd,"/req_lib")
+  packageVersion("rlang")
+
+  ###################### Creating folders:
+  subfolder_new        <- paste0("req_lib/")
+
+  if (!dir.exists(subfolder_new)) {
+         dir.create(subfolder_new)
+  }
+  .libPaths(req_lib_dir)
+  library(tidyverse)
+  library(magrittr)
+  
+  sim_par_table %>% tibble() %>% 
+  mutate(index = 1:nrow(sim_par_table), .before = 1) %>%
+  filter(d == 10,  p == 2, T == 100, N == 100, sigma2 == 0.05, prob_c == 1/3)
+
+}
+
+rm(example)
