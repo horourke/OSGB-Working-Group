@@ -22,8 +22,10 @@ rvar_project/experiments_cluster/sims_1/300_rvar/experiments1
 
 rvar_project/experiments_cluster/sims_2/req_lib
 
+rvar_project/experiments_cluster/sims_2/100_var/pretrainings1
 rvar_project/experiments_cluster/sims_2/100_var/experiments1
 rvar_project/experiments_cluster/sims_2/200_gimme/experiments1
+rvar_project/experiments_cluster/sims_2/300_mvar/pretrainings1
 rvar_project/experiments_cluster/sims_2/300_mvar/experiments1
 rvar_project/experiments_cluster/sims_2/400_rvar/pretrainings1/
 rvar_project/experiments_cluster/sims_2/400_rvar/experiments1/

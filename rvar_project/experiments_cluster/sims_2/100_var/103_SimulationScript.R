@@ -22,10 +22,6 @@ source("052_Simulation_EvaluatingMeasures.r")
 
 index  <- 1
 main_folder <- "100_var/"
-source(paste0(main_folder, index, "02_SimulationFunction.R"))
-
-
-
 
 #################################################
 #################################################
@@ -45,6 +41,13 @@ print(paste("id_original:", id_original))
 print(paste("id_task:", id_task))
 print(paste("id_mircorun:", id_mircorun))
 print(args)
+
+## Load Sim-Function:
+if (runtype == 1) {
+       source(paste0(main_folder, index, "01_SimulationFunctionPretrain.R"))
+} else source(paste0(main_folder, index, "02_SimulationFunction.R"))
+
+
 
 #################################################
 #################################################
