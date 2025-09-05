@@ -20,7 +20,28 @@
 ##    B       : d x (d * (p + 1)) matrix of R-VAR coefficients.
 ##
 solve_rvar_lm_vectorized <- function(Y_list, X, p) {
-  rdata <- vectorize_rvar_data(Y_list, X)
+
+  ###################
+  ## Preparing variable names:
+  ## Setting names of variables for Y
+  y_var_names <- NULL
+  if (is.null(colnames(Y_list[[1]]))) {
+    y_var_names <- paste0("var", 1:ncol(Y_list[[1]]))
+  } else {
+    y_var_names <- colnames(Y_list[[1]])
+  }
+  
+  ## Setting names of variables for X
+  x_var_names <- NULL 
+  if (is.null(colnames(X))) {
+    x_var_names <- paste0("x", 0:ncol(X))
+  } else {
+    x_var_names <- c("x0", colnames(X))
+  }
+
+  ###################
+  ## Initializing:
+  rdata <- vectorize_rvar_data(Y_list, X, y_var_names)
   d <- ncol(Y_list[[1]])
 
   ## Consistency check:

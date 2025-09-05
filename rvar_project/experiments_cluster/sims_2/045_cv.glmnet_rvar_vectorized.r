@@ -39,12 +39,6 @@ cv.solve_rvar_glmnet_vectorized <- function(
     nfolds = 5, verbose = FALSE, ...) { ## nfolds < N-individuals.
   
   ###################
-  ## Initializing:
-  N     <- nrow(X)
-  rdata <- vectorize_rvar_data(Y_list, X)
-  n_pf  <- length(penalty.factor)
-  
-  ###################
   ## Preparing variable names:
   ## Setting names of variables for Y
   y_var_names <- NULL
@@ -54,7 +48,6 @@ cv.solve_rvar_glmnet_vectorized <- function(
     y_var_names <- colnames(Y_list[[1]])
   }
   
-  
   ## Setting names of variables for X
   x_var_names <- NULL 
   if (is.null(colnames(X))) {
@@ -62,6 +55,12 @@ cv.solve_rvar_glmnet_vectorized <- function(
   } else {
     x_var_names <- c("x0", colnames(X))
   }
+    
+  ###################
+  ## Initializing:
+  N     <- nrow(X)
+  rdata <- vectorize_rvar_data(Y_list, X, y_var_names)
+  n_pf  <- length(penalty.factor)
 
   ###################
   ## Consistency check:
@@ -86,8 +85,11 @@ cv.solve_rvar_glmnet_vectorized <- function(
                             nrow = length(penalty.factor), 
                             ncol = length(lambda.seq))
   
-  memory_in_bytes <- mem_used()
-  print(paste0("CV_B:", memory_in_bytes / (1024^3), "GB"))
+  if (verbose) {
+    memory_in_bytes <- mem_used()
+    print(paste0("CV_B:", memory_in_bytes / (1024^3), "GB"))
+  }
+  
 
   ###################
   ## CV runs:
@@ -119,10 +121,12 @@ cv.solve_rvar_glmnet_vectorized <- function(
     cv_fit_error_m[pf_val_ind, ]  <- glmnet_sparse$cvm
     cv_fit_error_sd[pf_val_ind, ] <- glmnet_sparse$cvsd
     
-    if(verbose) print(pf_val_ind)
+    if (verbose) {
+      print(pf_val_ind)
 
-    memory_in_bytes <- mem_used()
-    print(paste0("CV_", pf_val_ind, ":", memory_in_bytes / (1024^3), "GB"))
+      memory_in_bytes <- mem_used()
+      print(paste0("CV_", pf_val_ind, ":", memory_in_bytes / (1024^3), "GB"))
+    } 
     rm(glmnet_sparse)
   }
   
@@ -169,8 +173,10 @@ cv.solve_rvar_glmnet_vectorized <- function(
     penalty.factor = pf_vec_opt,
     intercept = FALSE, standardize = FALSE)
   
-  memory_in_bytes <- mem_used()
-  print(paste0("CV_F1:", memory_in_bytes / (1024^3), "GB"))
+  if (verbose) {
+    memory_in_bytes <- mem_used()
+    print(paste0("CV_F1:", memory_in_bytes / (1024^3), "GB"))
+  }
 
   ###################
   ## Cleaning output:
@@ -182,13 +188,17 @@ cv.solve_rvar_glmnet_vectorized <- function(
   
   B_tibble_opt <- tibble()
   B_tibble_opt <- process_coeffs(d, p, B_tibble_opt, glmnet_sparse_opt, 
-                                 pf_val = pf_val, 
-                                 y_var_names, x_var_names)
-  B_tibble_opt <- B_tibble_opt %>% arrange(lambda1, lambda2, var)
+                                 pf_val = pf_opt_val, 
+                                 y_var_names, x_var_names) %>%
+                    mutate(var = factor(var, levels = y_var_names, ordered = TRUE)) %>%     
+                    arrange(lambda1, lambda2, var) %>%
+                    mutate(var = as.character(var))
   
-
-  memory_in_bytes <- mem_used()
-  print(paste0("CV_F2:", memory_in_bytes / (1024^3), "GB"))
+  if (verbose) {
+    memory_in_bytes <- mem_used()
+    print(paste0("CV_F2:", memory_in_bytes / (1024^3), "GB"))
+  }
+  
 
   ###################
   ## Creating individual VAR coefficient matrices
@@ -219,8 +229,10 @@ cv.solve_rvar_glmnet_vectorized <- function(
     rvar_glmnet_fit = glmnet_sparse_opt, ## rvar_glmnet_fit : unprocessed glmnet output for the rvar fit.
     var_ind_coeffs  = B_total)           ## var_ind_coeffs  : individual VAR models for each subject. 
 
-  memory_in_bytes <- mem_used()
-  print(paste0("CV_F3:", memory_in_bytes / (1024^3), "GB"))
+  if (verbose) {
+    memory_in_bytes <- mem_used()
+    print(paste0("CV_F3:", memory_in_bytes / (1024^3), "GB"))  
+  }
 
   return(output)
   

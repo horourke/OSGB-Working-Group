@@ -27,17 +27,12 @@
 ##                        choice of Penalty Factors.
 ##    rvar_opt_coeffs : matrix of optimal RVAR coefficients for PF and lambda.
 ##    rvar_glmnet_fit : unprocessed glmnet output for the rvar fit.
+##    var_ind_coeffs  : individual VAR models for each subject. 
 ##
 bic.solve_rvar_glmnet_vectorized <- function(
     d, p, Y_list, X, 
     lambda.seq, penalty.factor , 
     verbose = FALSE, ...) { ## nfolds < N-individuals.
-  
-  ###################
-  ## Initializing:
-  N     <- nrow(X)
-  rdata <- vectorize_rvar_data(Y_list, X)
-  n_pf  <- length(penalty.factor)
   
   ###################
   ## Preparing variable names:
@@ -58,6 +53,12 @@ bic.solve_rvar_glmnet_vectorized <- function(
   }
 
   ###################
+  ## Initializing:
+  N     <- nrow(X)
+  rdata <- vectorize_rvar_data(Y_list, X, y_var_names)
+  n_pf  <- length(penalty.factor)
+
+  ###################
   ## Consistency check:
   response_ids   <- rdata$response_vectorized[, c(1,2)]
   covariates_ids <- rdata$covariates[, c(1,2)]
@@ -71,8 +72,11 @@ bic.solve_rvar_glmnet_vectorized <- function(
                           ncol = length(penalty.factor),
                           nrow = length(lambda.seq))
   
-  memory_in_bytes <- mem_used()
-  print(paste0("BIC_B:", memory_in_bytes / (1024^3), "GB"))
+  if (verbose) {
+    memory_in_bytes <- mem_used()
+    print(paste0("BIC_B:", memory_in_bytes / (1024^3), "GB"))
+  }
+
   ###################
   ## CV runs:
   for (pf_val_ind in seq_along(penalty.factor)) {
@@ -101,21 +105,21 @@ bic.solve_rvar_glmnet_vectorized <- function(
 
     bic_fit_error[pf_val_ind, ] <- dfs * log(n_obs) - dev
            
-    if(verbose) print(pf_val_ind)
+    if(verbose){
+      print(pf_val_ind)
 
-
-    memory_in_bytes <- mem_used()
-    print(paste0("BIC_", pf_val_ind, ":", memory_in_bytes / (1024^3), "GB"))
+      memory_in_bytes <- mem_used()
+      print(paste0("BIC_", pf_val_ind, ":", memory_in_bytes / (1024^3), "GB"))
+    }
 
     rm(glmnet_sparse)
-
   }
   
   if(verbose) {
     plot(log(bic_fit_error  - min(bic_fit_error) + 1e-4) , 
          breaks = 100, 
          border = NA,
-         main = "Cross-Validation log-mean Error",
+         main = "log-BIC",
          xlab = "Lambda",
          ylab = "Penalty Factor") 
   }
@@ -156,9 +160,11 @@ bic.solve_rvar_glmnet_vectorized <- function(
     penalty.factor = pf_vec_opt,
     intercept = FALSE, standardize = FALSE)
   
-  memory_in_bytes <- mem_used()
-  print(paste0("BIC_F1:", memory_in_bytes / (1024^3), "GB"))
-
+  if (verbose) {
+    memory_in_bytes <- mem_used()
+    print(paste0("BIC_F1:", memory_in_bytes / (1024^3), "GB"))
+  }
+  
   ###################
   ## Cleaning output:
   #B_tibble <- tibble()
@@ -169,9 +175,11 @@ bic.solve_rvar_glmnet_vectorized <- function(
   
   B_tibble_opt <- tibble()
   B_tibble_opt <- process_coeffs(d, p, B_tibble_opt, glmnet_sparse_opt, 
-                                 pf_val = pf_val, 
-                                 y_var_names, x_var_names)
-  B_tibble_opt <- B_tibble_opt %>% arrange(lambda1, lambda2, var)
+                                 pf_val = pf_opt_val, 
+                                 y_var_names, x_var_names) %>%
+                    mutate(var = factor(var, levels = y_var_names, ordered = TRUE)) %>%     
+                    arrange(lambda1, lambda2, var) %>%
+                    mutate(var = as.character(var))
 
   memory_in_bytes <- mem_used()
   print(paste0("BIC_F2:", memory_in_bytes / (1024^3), "GB"))
@@ -236,16 +244,19 @@ if (example) {
   #########################
   ## Generate parameters:
   #########################
+  wd <- getwd()
+  .libPaths(paste0(wd, "/req_lib/"))
   library(plot.matrix)
   library(tidyverse)
   library(magrittr)
+  library(mvtnorm)
   
   set.seed(20)
   ## R-VAR parameters:
-  d         <- 5
+  d         <- 15
   p         <- 2
-  prob_phi0 <- 0.35
-  prob_phip <- 0.15
+  prob_phi0 <- 0.1
+  prob_phip <- 0.1
   min0      <- 0.3
   max0      <- 0.5
   minp      <- 0.2
@@ -269,7 +280,8 @@ if (example) {
   plot(output$phi0, breaks = 10)
   plot(output$phip_list[[1]], breaks = 10)
   plot(output$phip_list[[2]], breaks = 10)
-  
+  dev.off()
+
   #########################
   ## Generate Data:
   #########################
@@ -311,7 +323,7 @@ if (example) {
   plot(sims_data$B_list[[3]], main = "Sample 3", breaks = col_lims)
   plot(sims_data$B_list[[4]], main = "Sample 4", breaks = col_lims)
   plot(sims_data$B_list[[5]], main = "Sample 5", breaks = col_lims)
-  
+  dev.off()  
   
   
   
@@ -351,7 +363,7 @@ if (example) {
     ggplot(aes(x= time, y = value)) +
     geom_line(aes(col = var)) +
     facet_grid(subject ~ var)
-
+    dev.off()
 
   
   #########################
@@ -368,18 +380,32 @@ if (example) {
     lambda.seq = lambda.seq, nfolds = 10,
     penalty.factor = penalty.factor, verbose = verbose)
   
+  phiest_list <- cv_model$rvar_opt_coeffs %>%
+    select(-lambda1, -lambda2, -var) %>% 
+    {lapply(0:p, function(x_val, data) {
+        #print(colnames(data))
+        print(paste0("x", x_val))
+        which_keep <- str_detect(colnames(data), paste0("x", x_val))
+        mat_filtered <- data %>% select_if(which_keep) %>% 
+        as.matrix() 
+        print(colnames(mat_filtered))
+        return(mat_filtered)
+    }, data = .)}
+
   ## PLOT OF RESULTS:
   cv_model$rvar_opt_coeffs
-  layout(
-    matrix(c(1,2,3,
-             4,4,4,
-             5,5,5), 
-           byrow = T, ncol = 3))
+  par(mfcol = c(3,3))
   
   plot(sims_data$B_dcmp$phi0, main = "Joint Effect", breaks = col_lims)
   plot(sims_data$B_dcmp$phip_list[[1]], main = "Individual Effect Y1", breaks = col_lims)
   plot(sims_data$B_dcmp$phip_list[[2]], main = "Individual Effect Y2", breaks = col_lims)
   
+  lapply(phiest_list, plot, breaks = 10)
+  lapply(phiest_list, function(x) {
+    plot(x!= 0)
+  })
+  dev.off()
+
   cv_model$rvar_opt_coeffs %>% 
     select(-lambda1, -lambda2, -var) %>%
     as.matrix() %>%

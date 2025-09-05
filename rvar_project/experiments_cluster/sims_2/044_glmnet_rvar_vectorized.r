@@ -21,9 +21,8 @@
 ##
 solve_rvar_glmnet_vectorized <- function(Y_list, X, p, 
                                          lambda.seq, penalty.factor , ...) {
-  rdata <- vectorize_rvar_data(Y_list, X)
-  d <- ncol(Y_list[[1]])
-
+  
+  ###################
   ## Preparing variable names:
   ## Setting names of variables for Y
   y_var_names <- NULL
@@ -40,6 +39,13 @@ solve_rvar_glmnet_vectorized <- function(Y_list, X, p,
   } else {
     x_var_names <- c("x0", colnames(X))
   }
+
+  ###################
+  ## Initializing:
+  rdata <- vectorize_rvar_data(Y_list, X, y_var_names)
+  d <- ncol(Y_list[[1]])
+
+  
 
 
   ## Consistency check:
@@ -68,7 +74,10 @@ solve_rvar_glmnet_vectorized <- function(Y_list, X, p,
     B_tibble <- process_coeffs(d, p, B_tibble, glmnet_sparse, pf_val, y_var_names, x_var_names)
   }
   
-  B_tibble <- B_tibble %>% arrange(lambda1, lambda2, var)
+  B_tibble <- B_tibble %>% 
+    mutate(var = factor(var, levels = y_var_names, ordered = TRUE)) %>%     
+    arrange(lambda1, lambda2, var) %>%
+    mutate(var = as.character(var))
   return(B_tibble)
 
 }
