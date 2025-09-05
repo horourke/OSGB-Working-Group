@@ -16,7 +16,7 @@ eval_msr <-function(B_true_list, B_est_list) {
         function(a, b) {
             a_sp <- (abs(a) > 1e-10)
             b_sp <- (abs(b) > 1e-10)
-            return(sum(a_sp != 0))
+            return(sum(b_sp != 0))
         },
         a = B_true_list, b = B_est_list
     ) %>% unlist() %>% mean()
@@ -25,7 +25,7 @@ eval_msr <-function(B_true_list, B_est_list) {
         function(a, b) {
             a_sp <- (abs(a) > 1e-10)
             b_sp <- (abs(b) > 1e-10)
-            return(sum(b_sp != 0))
+            return(sum(a_sp != 0))
         },
         a = B_true_list, b = B_est_list
     ) %>% unlist() %>% mean()
