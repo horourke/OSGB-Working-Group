@@ -121,7 +121,7 @@ rearrange_rvar_data <- function(Y_list, X, p) {
 ##    covariates  : sum(T) x (d * (p + 1) + 2) matrix of multicolumn
 ##                    covariates.
 ##
-vectorize_rvar_data <- function(Y_list, X) {
+vectorize_rvar_data <- function(Y_list, X, y_var_names) {
   
   N    <- length(Y_list)
   p    <- ncol(X)
@@ -135,7 +135,9 @@ vectorize_rvar_data <- function(Y_list, X) {
         names_to = "var_name",
         values_to = "response"
         ) %>% 
-    arrange(var_name, subject, time)
+    mutate(var_name = factor(var_name, levels = y_var_names, ordered = TRUE)) %>% 
+    arrange(var_name, subject, time) %>%
+    mutate(var_name = as.character(var_name))
 
     ## Building meta-data for covariates.
     data$covariates <- data$covariates %>% 
