@@ -14,7 +14,7 @@
 #################################################
 ## Sourcing:
 #################################################
-source("001_requirements.R"); search()
+source("002_requirements_lite.R"); search()
 source("003_Generating_RvarData.R")
 
 source("041_rvar_supps_vect.R")
@@ -29,10 +29,6 @@ source("052_Simulation_EvaluatingMeasures.r")
 
 index  <- 1
 main_folder <- "400_rvar/"
-source(paste0(main_folder, index, "02_SimulationFunction.R"))
-
-
-
 
 #################################################
 #################################################
@@ -52,6 +48,13 @@ print(paste("id_original:", id_original))
 print(paste("id_task:", id_task))
 print(paste("id_mircorun:", id_mircorun))
 print(args)
+
+## Load Sim-Function:
+if (runtype == 1) {
+       source(paste0(main_folder, index, "01_SimulationFunctionPretrain.R"))
+} else source(paste0(main_folder, index, "02_SimulationFunction.R"))
+
+
 
 #################################################
 #################################################

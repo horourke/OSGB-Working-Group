@@ -14,7 +14,7 @@
 #################################################
 ## Sourcing:
 #################################################
-source("001_requirements.R"); search()
+source("002_requirements_lite.R"); search()
 source("003_Generating_RvarData.R")
 
 source("051_Simulation_CreatingParameters.R")
