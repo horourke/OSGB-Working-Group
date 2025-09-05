@@ -98,11 +98,11 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
   ## TABLE OF ALL PARAMETER COMBINATIONS.
   sim_par_table <- expand.grid(
     running_days  = 2,
-    entry_min     = 0.1,                            ## entry_min : minimum B0,B1,...,Bp entry magnitude
+    entry_min     = 0.3,                            ## entry_min : minimum B0,B1,...,Bp entry magnitude
     entry_max     = 0.9,                            ## entry_max : maximum B0,B1,...,Bp entry magnitude
     
     g_sd          = 0.3,                            ## g_sd  : 
-    u_min         = 0.4,                            ## u_min : minimum entry of exogenous X for type = "unif".
+    u_min         = 0.5,                            ## u_min : minimum entry of exogenous X for type = "unif".
     u_max         = 1,                              ## u_max : maximum entry of exogenous X for type = "unif".
     type          = "unif",                         ## type  : distribution of exogenous variables.
     nz_x_prob     = c(0.75),                        ## nz_x_prob : proportion of entries in exogenous
@@ -111,14 +111,14 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
 
 
     prob_c        = c(2/3, 1/3),                    ## prob_c   : proportion of common entries.
-    prob_tot      = 0.05,                           ## prob_tot : total proportion of non-zero entries.
+    prob_tot      = 0.1,                            ## prob_tot : total proportion of non-zero entries.
 
     nsim          = ifelse(
                       runtype == 1, 
                       1, 
                       ifelse(runtype == 2, 2, 10)),## nsim     : no of simulation repetitions.
     sigma2        = c(0.05, 0.1),                  ## sigma2   : variance o VAR error term.
-    N             = c(50, 100),                    ## N        : No. of individuals
+    N             = c(20, 50),                    ## N        : No. of individuals
     T             = c(50, 100),                    ## T        : timepoints per individual.
     p             = c(2, 5),                       ## p        : covariate dimension
     d             = c(10, 20))                     ## d        : Time series dimension
@@ -173,6 +173,9 @@ if (example) {
   library(tidyverse)
   library(magrittr)
   
+  runtype <- 1
+  sim_par_table[14,]
+
   sim_par_table %>% tibble() %>% 
   mutate(index = 1:nrow(sim_par_table), .before = 1) %>%
   filter(d == 10,  p == 2, T == 100, N == 100, sigma2 == 0.05, prob_c == 1/3)
