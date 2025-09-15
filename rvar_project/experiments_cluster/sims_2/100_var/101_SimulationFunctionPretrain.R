@@ -134,7 +134,7 @@ FullSimulation <- function(args) {
       
       count <- count + 1
 
-      gather$var_fit <- model
+      gather$var_fit <- B_est_list
       rm(model)
 
     }

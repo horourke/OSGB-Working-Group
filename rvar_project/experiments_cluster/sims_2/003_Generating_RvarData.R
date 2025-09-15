@@ -342,3 +342,39 @@ if (example) {
   
 }
 
+
+
+
+
+######################################################################
+######################################################################
+## rvar_to_blist:
+##  Given the p+1 matrices dxd that determine the R-VAR model, it this 
+##  function constructs the N matrices dxd of VAR parameters.
+##
+##  INPUTS:
+##    rvar_pars1 : parameters for the R-VAR model generated from the
+##                  function "generate_rvar_pars."
+##    X          : Matrix of covariates
+##
+##  OUTPUTS:
+##    B_list      : list of length N with dxd matrices with 
+##                  individual time series parameters.
+##
+rvar_to_blist <- function(rvar_pars1, X) {
+
+  B_list <- list()
+  for (k_ind in 1:nrow(X)) {
+    xk_ind <- X[k_ind,]
+    phip_list_mod <- rvar_pars1$phip_list
+    
+    for (l in 1:ncol(X)) {
+      phip_list_mod[[l]] <- xk_ind[l] * phip_list_mod[[l]] 
+    }
+
+    B_list[[k_ind]] <- rvar_pars1$phi0 + Reduce("+", phip_list_mod)
+    
+  }
+  return(B_list)
+}
+  
