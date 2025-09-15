@@ -106,7 +106,7 @@ FullSimulation <- function(args) {
       start_time                  <- Sys.time()
       model <- multivar::constructModel(data = Y_list, lassotype = "adaptive")
       fit <- multivar::cv.multivar(model)
-      fit$mats %>% str()
+      # fit$mats %>% str()
       end_time                    <- Sys.time()
 
       ## Saving things! bla bla bla
@@ -117,13 +117,19 @@ FullSimulation <- function(args) {
           as.numeric()
       output[count, -(1:4)] <- eval_msr(data$B_list, (fit$mats)$total)
       
+      difftime(
+          time1 = end_time, time2 = start_time, units = "s") %>% 
+          print()
+      
+      
       memory_in_bytes <- mem_used()
       print(paste0("Memory used ADAPTIVE:", memory_in_bytes / (1024^3), "GB"))
 
       count <- count + 1
 
-      gather$mvar_adaptive <- model
+      gather$mvar_adaptive <- fit
       rm(model)
+      rm(fit)
 
     }
     ############################
@@ -135,7 +141,7 @@ FullSimulation <- function(args) {
       start_time                  <- Sys.time()
       model <- multivar::constructModel(data = Y_list, lassotype = "standard")
       fit <- multivar::cv.multivar(model)
-      fit$mats %>% str()
+      #fit$mats %>% str()
       end_time                    <- Sys.time()
 
       ## Saving things! bla bla bla
@@ -146,13 +152,18 @@ FullSimulation <- function(args) {
           as.numeric()
       output[count, -(1:4)] <- eval_msr(data$B_list, (fit$mats)$total)
       
+      difftime(
+          time1 = end_time, time2 = start_time, units = "s") %>% 
+          print()
+      
       memory_in_bytes <- mem_used()
       print(paste0("Memory used STANDARD:", memory_in_bytes / (1024^3), "GB"))
 
       count <- count + 1
 
-      gather$mvar_standard <- model
+      gather$mvar_standard <- fit
       rm(model)
+      rm(fit)
 
     }
     ############################
