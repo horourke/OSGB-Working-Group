@@ -19,37 +19,52 @@ T0_prop_val    <- as.numeric(input[2])
 
 
 ###################### Parameter table:
-runtype       <- 3 # FOR FULL SIMULATIONS
+runtype       <- 2 # FOR EXPERIMENT RUNS
+#runtype       <- 3 # FOR FULL RUNS
 index_old     <- 1 # run index to use
 sim_par_table <- expand.grid(
-  K              = 3,
-  hmin1          = 4, hmax1         = 5,
-  hmin2          = 4, hmax2         = 5,
-  nhmin          = 4, nhmax         = 5,
-  neffmin        = 4, neffmax       = 5,
-  shuffle       = FALSE,
-  type          = "unif",
-  running_days  = ifelse(runtype <= 2, 1, 5),
-  threshold     = 2,
+  running_days  = 2,
+  entry_min     = 0.3,                            ## entry_min : minimum B0,B1,...,Bp entry magnitude
+  entry_max     = 0.9,                            ## entry_max : maximum B0,B1,...,Bp entry magnitude
     
-  r2              = c(3),
-  r1              = c(5),
-  pneff           = c(0.01),
-  pnh             = c(0.05),
-  ph2             = c(0.05, 0.25, 0.5),
-  ph1             = c(0.25, 0.5),
-    
-  nsim            = ifelse(runtype <= 2, 2, 5),
-  diagonal_shift  = c(2,5),
-  #n_prop          = c(0.25, 0.5, 0.75, 1),
-  n_prop          = c(0.5, 0.75, 1, 1.25),
-  T0_prop         = c(0.5, 0.75, 1),
-  p               = c(100, 200, 500))
+  g_sd          = 0.3,                            ## g_sd  : 
+  u_min         = 0.5,                            ## u_min : minimum entry of exogenous X for type = "unif".
+  u_max         = 1,                              ## u_max : maximum entry of exogenous X for type = "unif".
+  type          = "unif",                         ## type  : distribution of exogenous variables.
+  nz_x_prob     = c(0.75),                        ## nz_x_prob : proportion of entries in exogenous
+                                                    ##              data matrix X with non-zero values.
+  signed        = c(TRUE),                        ## signed    : are entries signed or all positive?
+
+
+  prob_c        = c(2/3, 1/3),                    ## prob_c   : proportion of common entries.
+  prob_tot      = 0.1,                            ## prob_tot : total proportion of non-zero entries.
+
+  nsim          = ifelse(
+                    runtype == 1, 
+                    1, 
+                    ifelse(runtype == 2, 2, 10)),## nsim     : no of simulation repetitions.
+  sigma2        = c(0.05, 0.1),                  ## sigma2   : variance o VAR error term.
+  N             = c(20, 50),                     ## N        : No. of individuals
+  T             = c(50, 100),                    ## T        : timepoints per individual.
+  p             = c(2, 5),                       ## p        : covariate dimension
+  d             = c(10, 20))                     ## d        : Time series dimension
+## Add specific parameters to table:
+sim_par_table$prob_phi0 <- sim_par_table$prob_tot * sim_par_table$prob_c
+sim_par_table$prob_phip <- sim_par_table$prob_tot * (1 - sim_par_table$prob_c)
+  
+sim_par_table$phi0_min <- sim_par_table$entry_min
+sim_par_table$phi0_max <- sim_par_table$entry_max
+sim_par_table$phip_min <- sim_par_table$entry_min
+sim_par_table$phip_max <- sim_par_table$entry_max
+  
+sim_par_table$vmax <- sim_par_table$sigma2
+sim_par_table$vmin <- 0.5 * sim_par_table$sigma2
 attach(sim_par_table)
 
 
+
 ###################### Creating folders:
-subfolder_new        <- paste0("600_AggregatedDataFull/")
+subfolder_new        <- paste0("500_AggregatedDataExperiments/")
 subfolder_data_new   <- paste0(subfolder_new, "data_all/")
 subfolder_plots_new  <- paste0(subfolder_new, "plots_all/")
 
@@ -69,29 +84,23 @@ if (!dir.exists(subfolder_plots_new)) {
 ##################################################################
 ##################################################################
 method_names <- c(
-    "GL.CORR.d",          ## GLASSO-methods
-    "HWGL.CORR.d",        ## HWGL-methdos.
-    "COR_Scr_IPCHD", 
-    "COR_Thr_IPCHD",
-    "ST.OVER.CORR.IM",
-    "ST.OVER.THR.IM")
+    "var_standard",
+    "mvar_standard", "mvar_adaptive",
+    "rvar_bic", "rvar_cv")
 method_names_clean <- c(
-    "GLASSO",          ## GLASSO-methods
-    "HWGL",        ## HWGL-methdos.
-    "IPC-HD: Screening",
-    "IPC-HD: Threshold",
-    "JIC-HD: Sample Cov",
-    "JIC-HD: Thresholded Cov")
+    "VAR",          
+    "M-VAR: Standard", "M-VAR: Adaptive",
+    "R-VAR: BIC", "R-VAR: CV")
 
 
 outputs_merged_list <- list()
-
-for (p_val in c(100,200,500)) {
+#p_val <- 2
+for (d_val in c(10, 20)) {
   
   ##############################
   ##############################
   ## LOADING ALL DATA WITH T0 = P.
-  sim_ind_load    <- which(T0_prop == T0_prop_val & p == p_val & diagonal_shift == diag_shift_val)
+  sim_ind_load    <- which(d == d_val) #p == p_val)
   type            <- "all"
   results_dir     <- paste0(subfolder_new, "plots_", type, "/")
 
@@ -106,17 +115,73 @@ for (p_val in c(100,200,500)) {
   ## TRUE POSITIVE RATE OF JIC-HD METHODS:
 
   ## Merge dataset of JIC-HD-derived data.
-  output_merged_jic  <- distinct(bind_rows(mget(ls(pattern = '^output\\d+')))) %>%
-    filter(METHOD %in% method_names[-c(1:4)]) %>%
-    mutate(METHOD = str_replace_all(METHOD, setNames(method_names_clean, method_names))) %>%
-    arrange(TASK_ID, SIM_NUM, K_MAT_NUM, METHOD) %>%
-    select(-K_MAT_NUM, -TIME)
-  output_merged_jic$microrun <- rep(1:10, nrow(output_merged_jic) / 10) 
-  output_merged_jic <- output_merged_jic %>% 
-    relocate(microrun, .after = 1)
-  dim(output_merged_jic)
-  head(output_merged_jic[,1:15], 15)
-  colnames(output_merged_jic)
+  output_merged  <- distinct(bind_rows(mget(ls(pattern = '^output\\d+')))) %>%
+    filter(method %in% method_names) %>%
+    #mutate(method = str_replace_all(method, setNames(method_names_clean, method_names))) %>%
+    mutate(total_N = N * T) %>% 
+    select(-N, -T) %>%
+    group_by(d, p, total_N, sigma2, prob_c, signed, method) %>%
+
+    summarise(
+      meanTPR = mean(TPR),
+      sdTPR = sd(TPR),
+      meanFPR = mean(FPR),
+      sdFPR = sd(FPR),
+      meanTime = mean(time),
+      sdTime = sd(time),
+      meanL1 = mean(l1),
+      sdL1 = sd(l1),
+      meanFr = mean(Fr),
+      sdFr = sd(Fr))
+
+  output_merged %>% head(15)
+
+  output_tpr_summary <- output_merged %>% 
+    select(d,p,total_N,sigma2,prob_c,signed, method, meanTPR) %>%
+    pivot_wider(
+      names_from = c("prob_c"),
+      names_prefix = c("pcT_"),
+      values_from = c("meanTPR"))  %>%
+
+      arrange()
+  
+  output_tpr_summary %>% head(15) 
+
+  file_name <- paste0(
+  subfolder_plots_new, 
+  "621_MainTPR",
+  "_d", d_val, 
+  ".pdf")
+  pdf(file_name, width = 8, height = 5)
+  output_merged %>% ggplot(aes(x = total_N, y = meanTPR)) + 
+    geom_line(aes(col = method, linetype = method), linewidth = 1) + 
+    geom_ribbon(aes(ymin = meanTPR - sdTPR, ymax = meanTPR + sdTPR, fill = method), alpha = 0.1) +
+    geom_hline(yintercept = c(0,1), linetype = 2) +
+    facet_grid(p ~ sigma2 + prob_c, scales = "free_x", labeller = label_parsed) +
+    theme(legend.position="bottom")
+
+  output_merged %>% ggplot(aes(x = total_N, y = meanFPR)) + 
+    geom_line(aes(col = method, linetype = method), linewidth = 1) + 
+    geom_ribbon(aes(ymin = meanFPR - sdFPR, ymax = meanFPR + sdFPR, fill = method), alpha = 0.1) +
+    geom_hline(yintercept = c(0), linetype = 2) +
+    facet_grid(p ~ sigma2 + prob_c, scales = "free_x", labeller = label_parsed) +
+    theme(legend.position="bottom")
+
+  output_merged %>% 
+    mutate(logmt = log(meanTime, base = 60))
+    ggplot(aes(x = total_N, y = logmt)) + 
+    geom_line(aes(col = method, linetype = method), linewidth = 1) + 
+    #geom_ribbon(aes(ymin = meanTime - sdTime, ymax = meanTime + sdTime, fill = method), alpha = 0.1) +
+    geom_hline(yintercept = c(0,1,2), linetype = 3) +
+    facet_grid(p ~ sigma2 + prob_c, scales = "free_x", labeller = label_parsed) +
+    theme(legend.position="bottom")
+
+    
+  dev.off()
+
+
+
+
 
   ## For each row, we calculate the TPR/FPR:
   mat_jic <- t(apply(
