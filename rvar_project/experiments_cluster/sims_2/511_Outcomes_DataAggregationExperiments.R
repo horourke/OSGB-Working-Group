@@ -120,7 +120,7 @@ for (id_task in 1:64) {
 
     ###########################
     ## Merge all data, from all methods into output.
-    for (method_ind in c(1,4)) {
+    for (method_ind in c(1,3,4)) {
       main_dir     <- run_info[[method_ind]]$main_dir
       run_index    <- run_info[[method_ind]]$run_index
       runtype      <- run_info[[method_ind]]$runtype
