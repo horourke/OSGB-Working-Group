@@ -19,29 +19,42 @@ runtype       <- 2 # FOR EXPERIMENT RUNS
 #runtype       <- 3 # FOR FULL RUNS
 index_old     <- 1 # run index to use
 sim_par_table <- expand.grid(
-  K              = 3,
-  hmin1          = 4, hmax1         = 5,
-  hmin2          = 4, hmax2         = 5,
-  nhmin          = 4, nhmax         = 5,
-  neffmin        = 4, neffmax       = 5,
-  shuffle       = FALSE,
-  type          = "unif",
-  running_days  = ifelse(runtype <= 2, 1, 5),
-  threshold     = 2,
+  running_days  = 2,
+  entry_min     = 0.3,                            ## entry_min : minimum B0,B1,...,Bp entry magnitude
+  entry_max     = 0.9,                            ## entry_max : maximum B0,B1,...,Bp entry magnitude
     
-  r2              = c(3),
-  r1              = c(5),
-  pneff           = c(0.01),
-  pnh             = c(0.05),
-  ph2             = c(0.05, 0.25, 0.5),
-  ph1             = c(0.25, 0.5),
-    
-  nsim            = ifelse(runtype <= 2, 2, 5),
-  diagonal_shift  = c(2,5),
-  #n_prop          = c(0.25, 0.5, 0.75, 1),
-  n_prop          = c(0.5, 0.75, 1, 1.25),
-  T0_prop         = c(0.5, 0.75, 1),
-  p               = c(100, 200, 500))
+  g_sd          = 0.3,                            ## g_sd  : 
+  u_min         = 0.5,                            ## u_min : minimum entry of exogenous X for type = "unif".
+  u_max         = 1,                              ## u_max : maximum entry of exogenous X for type = "unif".
+  type          = "unif",                         ## type  : distribution of exogenous variables.
+  nz_x_prob     = c(0.75),                        ## nz_x_prob : proportion of entries in exogenous
+                                                    ##              data matrix X with non-zero values.
+  signed        = c(TRUE),                        ## signed    : are entries signed or all positive?
+
+
+  prob_c        = c(2/3, 1/3),                    ## prob_c   : proportion of common entries.
+  prob_tot      = 0.1,                            ## prob_tot : total proportion of non-zero entries.
+
+  nsim          = ifelse(
+                    runtype == 1, 
+                    1, 
+                    ifelse(runtype == 2, 2, 10)),## nsim     : no of simulation repetitions.
+  sigma2        = c(0.05, 0.1),                  ## sigma2   : variance o VAR error term.
+  N             = c(20, 50),                    ## N        : No. of individuals
+  T             = c(50, 100),                    ## T        : timepoints per individual.
+  p             = c(2, 5),                       ## p        : covariate dimension
+  d             = c(10, 20))                     ## d        : Time series dimension
+## Add specific parameters to table:
+sim_par_table$prob_phi0 <- sim_par_table$prob_tot * sim_par_table$prob_c
+sim_par_table$prob_phip <- sim_par_table$prob_tot * (1 - sim_par_table$prob_c)
+  
+sim_par_table$phi0_min <- sim_par_table$entry_min
+sim_par_table$phi0_max <- sim_par_table$entry_max
+sim_par_table$phip_min <- sim_par_table$entry_min
+sim_par_table$phip_max <- sim_par_table$entry_max
+  
+sim_par_table$vmax <- sim_par_table$sigma2
+sim_par_table$vmin <- 0.5 * sim_par_table$sigma2
 attach(sim_par_table)
 
 
@@ -70,33 +83,33 @@ if (!dir.exists(subfolder_plots_new)) {
 ##  RUNTYPE = 3: full simulation runs. 
 run_info <- list(
   list(
-    main_dir       = "100_glasso/",
+    main_dir       = "100_var/",
     run_index      = 1,
     runtype        = runtype,
-    abrev_name     = "glasso"),
+    abrev_name     = "VAR"),
 
   list(
-    main_dir       = "200_hwgl/",
+    main_dir       = "200_gimme/",
     run_index      = 1,
     runtype        = runtype,
-    abrev_name     = "hwgl"),
+    abrev_name     = "GIMME"),
     
-  #list(
-  #  main_dir       = "300_mglasso/",
-  #  run_index      = 1,
-  #  runtype        = runtype,
-  #  abrev_name     = "mgl")
-
   list(
-    main_dir       = "400_stiefelsphere/",
+    main_dir       = "300_mvar/",
     run_index      = 1,
     runtype        = runtype,
-    abrev_name     = "stisph")
+    abrev_name     = "M-VAR"),
+
+  list(
+    main_dir       = "400_rvar/",
+    run_index      = 1,
+    runtype        = runtype,
+    abrev_name     = "RVAR")
   )
 
 ###########################
 ## LOOP OVER ALL 288 SIMULATION PARAMETER COMBINATIONS
-for (id_task in 1:432) {
+for (id_task in 1:64) {
   print(paste("XXXXXXXXXXXXXXXX ID-TASK", id_task))
 
   output <- NULL
@@ -107,7 +120,7 @@ for (id_task in 1:432) {
 
     ###########################
     ## Merge all data, from all methods into output.
-    for (method_ind in 1:length(run_info)) {
+    for (method_ind in c(1,4)) {
       main_dir     <- run_info[[method_ind]]$main_dir
       run_index    <- run_info[[method_ind]]$run_index
       runtype      <- run_info[[method_ind]]$runtype
@@ -123,10 +136,14 @@ for (id_task in 1:432) {
       args_temp   <- get(paste0("args", id_task))
       output_temp <- output_temp %>%
         mutate(
-          p = args_temp$p, 
-          T0 = args_temp$T0, n = args_temp$n,
-          ph1 = args_temp$ph1, ph2 = args_temp$ph2, 
-          .before = METHOD)
+          d = args_temp$d,
+          p = args_temp$p,
+          T = args_temp$T,
+          N = args_temp$N,
+          sigma2 = args_temp$sigma2,
+          prob_c = args_temp$prob_c,
+          signed = args_temp$signed,
+          .before = method)
       
       ## Clean names:
       colnames(output_temp) <- gsub(" ", "", colnames(output_temp))
@@ -141,7 +158,6 @@ for (id_task in 1:432) {
         output_temp)
       rm(output_temp, args_temp)
       rm(list = paste0("output", id_task, "_", id_microrun))
-      rm(list = paste0("rho_min", id_task, "_", id_microrun))
     }
   }
   
@@ -150,8 +166,6 @@ for (id_task in 1:432) {
   ###########################
   ## Saving data:
   print(paste("Saving data: Task-ID", id_task))
-  print(names(output))
-  print(ls())
   print(paste0(subfolder_data_new, "output", id_task, ".RData"))
   
   args <- get(paste0("args", id_task))
