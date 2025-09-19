@@ -1,6 +1,6 @@
-/rhome/josesa/OSGB-Working-Group/rvar_project/experiments_cluster/sims_2
-r25
-Wed Sep 17 12:29:52 PDT 2025
+/rhome/josesa/OSGB-Working-Group/rvar_project/experiments_cluster/sims_3
+r28
+Thu Sep 18 14:34:06 PDT 2025
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 This is task 141
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
@@ -23,10 +23,9 @@ The following objects are masked from ‘package:base’:
 ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ✔ dplyr   1.1.4     ✔ readr   2.1.5
 ✔ forcats 1.0.0     ✔ stringr 1.5.1
-✔ ggplot2 4.0.0     ✔ tibble  3.2.1
+✔ ggplot2 3.5.1     ✔ tibble  3.2.1
 ✔ purrr   1.0.2     ✔ tidyr   1.3.1
 ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ ggplot2::element() masks e1071::element()
 ✖ tidyr::extract()   masks magrittr::extract()
 ✖ dplyr::filter()    masks stats::filter()
 ✖ dplyr::lag()       masks stats::lag()
@@ -40,176 +39,11 @@ The following objects are masked from ‘package:tidyr’:
 
     expand, pack, unpack
 
-Loaded glmnet 4.1-10
-Registered S3 method overwritten by 'quantmod':
-  method            from
-  as.zoo.data.frame zoo 
-Loading required package: lattice
-
-Attaching package: ‘BigVAR’
-
-The following object is masked from ‘package:multivar’:
-
-    constructModel
-
-
-Attaching package: ‘gridExtra’
-
-The following object is masked from ‘package:dplyr’:
-
-    combine
-
- [1] ".GlobalEnv"          "package:plot.matrix" "package:gridExtra"  
- [4] "package:ggh4x"       "package:BigVAR"      "package:lattice"    
- [7] "package:multivar"    "package:gimme"       "package:mvtnorm"    
-[10] "package:glmnet"      "package:Matrix"      "package:lobstr"     
-[13] "package:forcats"     "package:stringr"     "package:dplyr"      
-[16] "package:purrr"       "package:readr"       "package:tidyr"      
-[19] "package:tibble"      "package:ggplot2"     "package:tidyverse"  
-[22] "package:lubridate"   "package:magrittr"    "package:e1071"      
-[25] "package:stats"       "package:graphics"    "package:grDevices"  
-[28] "package:utils"       "package:datasets"    "package:methods"    
-[31] "Autoloads"           "package:base"       
-[1] "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-[1] "#-----------------------Reading inputs"
-[1] "#----------------------Verifying Inputs"
-[1] "id_original: 141"
-[1] "id_task: 14"
-[1] "id_mircorun: 1"
-$running_days
-[1] 2
-
-$entry_min
-[1] 0.3
-
-$entry_max
-[1] 0.9
-
-$g_sd
-[1] 0.3
-
-$u_min
-[1] 0.5
-
-$u_max
-[1] 1
-
-$type
-[1] "unif"
-
-$nz_x_prob
-[1] 0.75
-
-$signed
-[1] TRUE
-
-$prob_c
-[1] 0.3333333
-
-$prob_tot
-[1] 0.1
-
-$nsim
-[1] 1
-
-$sigma2
-[1] 0.05
-
-$N
-[1] 50
-
-$T
-[1] 100
-
-$p
-[1] 2
-
-$d
-[1] 10
-
-$prob_phi0
-[1] 0.03333333
-
-$prob_phip
-[1] 0.06666667
-
-$phi0_min
-[1] 0.3
-
-$phi0_max
-[1] 0.9
-
-$phip_min
-[1] 0.3
-
-$phip_max
-[1] 0.9
-
-$vmax
-[1] 0.05
-
-$vmin
-[1] 0.025
-
-$id_task
-[1] 14
-
-[1] "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-[1] "#-----------------------Creating Folders"
-[1] "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-[1] "#------------------Running simulations"
-[1] "Generating Model and Data ( 0 % )"
-[1] "Step 1: bic.solve_rvar"
-[1] "BIC_F2:0.311019122600555GB"
-[1] "BIC_F3:0.311075419187546GB"
-# A tibble: 10 × 33
-   lambda1 lambda2 var   var1_x0 var2_x0 var3_x0 var4_x0 var5_x0 var6_x0 var7_x0
-     <dbl>   <dbl> <chr>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
- 1 1.83e-4 6.16e-5 var1    0           0   0           0       0       0   0    
- 2 1.83e-4 6.16e-5 var2    0           0   0           0       0       0   0    
- 3 1.83e-4 6.16e-5 var3    0           0   0           0       0       0   0    
- 4 1.83e-4 6.16e-5 var4    0           0   0           0       0       0   0    
- 5 1.83e-4 6.16e-5 var5    0           0   0           0       0       0   0    
- 6 1.83e-4 6.16e-5 var6    0           0   0           0       0       0   0    
- 7 1.83e-4 6.16e-5 var7    0           0   0           0       0       0   0    
- 8 1.83e-4 6.16e-5 var8    0.723       0   0           0       0       0  -0.784
- 9 1.83e-4 6.16e-5 var9    0           0   0.570       0       0       0   0    
-10 1.83e-4 6.16e-5 var10   0           0   0           0       0       0   0    
-# ℹ 23 more variables: var8_x0 <dbl>, var9_x0 <dbl>, var10_x0 <dbl>,
-#   var1_x1 <dbl>, var2_x1 <dbl>, var3_x1 <dbl>, var4_x1 <dbl>, var5_x1 <dbl>,
-#   var6_x1 <dbl>, var7_x1 <dbl>, var8_x1 <dbl>, var9_x1 <dbl>, var10_x1 <dbl>,
-#   var1_x2 <dbl>, var2_x2 <dbl>, var3_x2 <dbl>, var4_x2 <dbl>, var5_x2 <dbl>,
-#   var6_x2 <dbl>, var7_x2 <dbl>, var8_x2 <dbl>, var9_x2 <dbl>, var10_x2 <dbl>
-[1] "Memory used BIC:0.201009750366211GB"
-[1] "Step 1: cv.solve_rvar"
-# A tibble: 10 × 33
-     lambda1   lambda2 var   var1_x0  var2_x0 var3_x0 var4_x0 var5_x0 var6_x0
-       <dbl>     <dbl> <chr>   <dbl>    <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
- 1 0.0000886 0.0000616 var1    0     -0.00257   0           0       0       0
- 2 0.0000886 0.0000616 var2    0      0         0           0       0       0
- 3 0.0000886 0.0000616 var3    0     -0.00591   0           0       0       0
- 4 0.0000886 0.0000616 var4    0      0         0           0       0       0
- 5 0.0000886 0.0000616 var5    0      0         0           0       0       0
- 6 0.0000886 0.0000616 var6    0      0         0           0       0       0
- 7 0.0000886 0.0000616 var7    0      0         0           0       0       0
- 8 0.0000886 0.0000616 var8    0.772  0         0           0       0       0
- 9 0.0000886 0.0000616 var9    0      0         0.630       0       0       0
-10 0.0000886 0.0000616 var10   0      0         0           0       0       0
-# ℹ 24 more variables: var7_x0 <dbl>, var8_x0 <dbl>, var9_x0 <dbl>,
-#   var10_x0 <dbl>, var1_x1 <dbl>, var2_x1 <dbl>, var3_x1 <dbl>, var4_x1 <dbl>,
-#   var5_x1 <dbl>, var6_x1 <dbl>, var7_x1 <dbl>, var8_x1 <dbl>, var9_x1 <dbl>,
-#   var10_x1 <dbl>, var1_x2 <dbl>, var2_x2 <dbl>, var3_x2 <dbl>, var4_x2 <dbl>,
-#   var5_x2 <dbl>, var6_x2 <dbl>, var7_x2 <dbl>, var8_x2 <dbl>, var9_x2 <dbl>,
-#   var10_x2 <dbl>
-[1] "Memory used CV:0.20176936686039GB"
-[1] "Step 1: Time Analysis."
-  ID   method sim     time l0_est l0_true       TPR FPR       l1       Fr
-1  1 rvar_bic   1  41.0630   8.40     8.4 1.0000000   0  7.23853 3.191416
-2  2  rvar_cv   1 190.4673  17.88     8.4 0.4663604   0 15.71712 4.290936
-[1] "#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-[1] "#-----------------------Saving Outputs"
-[1] "400_rvar/pretrainings1/data/output14_1.RData"
+Loaded glmnet 4.1-8
+Error in library(gimme) : there is no package called ‘gimme’
+Calls: source -> withVisible -> eval -> eval -> library
+Execution halted
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 a
 a
-Wed Sep 17 12:33:55 PDT 2025
+Thu Sep 18 14:34:13 PDT 2025

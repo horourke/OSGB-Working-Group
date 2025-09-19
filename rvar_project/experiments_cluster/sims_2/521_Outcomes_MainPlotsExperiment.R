@@ -93,7 +93,6 @@ method_names_clean <- c(
     "R-VAR: BIC", "R-VAR: CV")
 
 
-outputs_merged_list <- list()
 for (d_val in c(10, 20)) {
   
   ##############################
@@ -139,16 +138,16 @@ for (d_val in c(10, 20)) {
   "_d", d_val, 
   ".pdf")
   pdf(file_name, width = 8, height = 5)
-  p1 <-  output_merged %>% ggplot(aes(x = total_N, y = meanTPR)) + 
-    geom_line(aes(col = method, linetype = method), linewidth = 1) + 
+  p1 <-  output_merged %>% ggplot(aes(x = total_N, y = meanTPR)) +
+    geom_line(aes(col = method, linetype = method), linewidth = 1) +
     geom_ribbon(aes(ymin = meanTPR - sdTPR, ymax = meanTPR + sdTPR, fill = method), alpha = 0.1) +
     geom_hline(yintercept = c(0,1), linetype = 2) +
     facet_grid(p ~ sigma2 + prob_c, scales = "free_x", labeller = label_parsed) +
     theme(legend.position="bottom")
   print(p1)
 
-  p2 <-  output_merged %>% ggplot(aes(x = total_N, y = meanFPR)) + 
-    geom_line(aes(col = method, linetype = method), linewidth = 1) + 
+  p2 <-  output_merged %>% ggplot(aes(x = total_N, y = meanFPR)) +
+    geom_line(aes(col = method, linetype = method), linewidth = 1) +
     geom_ribbon(aes(ymin = meanFPR - sdFPR, ymax = meanFPR + sdFPR, fill = method), alpha = 0.1) +
     geom_hline(yintercept = c(0), linetype = 2) +
     facet_grid(p ~ sigma2 + prob_c, scales = "free_x", labeller = label_parsed) +
@@ -159,7 +158,7 @@ for (d_val in c(10, 20)) {
     mutate(logmt = log(meanTime, base = 60)) %>%
     
     ggplot(aes(x = total_N, y = logmt)) + 
-      geom_line(aes(col = method, linetype = method), linewidth = 1) + 
+      geom_line(aes(col = method, linetype = method), linewidth = 1) +
       #geom_ribbon(aes(ymin = meanTime - sdTime, ymax = meanTime + sdTime, fill = method), alpha = 0.1) +
       geom_hline(yintercept = c(0,1,2), linetype = 3) +
       facet_grid(p ~ sigma2 + prob_c, scales = "free_x", labeller = label_parsed) +

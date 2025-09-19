@@ -4,10 +4,10 @@
 #SBATCH --mail-user=josesa@ucr.edu
 #SBATCH --cpus-per-task=1
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=8gb
+#SBATCH --mem-per-cpu=16gb
 #SBATCH --time=2-00:00:00
 #SBATCH --output=200_gimme/experiments1/logs/output%a.out
-#SBATCH --array=330-649
+#SBATCH --array=250-489
 
 pwd; hostname; date
 
