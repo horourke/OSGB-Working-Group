@@ -34,7 +34,7 @@ eval_msr <-function(B_true_list, B_est_list) {
         function(a, b) {
             a_sp <- (abs(a) > 1e-10)
             b_sp <- (abs(b) > 1e-10)
-            return(sum(a_sp != 0 & b_sp != 0) / (max(sum(b_sp != 0), 1)))
+            return(sum(a_sp != 0 & b_sp != 0) / (max(sum(a_sp != 0), 1)))
         },
         a = B_true_list, b = B_est_list
     ) %>% unlist() %>% mean()
@@ -43,7 +43,7 @@ eval_msr <-function(B_true_list, B_est_list) {
         function(a, b) {
             a_sp <- (abs(a) > 1e-10)
             b_sp <- (abs(b) > 1e-10)
-            return(sum(a_sp != 0 & b_sp == 0) / (max(sum(b_sp == 0), 1)))
+            return(sum(a_sp == 0 & b_sp != 0) / (max(sum(a_sp == 0), 1)))
         },
         a = B_true_list, b = B_est_list
     ) %>% unlist() %>% mean()
