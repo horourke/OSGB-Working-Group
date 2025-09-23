@@ -30,7 +30,6 @@ rvar_project/experiments_cluster/sims_2/400_rvar/pretrainings1/
 rvar_project/experiments_cluster/sims_2/400_rvar/experiments1/
 rvar_project/experiments_cluster/sims_2/042_cv_rvar.R
 rvar_project/experiments_cluster/sims_2/042_lm_rvar.r
-rvar_project/experiments_cluster/sims_2/500_AggregatedDataExperiments/data_all/
   
 
 
@@ -46,5 +45,4 @@ rvar_project/experiments_cluster/sims_3/400_rvar/pretrainings1/
 rvar_project/experiments_cluster/sims_3/400_rvar/experiments1/
 rvar_project/experiments_cluster/sims_3/042_cv_rvar.R
 rvar_project/experiments_cluster/sims_3/042_lm_rvar.r
-rvar_project/experiments_cluster/sims_3/500_AggregatedDataExperiments/data_all/
   
