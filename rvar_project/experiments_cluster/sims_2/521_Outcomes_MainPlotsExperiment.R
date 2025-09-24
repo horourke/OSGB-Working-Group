@@ -160,7 +160,12 @@ for (d_val in c(10, 20)) {
     ggplot(aes(x = total_N, y = logmt)) + 
       geom_line(aes(col = method, linetype = method), linewidth = 1) +
       #geom_ribbon(aes(ymin = meanTime - sdTime, ymax = meanTime + sdTime, fill = method), alpha = 0.1) +
-      geom_hline(yintercept = c(0,1,2), linetype = 3) +
+      geom_hline(yintercept = c(0,1, 1.56, 2), linetype = 2, linewidth = 0.25) +
+      ylab(expression(log[60]("seconds"))) +
+      annotate("text", x = 55, y = 0.15, label = "1 s", size = 2.5) + 
+      annotate("text", x = 55 * 0.93, y = 1.15, label = "1 m", size = 2.5) + 
+      annotate("text", x = 55 * 0.93, y = 1.71, label = "10 m", size = 2.5) + 
+      annotate("text", x = 55 * 0.93, y = 2.15, label = "1 h", size = 2.5) + 
       facet_grid(p ~ sigma2 + prob_c, scales = "free_x", labeller = label_parsed) +
       theme(legend.position="bottom")
   print(p3)
