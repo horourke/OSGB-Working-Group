@@ -103,7 +103,7 @@ FullSimulation <- function(args, microrun) {
     ######## RVAR-BIC
     {
       ## 
-      print(paste0("Step ", sim_ind,": bic.solve_rvar"))
+      print(paste0("Step ", sim_ind,".1: bic.solve_rvar"))
       start_time                  <- Sys.time()
       lambda.seq      <- 10^(seq(1, -5, length.out = 20))
       penalty.factor  <- 10^(seq(3, -3, length.out = 20))
@@ -134,7 +134,7 @@ FullSimulation <- function(args, microrun) {
     ######## BIC adaptive
     {
       ## 
-      print(paste0("Step ", sim_ind,": bic.solve_rvar_ad"))
+      print(paste0("Step ", sim_ind,".2: bic.solve_rvar_ad"))
       start_time                  <- Sys.time()
       lambda.seq      <- 10^(seq(1, -5, length.out = 20))
       bic.model_ad <- solve_rvar_glmnet_adaptive(
@@ -152,7 +152,7 @@ FullSimulation <- function(args, microrun) {
       output[count, 3]      <- sim_ind
       output[count, 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
-          {as.numeric() + output[count - 1, 4]}
+          {as.numeric(.) + output[count - 1, 4]}
       output[count, -(1:4)] <- eval_msr(data$B_list, bic.model_ad$var_ind_coeffs)
       
       memory_in_bytes <- mem_used()
@@ -166,7 +166,7 @@ FullSimulation <- function(args, microrun) {
     ####################################################################################
     ######## Sparse Multi-VAR: adaptive
     {
-      print(paste0("Step ", sim_ind,": cv.solve_rvar"))
+      print(paste0("Step ", sim_ind,".3: cv.solve_rvar"))
       start_time                  <- Sys.time()
       lambda.seq      <- 10^(seq(1, -5, length.out = 20))
       penalty.factor  <- 10^(seq(3, -3, length.out = 20))
@@ -199,7 +199,7 @@ FullSimulation <- function(args, microrun) {
     ######## CV adaptive
     {
       ## 
-      print(paste0("Step ", sim_ind,": bic.solve_rvar_ad"))
+      print(paste0("Step ", sim_ind,".4: bic.solve_rvar_ad"))
       start_time                  <- Sys.time()
       lambda.seq      <- 10^(seq(1, -5, length.out = 20))
       cv.model_ad <- solve_rvar_glmnet_adaptive(
@@ -217,7 +217,7 @@ FullSimulation <- function(args, microrun) {
       output[count, 3]      <- sim_ind
       output[count, 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
-          {as.numeric() + output[count - 1, 4]}
+          {as.numeric(.) + output[count - 1, 4]}
       output[count, -(1:4)] <- eval_msr(data$B_list, cv.model_ad$var_ind_coeffs)
       
       memory_in_bytes <- mem_used()
@@ -229,7 +229,7 @@ FullSimulation <- function(args, microrun) {
     ############################
     ######## Time analysis:
     {
-      print(paste0("Step ", sim_ind,": Time Analysis."))
+      print(paste0("Step ", sim_ind,"5: Time Analysis."))
       
       ## If it will take more than X days to run,
       ## save results and leave.

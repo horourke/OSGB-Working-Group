@@ -32,14 +32,14 @@ print("#-----------------------Reading inputs")
 input                <- commandArgs(trailingOnly = TRUE)
 id_original          <- as.numeric(input[1])
 id_task              <- id_original %/% 10
-id_mircorun          <- id_original %% 10
+id_microrun          <- id_original %% 10
 runtype              <- as.numeric(input[2])
 
 args <- CreateParameters(id_task, runtype)
 print("#----------------------Verifying Inputs")
 print(paste("id_original:", id_original))
 print(paste("id_task:", id_task))
-print(paste("id_mircorun:", id_mircorun))
+print(paste("id_microrun:", id_microrun))
 print(args)
 
 ## Load Sim-Function:
@@ -78,7 +78,7 @@ if (!dir.exists(subfolder_plots)) {
 print("#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 print("#------------------Running simulations")
 set.seed(id_original)
-assign(paste0("output", id_task), FullSimulation(args = args, mircorun = id_mircorun))
+assign(paste0("output", id_task), FullSimulation(args = args, microrun = id_microrun))
 
 #################################################
 #################################################
@@ -86,16 +86,16 @@ assign(paste0("output", id_task), FullSimulation(args = args, mircorun = id_mirc
 print("#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 print("#-----------------------Saving Outputs")
 tmp_env_sim <- new.env()
-assign(paste0("output", id_task,"_", id_mircorun),
+assign(paste0("output", id_task,"_", id_microrun),
        get(paste0("output", id_task)),
        pos = tmp_env_sim)
 assign(paste0("args", id_task),
        args,
        pos = tmp_env_sim)
 
-print(paste0(subfolder_data, "output", id_task,"_", id_mircorun, ".RData"))
+print(paste0(subfolder_data, "output", id_task,"_", id_microrun, ".RData"))
 save(
        list = ls(all.names = TRUE, pos = tmp_env_sim), envir = tmp_env_sim,
-       file = paste0(subfolder_data, "output", id_task,"_", id_mircorun, ".RData"))
+       file = paste0(subfolder_data, "output", id_task,"_", id_microrun, ".RData"))
 
 warnings()
