@@ -32,8 +32,7 @@ FullSimulation <- function(args, microrun) {
   ## What methods do you want to run?
   method_names  <- c(
     "rvar_bic", "rvar_bic_ad",
-    "rvar_cv", "rvar_cv_ad"
-    )
+    "rvar_cv", "rvar_cv_ad")
   n_methods     <- length(method_names)
 
   ## Output of simulation:
@@ -67,7 +66,10 @@ FullSimulation <- function(args, microrun) {
                   round(100 * (sim_ind - 1) / args$nsim, 2),
                   "%", ")"))
       
-      set.seed(10000 * args$id_task  + 100 * microrun + sim_ind)
+      # Setting common seed for each id_task*microrun*sim_ind
+      seed_val <- 10000 * args$id_task  + 100 * microrun + sim_ind
+      set.seed(seed_val)
+      print(paste0("Seed val: ", seed_val))
 
       # Generate Phi0, Phi1, ... Phip parameters:
       rvar_model_pars <- generate_rvar_pars(
@@ -95,23 +97,23 @@ FullSimulation <- function(args, microrun) {
       Y_list <- data$Y_list
   
     }
-    ############################
-    ############################
-    ############################
-    ######## Sparse Multi-VAR: adaptive
+    ####################################################################################
+    ####################################################################################
+    ####################################################################################
+    ######## RVAR-BIC
     {
       ## 
       print(paste0("Step ", sim_ind,": bic.solve_rvar"))
       start_time                  <- Sys.time()
       lambda.seq      <- 10^(seq(1, -5, length.out = 20))
       penalty.factor  <- 10^(seq(3, -3, length.out = 20))
-      model <- bic.solve_rvar_glmnet_vectorized(
+      bic.model <- bic.solve_rvar_glmnet_vectorized(
         d = args$d, p = args$p,
         Y_list = Y_list, X = X,
         lambda.seq = lambda.seq,
         penalty.factor = penalty.factor,
         verbose = FALSE)
-      print(model$rvar_opt_coeffs)
+      print(bic.model$rvar_opt_coeffs)
       end_time                    <- Sys.time()
 
       ## Saving things! bla bla bla
@@ -120,7 +122,7 @@ FullSimulation <- function(args, microrun) {
       output[count, 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
           as.numeric()
-      output[count, -(1:4)] <- eval_msr(data$B_list, model$var_ind_coeffs)
+      output[count, -(1:4)] <- eval_msr(data$B_list, bic.model$var_ind_coeffs)
       
       memory_in_bytes <- mem_used()
       print(paste0("Memory used BIC:", memory_in_bytes / (1024^3), "GB"))
@@ -129,7 +131,39 @@ FullSimulation <- function(args, microrun) {
     }
     ############################
     ############################
-    ############################
+    ######## BIC adaptive
+    {
+      ## 
+      print(paste0("Step ", sim_ind,": bic.solve_rvar_ad"))
+      start_time                  <- Sys.time()
+      lambda.seq      <- 10^(seq(1, -5, length.out = 20))
+      bic.model_ad <- solve_rvar_glmnet_adaptive(
+        d = args$d, p = args$p,
+        Y_list = Y_list, X = X,
+        gamma = 2,
+        rvar.fit = bic.model, 
+        lambda.seq = lambda.seq,
+        verbose = FALSE)
+      print(bic.model_ad$rvar_opt_coeffs)
+      end_time                    <- Sys.time()
+
+      ## Saving things! bla bla bla
+      output[count, 2]      <- "rvar_bic_ad"
+      output[count, 3]      <- sim_ind
+      output[count, 4]      <- difftime(
+          time1 = end_time, time2 = start_time, units = "s") %>%
+          {as.numeric() + output[count - 1, 4]}
+      output[count, -(1:4)] <- eval_msr(data$B_list, bic.model_ad$var_ind_coeffs)
+      
+      memory_in_bytes <- mem_used()
+      print(paste0("Memory used BIC:", memory_in_bytes / (1024^3), "GB"))
+      
+      count <- count + 1
+
+    }
+    ####################################################################################
+    ####################################################################################
+    ####################################################################################
     ######## Sparse Multi-VAR: adaptive
     {
       print(paste0("Step ", sim_ind,": cv.solve_rvar"))
@@ -137,14 +171,14 @@ FullSimulation <- function(args, microrun) {
       lambda.seq      <- 10^(seq(1, -5, length.out = 20))
       penalty.factor  <- 10^(seq(3, -3, length.out = 20))
 
-      model <- cv.solve_rvar_glmnet_vectorized(
+      cv.model <- cv.solve_rvar_glmnet_vectorized(
         d = args$d, p = args$p,
         Y_list = Y_list, X = X,
         lambda.seq = lambda.seq,
         penalty.factor = penalty.factor,
         nfolds = 5,
         verbose = FALSE)
-      print(model$rvar_opt_coeffs)
+      print(cv.model$rvar_opt_coeffs)
       end_time                    <- Sys.time()
 
       ## Saving things! bla bla bla
@@ -153,12 +187,44 @@ FullSimulation <- function(args, microrun) {
       output[count, 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
           as.numeric()
-      output[count, -(1:4)] <- eval_msr(data$B_list, model$var_ind_coeffs)
+      output[count, -(1:4)] <- eval_msr(data$B_list, cv.model$var_ind_coeffs)
       
       memory_in_bytes <- mem_used()
       print(paste0("Memory used CV:", memory_in_bytes / (1024^3), "GB"))
 
       count <- count + 1
+    }
+    ############################
+    ############################
+    ######## CV adaptive
+    {
+      ## 
+      print(paste0("Step ", sim_ind,": bic.solve_rvar_ad"))
+      start_time                  <- Sys.time()
+      lambda.seq      <- 10^(seq(1, -5, length.out = 20))
+      cv.model_ad <- solve_rvar_glmnet_adaptive(
+        d = args$d, p = args$p,
+        Y_list = Y_list, X = X,
+        gamma = 2,
+        rvar.fit = cv.model, 
+        lambda.seq = lambda.seq,
+        verbose = FALSE)
+      print(cv.model_ad$rvar_opt_coeffs)
+      end_time                    <- Sys.time()
+
+      ## Saving things! bla bla bla
+      output[count, 2]      <- "rvar_cv_ad"
+      output[count, 3]      <- sim_ind
+      output[count, 4]      <- difftime(
+          time1 = end_time, time2 = start_time, units = "s") %>%
+          {as.numeric() + output[count - 1, 4]}
+      output[count, -(1:4)] <- eval_msr(data$B_list, cv.model_ad$var_ind_coeffs)
+      
+      memory_in_bytes <- mem_used()
+      print(paste0("Memory used BIC:", memory_in_bytes / (1024^3), "GB"))
+      
+      count <- count + 1
+
     }
     ############################
     ######## Time analysis:

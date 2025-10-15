@@ -22,6 +22,7 @@ source("043_lm_rvar_vectorized.r")
 source("044_glmnet_rvar_vectorized.r")
 source("045_cv.glmnet_rvar_vectorized.r")
 source("046_bic.glmnet_rvar_vectorized.r")
+source("047_glmnet_rvar_adaptive.r")
 
 
 source("051_Simulation_CreatingParameters.R")

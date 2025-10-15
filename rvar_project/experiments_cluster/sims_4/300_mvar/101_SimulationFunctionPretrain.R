@@ -66,7 +66,10 @@ FullSimulation <- function(args, microrun) {
                   round(100 * (sim_ind - 1) / args$nsim, 2),
                   "%", ")"))
       
-      set.seed(10000 * args$id_task  + 100 * microrun + sim_ind)
+      # Setting common seed for each id_task*microrun*sim_ind
+      seed_val <- 10000 * args$id_task  + 100 * microrun + sim_ind
+      set.seed(seed_val)
+      print(paste0("Seed val: ", seed_val))
 
       # Generate Phi0, Phi1, ... Phip parameters:
       rvar_model_pars <- generate_rvar_pars(
