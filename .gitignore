@@ -50,5 +50,16 @@ rvar_project/experiments_cluster/sims_3/500_AggregatedDataExperiments/data_all
 
 
 
-
 rvar_project/experiments_cluster/sims_4/req_lib
+rvar_project/experiments_cluster/sims_4/plot*
+rvar_project/experiments_cluster/sims_4/100_var/pretrainings1
+rvar_project/experiments_cluster/sims_4/100_var/experiments1
+rvar_project/experiments_cluster/sims_4/200_gimme/experiments1
+rvar_project/experiments_cluster/sims_4/300_mvar/pretrainings1
+rvar_project/experiments_cluster/sims_4/300_mvar/experiments1
+rvar_project/experiments_cluster/sims_4/400_rvar/pretrainings1/
+rvar_project/experiments_cluster/sims_4/400_rvar/experiments1/
+rvar_project/experiments_cluster/sims_4/042_cv_rvar.R
+rvar_project/experiments_cluster/sims_4/042_lm_rvar.r
+rvar_project/experiments_cluster/sims_4/500_AggregatedDataExperiments/data_all 
+
