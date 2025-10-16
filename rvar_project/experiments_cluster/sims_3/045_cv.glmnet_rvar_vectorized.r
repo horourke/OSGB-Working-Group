@@ -205,7 +205,7 @@ cv.solve_rvar_glmnet_vectorized <- function(
   Bmat <- B_tibble_opt %>%
     select(-lambda1, -lambda2, -var) %>%
     as.matrix() %>%
-    {abs(.) > 1e-10}
+    {(.) * (abs(.) > 1e-10)}
 
   B_total <- list()
   for (ind in 1:N) {
