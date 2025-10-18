@@ -88,6 +88,29 @@ solve_rvar_glmnet_adaptive <- function(
     Inf,
     1 / abs(pre_pf_vec) ^ gamma)
 
+  if(sum(pre_pf_vec != -1) == 0) {
+
+    lseq.length <- length(lambda.seq)
+    lopt <- rvar.fit$lambda_opt_val
+    error <- rvar.fit[[3]][rvar.fit$lambda == lopt]
+
+    output <- list(
+      lambda          = rvar.fit$lambda,          ## lambda          : Sequence of lambda used.
+      adaptive_weight = pf_vec,                   ## adaptive_weight : Sequence of penalty factors used.
+      cv_error_m      = rep(error, lseq.length),  ## cv_error_m      : cross-validation mean error.
+      cv_error_sd     = rep(0, lseq.length),      ## cv_error_sd     : cross-validation SD of error.
+      lambda_opt_val  = rvar.fit$lambda_opt_val,  ## lambda_opt_val  : optimal lambda according to cross-validation error.
+      rvar_opt_coeffs = rvar.fit$rvar_opt_coeffs, ## rvar_opt_coeffs : matrix of optimal RVAR coefficients for PF and lambda.
+      rvar_glmnet_fit = rvar.fit$rvar_glmnet_fit, ## rvar_glmnet_fit : unprocessed glmnet output for the rvar fit.
+      var_ind_coeffs  = rvar.fit$var_ind_coeffs)  ## var_ind_coeffs  : individual VAR models for each subject. 
+
+    return(output)
+  }
+
+
+  ###################
+  ## Train Adaptive RVAR
+
   glmnet_sparse <- cv.glmnet(
     x = as.matrix(rdata$covariates_vectorized[, -c(1:2)]),
     y = unlist(rdata$response_vectorized[,4][[1]]),

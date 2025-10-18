@@ -66,7 +66,7 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
 
     signed        = TRUE,       ## signed   : are entries signed or all positive?
     prob_c        = 0.5,        ## prob_c   : proportion of common entries.
-    prob_tot      = 0.1,       ## prob_tot : total proportion of non-zero entries.
+    prob_tot      = 0.2,       ## prob_tot : total proportion of non-zero entries.
 
     nsim          = 2,          ## nsim     : no of simulation repetitions.
     sigma2        = 0.05,       ## sigma2   : variance o VAR error term.
