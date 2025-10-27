@@ -1,0 +1,84 @@
+1) Spend a lot of time clearing out the aims.
+
+2) Make it fully clear what are the steps of analysis that you want to complete and why?
+
+3) Big idea. Go down to granular, but close by coming back to the main idea again. 
+
+4) Have an explicit conversation about what are the concrete aims. 
+
+5) Explain the first aim: something you already did. 
+
+	Example: I already coded R-var, but I need resources to build a systematic simulation.
+
+6) Psych, biomed, etc. 
+
+7) Aim: reaching out to researchers in the area. 
+
+8) From a perspective of a developmental psychologist: how does RVAR help?
+
+9) The methods are general, and speak to these examples, but also more. 
+
+
+10) Testing, R packages, GIMME, 
+
+
+11) Lots of data. Example?  Limitations on the inferences that can be made on that data. 
+Examples: a psychologist, a neuroscientist, a ...()
+
+There are no existing methdos that do...
+
+I have been developing RVAR. I think it works. 
+
+12) Aim 1: develop and assess method.
+13) Aim 2: demonstrate usefuless in applications (fields: neuroscience, psychology (if need short, current collaborators from UCR / public + ))
+14) Aim 3: Create software to facilitate and diseminate methods to applied researchers.
+
+Don't overpromess.
+
+
+- Talk to a program officer (future)
+
+FIGURES?
+
+- Context of the example? So, add specific mentions of variable names. 
+
+- Age, gender, socio-economic status, current mental-health diagonsis, 
+	Can current mental health diagnosis has an effect on how XXX relate to each other.
+
+
+- 
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+1) Limited grant.
+
+- Give only 1 example.
+
+- Talk to program officers beforehand.
+
+
+
+
+
+In psychology, there is a growing interest in estimating causal networks that model the connections between psychological features and individual behavioral patterns. These networks help gain a deeper understanding of the causal links between different psychological variables (e.g., anxiety, depression) and behavioral patterns (sleep quality, exercise, eating habits, social engagement). To measure these relationships, researchers conduct longitudinal studies where all these variables are measured daily across multiple subjects for a long period of time. To analyze this data, statistical models must recognize that not all individuals are equal: factors like age, socioeconomic status or prior mental health diagnoses may influence how behavioral and psychological variables relate to each other. In collaboration with faculty in the department of Psychology at UCR, we have developed the novel Covariate-Dependent Vector Auto-regressive model (CD-VAR) method, which is the first model that estimates the common psychological links across subjects, and quantifies how individual characteristics may affect the network structure. We have successfully developed the method’s software and have shown its outstanding performance for causal network estimation on preliminary simulated datasets. With the support of this grant, we aim to further assess our CD-VAR method via intensive computational experiments, to deeply explore its performance, and compare it to other methods in the literature. Furthermore, we aim to apply our novel methodology on several psychological longitudinal studies, to assess the effect that a variety of may have in the psychological and behavioral states of individuals.
+
+
+
+1) VAR, SEM, USEM, GIMME, Multi-VAR.
+
+
+
+
+In psychological studies, it is vital to study how a variety of psychological traits and behavioral patterns relate to each other. For example, we may want to study the causal connections between a variety of psychological states, e.g., levels of depression, anxiety, etc., and behavioral patterns such as sleep quality, physical activity, engagement in social behavior, among others. One approach is to model these relationships via a causal network, where nodes represent psychological or behavioral traits, and a link between them corresponds to a directed causal relationship between them. In early studies, the focus has been to estimate these causal relationships assuming subject homogeneity, i.e., aggregating data across subjects in the study to explore the common causal structures shared across all individuals [citations]. 
+## Describe the type of data we are interested in analying and the study data we have available. 
+In recent years, there is a growing recognition that these behavioral and psychological causal relationships are highly dependent on individual characteristics. This has led to the development of methods that can account for both common traits, as well as quantifying individual features. For example GIMME […]. More recently, Multi-VAR […]. 
+While methods have been developed for the estimation of common and individual causal relationships, to our best knowledge, no method can provide explanations for the origin of this cross-individual variation. 
+With the aim of quantifying the effect that these individual traits may have on the causal networks, we developed the Covariate-Dependent Vector Auto-Regressive model (CD-VAR). To our best knowledge, our method is the first that accounts for the presence of both common and individual causal network structures, and quantifies the effects that additional individual features have on the causal network. This estimation is the first step towards explaining. 
+## Current development.
+Our method achieves the estimation of these causal networks via use of penalized. Currently, our interdisciplinary team has successfully developed the software in R for estimating CD-VAR. Furthermore, we have performed preliminary simulations on simulated datsets, which confirm the performance capabilities of CD-VAR for recovering both common and feature-dependent causal relationships among psychological and behavioral variables.  
+## Future.
+We believe our CD-VAR has the potential to provide a variety of vital insights on the effects that underlying individual factors such as age, socio-economic status, or prior mental-health diagnoses may have on behavior and psychological states.  
+## Beyond
+Beyond research on , there are many areas of study in which inter and intra-subject variability is expected and must be accounted for when performing inference. For example, in longitudinal neurological studies, researchers are interested in detecting the patterns of connectivity across regions in the brain, and explain the relationships of these brain networks with individual characteristics. 
+
