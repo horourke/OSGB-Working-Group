@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.3.7)  28 JUL 2025 10:39
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.3.7)  7 NOV 2025 12:03
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -978,7 +978,14 @@ tex.def
 File: l3backend-pdftex.def 2024-02-20 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count358
 \l__pdf_internal_box=\box89
-) (MainPaper.aux)
+) (MainPaper.aux
+
+LaTeX Warning: Label `eq:rvar_opt' multiply defined.
+
+
+LaTeX Warning: Label `eq:rvar_opt@cref' multiply defined.
+
+)
 \openout1 = `MainPaper.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 18.
@@ -1123,22 +1130,26 @@ Package pdftex.def Info: figures/1_VisParExample.png  used on input line 74.
 (pdftex.def)             Requested size: 462.26999pt x 396.30196pt.
  [5 <./figures/2_VisRvarTrueEstPars.png>] [6 <./figures/1_VisParExample.png>]
 LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1
-33.
+35.
  (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-[7] [8]) (MainPaper.bbl [9]) [10] (MainPaper.aux)
+[7] [8] [9] [10]) (MainPaper.bbl [11]) [12] (MainPaper.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
  ***********
+
+
+LaTeX Warning: There were multiply-defined labels.
+
  ) 
 Here is how much of TeX's memory you used:
- 32178 strings out of 474457
- 646374 string characters out of 5742755
- 1948190 words of memory out of 5000000
- 53926 multiletter control sequences out of 15000+600000
- 658427 words of font info for 119 fonts, out of 8000000 for 9000
+ 32202 strings out of 474457
+ 646676 string characters out of 5742755
+ 1949190 words of memory out of 5000000
+ 53938 multiletter control sequences out of 15000+600000
+ 664413 words of font info for 121 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  94i,16n,96p,984b,1066s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
@@ -1169,9 +1180,9 @@ m/lmsy7.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm
 /lmsy8.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/
 lmtt12.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/symbols/msbm10.pfb>
-Output written on MainPaper.pdf (10 pages, 432084 bytes).
+Output written on MainPaper.pdf (12 pages, 443517 bytes).
 PDF statistics:
- 287 PDF objects out of 1000 (max. 8388607)
- 33 named destinations out of 1000 (max. 500000)
- 71 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 317 PDF objects out of 1000 (max. 8388607)
+ 43 named destinations out of 1000 (max. 500000)
+ 87 words of extra memory for PDF output out of 10000 (max. 10000000)
 
