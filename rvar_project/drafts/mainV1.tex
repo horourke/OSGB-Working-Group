@@ -28,35 +28,35 @@
 
 
 \begin{itemize}
-	\item Consider we have a study with $N$ subjects. For each subject $1\leq k\leq N$, we have access to two data modes: (\textit{i}) a $p$-dimensional vector of covariates $\bY_k\in\bbR^{p}$, and (\textit{ii}) a $d$-dimensional time series of length $T_k$, given as $\{\bX_t^{(k)}\in\bbR^{d} \,:\, 1\leq t\leq T_k\}$.
+	\item Consider we have a study with $N$ subjects. For each subject $1\leq k\leq N$, we have access to two data modes: (\textit{i}) a $p$-dimensional vector of covariates $\bX_k\in\bbR^{p}$, and (\textit{ii}) a $d$-dimensional time series of length $T_k$, given as $\{\bY_t^{(k)}\in\bbR^{d} \,:\, 1\leq t\leq T_k\}$.
 	
 	\item In the usual GIMME or MultiVAR frameworks \citep{gates2012group,fisher2022penalized}, the aim is to model the time-series with a common+individual decomposition, usually of the form:
 	\begin{align*}
-		\bX^{(k)}_t &= \sum_{\ell=1}^{q} (\Psi_\ell^{c} + \Psi_\ell^{(k)}) \bX_{t-\ell}^{(k)} + \be^{(k)}_{t}.\hspace{40mm} \text{(MultiVAR)};\\
-		\bX^{(k)}_t &= (\Ar^{c} + \Ar^{(k)}) \bX^{(k)}_t + \sum_{\ell=1}^{q} (\Phi_\ell^{c} + \Phi_\ell^{(k)}) \bX_{t-\ell}^{(k)} + \varepsilon^{(k)}_{t}.\hspace{10mm} \text{(GIMME)}.
+		\bY^{(k)}_t &= \sum_{\ell=1}^{q} (\Psi_\ell^{c} + \Psi_\ell^{(k)}) \bY_{t-\ell}^{(k)} + \be^{(k)}_{t}.\hspace{40mm} \text{(MultiVAR)};\\
+		\bY^{(k)}_t &= (\Ar^{c} + \Ar^{(k)}) \bY^{(k)}_t + \sum_{\ell=1}^{q} (\Phi_\ell^{c} + \Phi_\ell^{(k)}) \bY_{t-\ell}^{(k)} + \varepsilon^{(k)}_{t}.\hspace{10mm} \text{(GIMME)}.
 	\end{align*}
 	
 	\item While these approaches are useful at extracting common and individual structure, they miss the opportunity to exploit the potentially useful additional information contained in $\{\bY_k\}_{k=1}^N$. 
 	
 	\item To exploit it, we assume that the time-series model coefficients depend on the values of $Y$. We consider the following models: 
 	\begin{align}
-		\bX^{(k)}_t &= \sum_{\ell=1}^{q} \Psi_\ell(\bY_k) \bX_{t-\ell}^{(k)} + \be^{(k)}_{t}.\hspace{40mm} \text{(MultiVAR)}; \label{eq:rvar}\\
-		\bX^{(k)}_t &= \Ar(\bY_k) \bX^{(k)}_t + \sum_{\ell=1}^{q} \Phi_\ell(\bY_k) \bX_{t-\ell}^{(k)} + \varepsilon^{(k)}_{t}.\hspace{17mm} \text{(GIMME)}.
+		\bY^{(k)}_t &= \sum_{\ell=1}^{q} \Psi_\ell(\bX_k) \bY_{t-\ell}^{(k)} + \be^{(k)}_{t}.\hspace{40mm} \text{(MultiVAR)}; \label{eq:rvar}\\
+		\bY^{(k)}_t &= \Ar(\bX_k) \bY^{(k)}_t + \sum_{\ell=1}^{q} \Phi_\ell(\bY_k) \bY_{t-\ell}^{(k)} + \varepsilon^{(k)}_{t}.\hspace{17mm} \text{(GIMME)}.
 	\end{align}
-	Notice that, instead of being fixed, the set of coefficients $\Psi_\ell(Y_k), \Ar(Y_k), \Phi_\ell(Y_k)$ now depend on the individual covariate data. From this, the individual structure of each cannot be arbitrary, but it now depends on the specific features $Y_k$.
+	Notice that, instead of being fixed, the set of coefficients $\Psi_\ell(\bX_k), \Ar(\bX_k), \Phi_\ell(\bX_k)$ now depend on the individual covariate data. From this, the individual structure of each cannot be arbitrary, but it now depends on the specific features $\bX_k$.
 	
-	\item As a first approach, lets assume that these parameters have a \textit{additive} relationship to the underlying covariates. For a vector $\by=(y_1,y_2,\ldots ,y_p)\in\bbR^p$
+	\item As a first approach, lets assume that these parameters have a \textit{additive} relationship to the underlying covariates. For a vector $\bx=(x_1,x_2,\ldots ,x_p)^\mt\in\bbR^p$
 	\begin{align*}
-		\Psi_\ell(\by) &= \Psi_{\ell 0} + y_1 \Psi_{\ell 1} + y_2 \Psi_{\ell 2} + \ldots + y_p \Psi_{\ell p} ;\\
-		\Ar(\by) &= \Ar_0 + y_1 \Ar_1 + y_2 \Ar_2 + \ldots + y_p \Ar_p ;\\
-		\Phi_\ell(\by) &= \Phi_{\ell0} + y_1 \Phi_{\ell1} + y_2 \Phi_{\ell2} + \ldots + y_p \Phi_{\ell p}. \\
+		\Psi_\ell(\bx) &= \Psi_{\ell 0} + x_1 \Psi_{\ell 1} + x_2 \Psi_{\ell 2} + \ldots + x_p \Psi_{\ell p} ;\\
+		\Ar(\bx) &= \Ar_0 + x_1 \Ar_1 + x_2 \Ar_2 + \ldots + x_p \Ar_p ;\\
+		\Phi_\ell(\bx) &= \Phi_{\ell0} + x_1 \Phi_{\ell1} + x_2 \Phi_{\ell2} + \ldots + x_p \Phi_{\ell p}. \\
 	\end{align*}
-	Here, the matrices $\{\Psi_{\ell 0}\}_{\ell=1}^q, \Ar_0, \{\Phi_{\ell 0}\}_{\ell = 1}^q$ represent the structure that is common (nomothetic) among all subjects. The remaining parameters are affected by $y$, so they are dependent on the individual characteristics of each subject.
+	Here, the matrices $\{\Psi_{\ell 0}\}_{\ell=1}^q, \Ar_0, \{\Phi_{\ell 0}\}_{\ell = 1}^q$ represent the structure that is common (nomothetic) among all subjects. The remaining parameters are affected by $\bx$, so they are dependent on the individual characteristics of each subject.
 
-	\item \textbf{Example:} We consider a VAR model, where there is a single lagged relationship, \textit{i.e.} $q = 1$, and two subject-level covariates $p = 2$. In that case, given that $\bY_k = (Y_{k1},Y_{k2})^\mt$ our equations simplify to:
+	\item \textbf{Example:} We consider a VAR model, where there is a single lagged relationship, \textit{i.e.} $q = 1$, and two subject-level covariates $p = 2$. In that case, given that $\bX_k = (X_{k1},X_{k2})^\mt$ our equations simplify to:
 	\begin{align*}
-		\bX^{(k)}_t &= \Psi(\bY_k) X_{t-1}^{(k)} + \be^{(k)}_{t}\\
-		&= [\Psi_{0} + Y_{k1} \Psi_{1} + Y_{k2} \Psi_{2}] \cdot \bX_{t-1}^{(k)} + \be^{(k)}_{t}
+		\bY^{(k)}_t &= \Psi(\bX_k) \bY_{t-1}^{(k)} + \be^{(k)}_{t}\\
+		&= [\Psi_{0} + X_{k1} \Psi_{1} + X_{k2} \Psi_{2}] \cdot \bY_{t-1}^{(k)} + \be^{(k)}_{t}
 	\end{align*}
 	Notice that each subject $k$ will have their own VAR structure. This structure will incorporate a common structure shared across all subjects $\Psi_0\in\bbR^{d\times d}$. It also has individual structure. Now, instead of having this individual structure vary arbitrarily, it has the form $Y_{k1} \Psi_{1} + Y_{k2} \Psi_{2}$. Therefore, it depends on known information $Y_k = (Y_{k1}, Y_{k2})^{'}$ about each subject.
 	
@@ -72,7 +72,7 @@
 	\begin{figure}
 		\centering
 		\includegraphics[width = \linewidth]{figures/1_VisParExample}
-		\caption{Illustration of the Regression VAR framework with 2 covariate-dependent effects. Top-panels: visualization of the joint effects that are common across all subjects. We also visualize the effects that are individual to variables $Y_1$ and $Y_2$. Center-left panel: Visualization of the covariate information for $N = 50$ subjects. We highlight the covariate information of the first 5 subjects. Remaining panels: Visualization of the effects for the first 5 subjects. We observe that, as subject 1 has nearly zero for both $Y_1$ and $Y_2$, the effects are mostly just the joint effects. Subject 3 has a high $Y_2$ covariate, but low $Y_1$ covariate, and therefore its effects are a mixture of the joint and $Y_2$ effects. Subject 2 has large covariates for both $Y_1$ and $Y_2$, so its time series effects are a mixture of all.}\label{fig:rvarCoeffsExample}
+		\caption{Illustration of the Regression VAR framework with 2 covariate-dependent effects. Top-panels: visualization of the joint effects that are common across all subjects. We also visualize the effects that are individual to variables $X_1$ and $X_2$. Center-left panel: Visualization of the covariate information for $N = 50$ subjects. We highlight the covariate information of the first 5 subjects. Remaining panels: Visualization of the effects for the first 5 subjects. We observe that, as subject 1 has nearly zero for both $X_1$ and $X_2$, the effects are mostly just the joint effects. Subject 3 has a high $X_2$ covariate, but low $X_1$ covariate, and therefore its effects are a mixture of the joint and $X_2$ effects. Subject 2 has large covariates for both $X_1$ and $X_2$, so its time series effects are a mixture of all.}\label{fig:rvarCoeffsExample}
 	\end{figure}
 	
 	
@@ -92,13 +92,13 @@ In this section, we describe the fitting of the RVAR model of the form \eqref{eq
 {\footnotesize
 \begin{equation*}
 	\underbrace{\begin{bmatrix} 
-		(X_{T_k}^k)^{'} \\ (X_{T_k-1}^k)^{'} \\ \vdots \\ (X_{2}^k)^{'}
+		(\bY_{T_k}^k)^{'} \\ (\bY_{T_k-1}^k)^{'} \\ \vdots \\ (\bY_{2}^k)^{'}
 	\end{bmatrix}}_{\Zb^{k}} = 
 	\underbrace{\begin{bmatrix} 
-		(X_{T_k-1}^{k})^{'}  & Y_{k1} (X_{T_k-1}^{k})^{'} &  Y_{k2} (X_{T_k-1}^{k})^{'} & \ldots & Y_{kp} (X_{T_k-1}^{k})^{'} \\
-		(X_{T_k-2}^{k})^{'}  & Y_{k1} (X_{T_k-2}^{k})^{'} &  Y_{k2} (X_{T_k-2}^{k})^{'} & \ldots & Y_{kp} (X_{T_k-2}^{k})^{'} \\
+		(\bY_{T_k-1}^{k})^{'}  & X_{k1} (\bY_{T_k-1}^{k})^{'} &  X_{k2} (\bY_{T_k-1}^{k})^{'} & \ldots & X_{kp} (\bY_{T_k-1}^{k})^{'} \\
+		(\bY_{T_k-2}^{k})^{'}  & X_{k1} (\bY_{T_k-2}^{k})^{'} &  X_{k2} (\bY_{T_k-2}^{k})^{'} & \ldots & X_{kp} (\bY_{T_k-2}^{k})^{'} \\
 		 \vdots      &     \vdots      & \ddots & \vdots 		  \\
-		(X_{1}^{k})^{'}  & Y_{k1} (X_{1}^{k})^{'} &  Y_{k2} (X_{1}^{k})^{'} & \ldots & Y_{kp} (X_{1}^{k})^{'} \\
+		(\bY_{1}^{k})^{'}  & X_{k1} (\bY_{1}^{k})^{'} &  X_{k2} (\bY_{1}^{k})^{'} & \ldots & X_{kp} (\bY_{1}^{k})^{'} \\
 	\end{bmatrix}}_{\Wb^k} 
 	\underbrace{\begin{bmatrix}
 		\Psi_{0}^{'} \\ \Psi_{1}^{'} \\ \vdots \\ \Psi_{p}^{'}
@@ -113,38 +113,59 @@ This can be simplified to matrix form as
 	\Zb^{k} = \Wb^{k} \bPsi + \Eb^{k}
 \end{equation}
 The equation \eqref{eq:rvar_kmat} represents the VAR relationships for individual $k$. Then, we can model the behavior for all individuals via the equation
-\begin{equation*}
+\begin{equation}\label{eq:multiresponse_regression}
 	%\underbrace{\begin{bmatrix}  \Zb^1 \\ \Zb^2 \\ \vdots \\  \Zb^k \\ \vdots \\ \Zb^N \end{bmatrix}}_{\Zb} = 
 	\underbrace{\begin{bmatrix}  \Zb^1 \\ \Zb^2  \\ \vdots \\ \Zb^N \end{bmatrix}}_{\Zb} = 
 	%\underbrace{\begin{bmatrix}  \Wb^1 \\ \Wb^2 \\ \vdots \\  \Wb^k \\ \vdots \\ \Wb^N \end{bmatrix}}_{\Wb}  
 	\underbrace{\begin{bmatrix}  \Wb^1 \\ \Wb^2  \\ \vdots \\ \Wb^N \end{bmatrix}}_{\Wb}  
 	\bPsi + 
 	%\underbrace{\begin{bmatrix}  \Eb^1 \\ \Eb^2 \\ \vdots \\  \Eb^k \\ \vdots \\ \Eb^N \end{bmatrix}}_{\Eb} 
-	\underbrace{\begin{bmatrix}  \Eb^1 \\ \Eb^2 \\ \vdots \\ \Eb^N \end{bmatrix}}_{\Eb} 
-\end{equation*}
-We can finally summarize the VAR equation model for all individuals simultaneously with the reduced matrix equation:
-\begin{equation}\label{eq:rvar_mat}
-	\Zb = \Wb \bPsi + \bE.
+	\underbrace{\begin{bmatrix}  \Eb^1 \\ \Eb^2 \\ \vdots \\ \Eb^N \end{bmatrix}}_{\Eb} ,
 \end{equation}
+Thus, we can summarize the VAR equation model for all individuals simultaneously with the reduced matrix equation:
+\begin{equation}\label{eq:rvar_mat}
+	\Zb = \Wb \bPsi + \bE,
+\end{equation}
+where $\Zb \in \bbR^{(T - N)\times d}$, $T = \sum_{k} T_k$, $\Wb\in \bbR^{(T - N)\times (d(p + 1))}$ and $\Eb \in \bbR^{(T - N)\times d}$. 
+
 To solve for the parameter $\bPsi\in\bbR^{d (p+1) \times d}$, we propose performing the following optimization,
 \begin{equation}\label{eq:rvar_matreg_lasso}
-	\bhat\bPsi := \argmin_{\bPsi\in \bbR^{d (p+1) \times d}} \vertiii{ \Zb - \Wb \bPsi }_{F}^2 + \lambda_1 \vertiii{\Psi_{0}}_1 +  \lambda_2 \vertiii{[\Psi_1 \, \Psi_2 \, \ldots \, \Psi_p]}_1,
+	\bhat\bPsi := \bhat\bPsi(\lambda_1,\lambda_2) = \argmin_{\bPsi\in \bbR^{d (p+1) \times d}} \vertiii{ \Zb - \Wb \bPsi }_{F}^2 + \lambda_1 \vertiii{\Psi_{0}}_1 +  \lambda_2 \vertiii{[\Psi_1 \, \Psi_2 \, \ldots \, \Psi_p]}_1,
 \end{equation}
-where the hyperparameter $\lambda_1$ serves to penalize the common structure of all VAR models, and $\lambda_2$ penalizes the $Y$ covariate dependent portion of the model. We can interpret \eqref{eq:rvar_matreg_lasso} as a matrix regression problem. To solve the optimization problem \eqref{eq:rvar_matreg_lasso}, we use the \texttt{glmnet} package, which allows for solving matrix regression problems directly. The \texttt{glmnet} implementation  solves the problem by reducing the matrix regression problem to solving the regression problems of their individual columns.  
-\begin{equation*}
+where the hyperparameter $\lambda_1$ serves to penalize the common structure of all VAR models, and $\lambda_2$ penalizes the $X$ covariate dependent portion of the model. We can interpret \eqref{eq:rvar_matreg_lasso} as a matrix regression problem. To solve the optimization problem \eqref{eq:rvar_matreg_lasso}, we use the \texttt{glmnet} package, which allows for solving matrix regression problems directly. The \texttt{glmnet} implementation  solves the problem by reducing the matrix regression problem to solving the regression problems of their individual columns.  
+\begin{equation}\label{eq:rvar_opt}
 	\bhat\bPsi^{\ell}(\lambda_1,\lambda_2) = \argmin_{\bPsi^{(\ell)} \in \bbR^{d (p+1)}} \vertiii{ \Zb_{\cdot \ell} - \Wb \bPsi^{(\ell)} }_{F}^2 + \lambda_1 \|{[\bPsi^{(\ell)}]_{1:d}}\|_1 +  \lambda_2 \|{[\bPsi^{(\ell)}]_{(d+1):(dp)}}\|_1.
-\end{equation*}
+\end{equation}
 Finally, we set the estimated parameter $\bhat\bPsi(\lambda_1,\lambda_2) := \left[\bhat\bPsi^{1}\, \bhat\bPsi^{2}\,\ldots \, \bhat\bPsi^{d}\right](\lambda_1,\lambda_2)\in\bbR^{d(p+1)\times d}$. Figure \ref{fig:rvar_TrueEstimatedPars} in the previous section was derived with $\lambda_1 = \lambda_2 = 0$.
 
 The current implementation only allows for a single lagged relationship, \textit{i.e.} $q = 1$. We aim to create a more general implementation with lag $q> 1$ in the future.
 
 
-Unfortunately, we are not really able to use the \texttt{glmnet} package for implementing our solution to the R-VAR problem. This is in part because the multi-task regression option provided by the \texttt{glmnet} package defaults to applying a row-wise group LASSO penalty, instead of the desired entry-wise penalty. I explored the possibility of using a different package for fitting the multi-task learning problem, such as the  \texttt{RMTL} package. Despite my efforts, I realized that the package would not help since it does not allow for weighted problems. This leaves me in the realization that we need to optimize the problem with our own functions. I think this is doable, but will require effort.
+To solve the optimization problem \eqref{eq:rvar_opt}, notice that the representation \eqref{eq:rvar_mat} can be further vectorized into a single-response linear regression of the form 
+\begin{align*}
+	\bvec(\bZ) =  ( I_d \otimes  \Wb )  \cdot \bvec(\Psi) + \bvec(\Eb)
+\end{align*}
+where $\bvec(\Ab) = [A_{\cdot 1}^\mt , A_{\cdot 2}^\mt ,  \ldots A_{\cdot n}^\mt]^\mt\in\bbR^{ab}$ and $\Ab \otimes \Bb = [A_{ij}\cdot \Bb]_{i,j}\in\bbR^{ac \times bd}$ for any $\Ab\in\bbR^{a\times b}$ and $\Bb \in \bbR^{c\times d}$. Thus, solving \eqref{eq:rvar_opt} is equivalent to solving a weighted version of the LASSO optimization problem \jose{add LASSO/glmnet ref}.
+
+\subsection{Adaptive CD-VAR}
+
+To improve upon the performance of our original estimator, we propose a refinement of our CD-VAR estimator through an adaptive approach. For this, let $\bhat{\bPsi}$ be an initial estimator of the CD-VAR model. Then, given a constant $\gamma > 0$ we define the adaptively-weighted $\ell_1$ penalty as:
+\begin{equation}
+	P_{ad}(\bPsi)  = \sum_{\ell = 1}^{p}\sum_{i, j=1}^{d}  (\Psi^{(\ell)}_{ij})^{-\gamma}\cdot |\bPsi^{(w)}_{ij}|
+\end{equation}
+Then, for $\lambda >0$, our adaptive CD-VAR estimator is given as a solution to the optimization problem
+\begin{equation*}\label{eq:rvar_opt}
+	\bhat\bPsi_{ad}(\lambda_a) = \argmin_{\bPsi \in \bbR^{d \times (d(p+1))}} \vertiii{ \Zb - \Wb \bPsi }_{F}^2 + \lambda P_{ad}(\bPsi).
+\end{equation*}
+
+In following sections, we explore how the adaptive approach can help improve the edge-recovery performance. 
 
 
 \subsection{Tuning Parameter Selection}
 
 One of the main concerns when fitting a penalized model is to determine the best procedure for selecting tuning parameters. In particular, due to the dependence present in time series data, direct sample splitting is not feasible, leading to sophisticated procedures of data splitting to obtain a reasonable cross-validation procedure. For example \jose{add references, and what they do.}
+
+\subsubsection{Cross-Validation}
 
 In our particular modeling, due to the independence across individuals, it is possible for us to perform cross validation as follows. Given a number of subjects $N$ and s number of folds $K< N$, we divide the set of individuals $\{1,2,\ldots, N\} $into $K$ groups $\cG_1,\ldots, \cG_K$. Then, for each $k\in[K]$, the $k$-th fold consist of the union of all the data corresponding to the individuals in $\cG_k$. 
 
@@ -153,7 +174,14 @@ While simple, this approach for cross-validation cannot be used in usual VAR mod
 On our case, since we assume that there is an underlying additive structure that connects all the individual time-series models, it is possible to train both the invidiual and common structure simultaneously. Furthermore, since our model determines how exogenous covariates relate to the coefficients in the model, fitting our model on a set of $N'$ individuals in fact 
 
 
+\subsubsection{BIC}
 
+In addition to cross-validation, we alternatively propose the fitting of our model by selecting the tuning parameter that minimizes the Bayesian information criteria (BIC). Given $\lambda_1,\lambda_2 > 0$, we define,
+\begin{equation}\label{eq:bic}
+	\BIC(\lambda_1,\lambda_2) =  \vertiii{ \Zb - \Wb \bhat\bPsi(\lambda_1,\lambda_2) }_{F}^2 + \vertiii{\bhat\bPsi(\lambda_1,\lambda_2)}_0 \log(T-N)  . 
+\end{equation}
+
+Through numerical results, we have verified that BIC is a measure that leads to more sparse estimates of the matrix $\bPsi$ when compared to the estimate obtained through cross-validation.
 
 \section{Fitting RUSEM}
 
@@ -168,4 +196,17 @@ I explored the original GIMME reference \citet{gates2012group}, which points tow
 \section{Simulation Study for R-VAR}
 
 To explore the performance of our proposed RVAR model, and to compare to other methods found in the literature, we perform a numerical simulation study. 
+
+\subsection{Simulation Setup}
+
+To explore the accuracy of our CD-VAR method on the task of estimating covariate-dependent time series models, we consider the following simulation scenarios. 
+
+
+We consider multivariate time series over $d = 10, 20, 30$ variables of interest. We consider scenarios with $N = 10, 20$ subjects, measured over $T = 30, 50, 100$ time points. For each subject $k\in\{1,2,\ldots , N\}$, we simulate a vector of $p = 2,5$ time-invariant covariates according to the mixture distribution $\bX_{k} = (X_{k1},X_{k2},\ldots , X_{kp})\stackrel{i.i.d.}{\sim} 0.25\cdot \delta_{0} + 0.75\cdot\Unif([-1,-0.5]\cup [0.5,1])$. Then, we simulate a lag-1 time series dataset for the subject $k \in \{1,2,\ldots , N\}$ according to the covariate-dependent VAR model \eqref{eq:rvar} with parameter $\bPsi(\bX_i)$, where 
+\begin{equation*}
+	\bPsi(\bx) = \Psi_0 + x_1 \Psi_1 + x_2 \Psi_2 + \ldots + x_p \Psi_p.
+\end{equation*}
+Finally, the common effect matrix $\Psi_0\in\bbR^{d\times d}$ and the matrix of covariate-dependent effects $\Psi_1,\ldots,\Psi_p \in\bbR^{d\times d}$ are generated as follows. 
+We generate $\bPsi(\bx)$ such that . Furthemore, non-zero entries follow the distribution $\Unif([-0.9,-0.3]\cup[0.3,0.9])$. 
+
 
