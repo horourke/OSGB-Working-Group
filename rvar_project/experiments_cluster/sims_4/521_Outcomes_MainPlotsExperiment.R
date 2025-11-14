@@ -36,18 +36,19 @@ sim_par_table <- expand.grid(
   signed        = c(TRUE),                        ## signed    : are entries signed or all positive?
 
 
-  prob_c        = c(2/3, 1/3),                    ## prob_c   : proportion of common entries.
+  prob_c        = c(0.25, 0.75),                  ## prob_c   : proportion of common entries.
   prob_tot      = 0.1,                            ## prob_tot : total proportion of non-zero entries.
 
   nsim          = ifelse(
                     runtype == 1, 
                     1, 
-                    ifelse(runtype == 2, 2, 10)),## nsim     : no of simulation repetitions.
-  sigma2        = c(0.05, 0.1),                  ## sigma2   : variance o VAR error term.
-  N             = c(20, 50),                     ## N        : No. of individuals
-  T             = c(50, 100),                    ## T        : timepoints per individual.
-  p             = c(2, 5),                       ## p        : covariate dimension
-  d             = c(10, 20))                     ## d        : Time series dimension
+                    ifelse(runtype == 2, 2, 10)), ## nsim     : no of simulation repetitions.
+  sigma2        = c(0.1),                         ## sigma2   : variance o VAR error term.
+  N             = c(10, 20),                      ## N        : No. of individuals
+  T             = c(30, 50, 100),                 ## T        : timepoints per individual.
+  p             = c(2, 5),                        ## p        : covariate dimension
+  d             = c(10, 20, 30))                  ## d        : Time series dimension
+
 ## Add specific parameters to table:
 sim_par_table$prob_phi0 <- sim_par_table$prob_tot * sim_par_table$prob_c
 sim_par_table$prob_phip <- sim_par_table$prob_tot * (1 - sim_par_table$prob_c)
@@ -86,14 +87,16 @@ if (!dir.exists(subfolder_plots_new)) {
 method_names <- c(
     "var_standard",
     "mvar_standard", "mvar_adaptive",
-    "rvar_bic", "rvar_cv")
+    "rvar_bic", "rvar_bic_ad",
+    "rvar_cv", "rvar_cv_ad")
 method_names_clean <- c(
     "VAR",          
     "M-VAR: Standard", "M-VAR: Adaptive",
-    "R-VAR: BIC", "R-VAR: CV")
+    "R-VAR: BIC", "R-VAR: BIC Ada", 
+    "R-VAR: CV", "R-VAR: CV Ada")
 
 
-for (d_val in c(10, 20)) {
+for (d_val in c(10, 20, 30)) {
   
   ##############################
   ##############################

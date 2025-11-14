@@ -86,21 +86,19 @@ if (!dir.exists(subfolder_plots_new)) {
 method_names <- c(
     "var_standard",
     "mvar_standard", "mvar_adaptive",
-    "rvar_bic", "rvar_bic_ad",
-    "rvar_cv", "rvar_cv_ad")
+    "rvar_bic_ad")
 method_names_clean <- c(
     "VAR",          
     "M-VAR: Standard", "M-VAR: Adaptive",
-    "R-VAR: BIC", "R-VAR: BIC Ada", 
-    "R-VAR: CV", "R-VAR: CV Ada")
+    "CD-VAR")
 
 for(sigma2_val in c(0.05, 0.1)) {
-  for (d_val in c(10, 20, 30)) {
+  for (d_val in c(30)) {
   
     ##############################
     ##############################
     ## LOADING ALL DATA WITH T0 = P.
-    sim_ind_load    <- which(d == d_val, sigma2 == sigma2_val) #p == p_val)
+    sim_ind_load    <- which(d == d_val, sigma2 == sigma2_val, prob_c == 0.25) #p == p_val)
     type            <- "all"
     results_dir     <- paste0(subfolder_new, "plots_", type, "/")
 
@@ -118,11 +116,21 @@ for(sigma2_val in c(0.05, 0.1)) {
     ## Merge dataset of JIC-HD-derived data.
     output_merged  <- distinct(bind_rows(mget(ls(pattern = '^output\\d+')))) %>%
       filter(method %in% method_names) %>%
-      #mutate(method = str_replace_all(method, setNames(method_names_clean, method_names))) %>%
+      mutate(method = factor(method)) %>%
+      mutate(method = recode_factor(
+        method, 
+        "var_standard" = "VAR", 
+        "mvar_standard" = "M-VAR: Standard",
+        "mvar_adaptive" = "M-VAR: Adaptive",
+        "rvar_bic_ad" = "CD-VAR")) %>%
       #mutate(total_N = N * T) %>% 
+      mutate(is_rvar = ifelse(method == "CD-VAR", "CD-VAR", "Other Methods")) %>%
+      mutate(no_cov = factor(paste0("p == ", p))) %>%
+      mutate(no_subj = factor(paste0("N == ", N))) %>%
       filter(sigma2 == 0.1, signed == TRUE) %>%
-      select(-sigma2) %>%
-      group_by(d, p, T, N, prob_c, method) %>%
+      select(-sigma2, -prob_c) %>%
+      group_by(d, no_cov, T, no_subj, method, is_rvar) %>%
+      droplevels() %>%
 
     summarise(
       meanTPR = mean(TPR),
@@ -136,50 +144,84 @@ for(sigma2_val in c(0.05, 0.1)) {
       meanFr = mean(Fr),
       sdFr = sd(Fr))
 
+    
+    print(unique(output_merged$method))
+
+    col_rvar <- "#004D40"
+    col_others <- "#D81B60"
+
     file_name <- paste0(
       subfolder_plots_new, 
       "621_ByPnN",
       "_d", d_val, 
       "_sigma2_", sigma2_val,
-      ".pdf")
+      "_GRANT.pdf")
     pdf(file_name, width = 8, height = 5)
     p1 <-  output_merged %>% ggplot(aes(x = T, y = meanTPR)) +
-      geom_line(aes(col = method, linetype = method), linewidth = 1) +
-      geom_ribbon(aes(ymin = meanTPR - sdTPR, ymax = meanTPR + sdTPR, fill = method), alpha = 0.1) +
+      geom_line(aes(col = is_rvar, linetype = method, group = method), linewidth = 1) +
+      geom_ribbon(aes(ymin = meanTPR - sdTPR, ymax = meanTPR + sdTPR, fill = is_rvar, group = method), alpha = 0.2) +
       geom_hline(yintercept = c(0,1), linetype = 2) +
-      facet_grid(p ~ prob_c + N, scales = "free_x", labeller = label_parsed) +
-      theme(legend.position="bottom")
+      scale_color_manual(values = c("CD-VAR" = col_rvar, "Other Methods" = col_others)) +
+      scale_fill_manual(values = c("CD-VAR" = col_rvar, "Other Methods" = col_others)) + 
+      scale_linetype_manual(
+        values = c("dotted", "twodash", "dotdash", "solid"),
+        labels = method_names_clean) + 
+      labs(color = NULL) +
+      facet_grid(no_cov ~ no_subj, scales = "free_y", labeller = label_parsed) 
+      #theme(legend.position="bottom") 
     print(p1)
 
     p2 <-  output_merged %>% ggplot(aes(x = T, y = meanFPR)) +
-      geom_line(aes(col = method, linetype = method), linewidth = 1) +
-      geom_ribbon(aes(ymin = meanFPR - sdFPR, ymax = meanFPR + sdFPR, fill = method), alpha = 0.1) +
-      geom_hline(yintercept = c(0), linetype = 2) +
-      facet_grid(p ~ prob_c + N, scales = "free_x", labeller = label_parsed) +
-      theme(legend.position="bottom")
+      geom_line(aes(col = is_rvar, linetype = method, group = method), linewidth = 1) +
+      geom_ribbon(aes(ymin = meanFPR - sdFPR, ymax = meanFPR + sdFPR, fill = is_rvar, group = method), alpha = 0.2) +
+      scale_color_manual(values = c("CD-VAR" = col_rvar, "Other Methods" = col_others)) +
+      scale_fill_manual(values = c("CD-VAR" = col_rvar, "Other Methods" = col_others)) + 
+      scale_linetype_manual(
+        values = c("dotted", "twodash", "dotdash", "solid"),
+        labels = method_names_clean) + 
+      labs(color = NULL) +
+      facet_grid(no_cov ~ no_subj, scales = "free_y", labeller = label_parsed) 
+      #theme(legend.position="bottom")
     print(p2)
 
     p3 <-  output_merged %>% ggplot(aes(x = T, y = meanL1)) +
-      geom_line(aes(col = method, linetype = method), linewidth = 1) +
-      geom_ribbon(aes(ymin = meanL1 - sdL1, ymax = meanL1 + sdL1, fill = method), alpha = 0.1) +
+      geom_line(aes(col = is_rvar, linetype = method, group = method), linewidth = 1) +
+      geom_ribbon(aes(ymin = meanL1 - sdL1, ymax = meanL1 + sdL1, fill = is_rvar, group = method), alpha = 0.2) +
       geom_hline(yintercept = c(0), linetype = 2) +
-      facet_grid(p ~ prob_c + N, scales = "free_x", labeller = label_parsed) +
-      theme(legend.position="bottom")
+      scale_color_manual(values = c("CD-VAR" = col_rvar, "Other Methods" = col_others)) +
+      scale_fill_manual(values = c("CD-VAR" = col_rvar, "Other Methods" = col_others)) + 
+      scale_linetype_manual(
+        values = c("dotted", "twodash", "dotdash", "solid"),
+        labels = method_names_clean) + 
+      labs(
+        color = NULL,
+        fill = NULL,
+        linetype = NULL,
+        y = "Mean network absolute estimation error",
+        x = "No. of available time points") +
+      facet_grid(no_cov ~ no_subj,  labeller = label_parsed) 
+      #theme(legend.position="bottom") 
     print(p3)
 
     p4 <-  output_merged %>% ggplot(aes(x = T, y = meanFr)) +
-      geom_line(aes(col = method, linetype = method), linewidth = 1) +
-      geom_ribbon(aes(ymin = meanFr - sdFr, ymax = meanFr + sdFr, fill = method), alpha = 0.1) +
+      geom_line(aes(col = is_rvar, linetype = method, group = method), linewidth = 1) +
+      geom_ribbon(aes(ymin = meanFr - sdFr, ymax = meanFr + sdFr, fill = is_rvar, group = method), alpha = 0.2) +
       geom_hline(yintercept = c(0), linetype = 2) +
-      facet_grid(p ~ prob_c + N, scales = "free_x", labeller = label_parsed) +
-      theme(legend.position="bottom")
+      scale_color_manual(values = c("CD-VAR" = col_rvar, "Other Methods" = col_others)) +
+      scale_fill_manual(values = c("CD-VAR" = col_rvar, "Other Methods" = col_others)) + 
+      scale_linetype_manual(
+        values = c("dotted", "twodash", "dotdash", "solid"),
+        labels = method_names_clean) + 
+      labs(color = NULL) +
+      facet_grid(no_cov ~ no_subj, scales = "free_y", labeller = label_parsed) 
+      #theme(legend.position="bottom") 
     print(p4)
 
     p5 <-  output_merged %>% 
       mutate(logmt = log(meanTime, base = 60)) %>%
     
       ggplot(aes(x = T, y = logmt)) + 
-        geom_line(aes(col = method, linetype = method), linewidth = 1) +
+        geom_line(aes(col = is_rvar, linetype = method, group = method), linewidth = 1) +
         #geom_ribbon(aes(ymin = meanTime - sdTime, ymax = meanTime + sdTime, fill = method), alpha = 0.1) +
         ylab(expression(log[60]("seconds"))) +
         geom_hline(yintercept = c(0,1, 1.56, 2), linetype = 2, linewidth = 0.25) +
@@ -187,7 +229,7 @@ for(sigma2_val in c(0.05, 0.1)) {
         annotate("text", x = 55 * 0.93, y = 1.15, label = "1 m", size = 2.5) + 
         annotate("text", x = 55 * 0.93, y = 1.71, label = "10 m", size = 2.5) + 
         annotate("text", x = 55 * 0.93, y = 2.15, label = "1 h", size = 2.5) + 
-        facet_grid(p ~ prob_c + N, scales = "free_x", labeller = label_parsed) +
+      facet_grid(no_cov ~ no_subj, scales = "free_y", labeller = label_parsed) +
         theme(legend.position="bottom")
     print(p5)
 
