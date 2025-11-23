@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.3.7)  7 NOV 2025 12:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.3.7)  15 NOV 2025 18:33
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -933,8 +933,9 @@ LaTeX Font Info:    Trying to load font information for T1+lmr on input line 11
 (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ))
-(C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/mathtools\mathtools.sty
-Package: mathtools 2022/06/29 v1.29 mathematical typesetting tools
+(C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/pdfpages\pdfpages.sty
+Package: pdfpages 2024/05/29 v0.6a Insert pages of external PDF documents (AM)
+
 (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/tools\calc.sty
 Package: calc 2023/07/08 v4.3 Infix arithmetic (KKT,FJ)
 \calc@Acount=\count346
@@ -948,36 +949,59 @@ LaTeX Info: Redefining \addtolength on input line 81.
 \calc@Ccount=\count348
 \calc@Cskip=\skip87
 )
+(C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/eso-pic\eso-pic.sty
+Package: eso-pic 2023/05/03 v3.0c eso-pic (RN)
+\ESO@tempdima=\dimen309
+\ESO@tempdimb=\dimen310
+)
+\AM@pagewidth=\dimen311
+\AM@pageheight=\dimen312
+\AM@fboxrule=\dimen313
+
+(C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/pdfpages\pppdftex.def
+File: pppdftex.def 2024/05/29 v0.6a Pdfpages driver for pdfTeX (AM)
+)
+\pdfpages@includegraphics@status=\count349
+\AM@pagebox=\box88
+\AM@global@opts=\toks48
+\AM@pagecnt=\count350
+\AM@toc@title=\toks49
+\AM@lof@heading=\toks50
+\c@AM@survey=\count351
+\AM@templatesizebox=\box89
+)
+(C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/mathtools\mathtools.sty
+Package: mathtools 2022/06/29 v1.29 mathematical typesetting tools
 (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/mathtools\mhsetup.sty
 Package: mhsetup 2021/03/18 v1.4 programming setup (MH)
 )
-\g_MT_multlinerow_int=\count349
-\l_MT_multwidth_dim=\dimen309
+\g_MT_multlinerow_int=\count352
+\l_MT_multwidth_dim=\dimen314
 \origjot=\skip88
-\l_MT_shortvdotswithinadjustabove_dim=\dimen310
-\l_MT_shortvdotswithinadjustbelow_dim=\dimen311
-\l_MT_above_intertext_sep=\dimen312
-\l_MT_below_intertext_sep=\dimen313
-\l_MT_above_shortintertext_sep=\dimen314
-\l_MT_below_shortintertext_sep=\dimen315
-\xmathstrut@box=\box88
-\xmathstrut@dim=\dimen316
+\l_MT_shortvdotswithinadjustabove_dim=\dimen315
+\l_MT_shortvdotswithinadjustbelow_dim=\dimen316
+\l_MT_above_intertext_sep=\dimen317
+\l_MT_below_intertext_sep=\dimen318
+\l_MT_above_shortintertext_sep=\dimen319
+\l_MT_below_shortintertext_sep=\dimen320
+\xmathstrut@box=\box90
+\xmathstrut@dim=\dimen321
 )
-\c@thm=\count350
-\c@cor=\count351
-\c@ex=\count352
-\c@prop=\count353
-\c@lemma=\count354
-\c@assumption=\count355
-\c@definition=\count356
-\c@remark=\count357
+\c@thm=\count353
+\c@cor=\count354
+\c@ex=\count355
+\c@prop=\count356
+\c@lemma=\count357
+\c@assumption=\count358
+\c@definition=\count359
+\c@remark=\count360
 \dhatheight=\skip89
 )
 (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
 tex.def
 File: l3backend-pdftex.def 2024-02-20 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count358
-\l__pdf_internal_box=\box89
+\l__color_backend_stack_int=\count361
+\l__pdf_internal_box=\box91
 ) (MainPaper.aux
 
 LaTeX Warning: Label `eq:rvar_opt' multiply defined.
@@ -1010,17 +1034,17 @@ LaTeX Font Info:    ... okay on input line 18.
 (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
 ii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count359
-\scratchdimen=\dimen317
-\scratchbox=\box90
-\nofMPsegments=\count360
-\nofMParguments=\count361
-\everyMPshowfont=\toks48
-\MPscratchCnt=\count362
-\MPscratchDim=\dimen318
-\MPnumerator=\count363
-\makeMPintoPDFobject=\count364
-\everyMPtoPDFconversion=\toks49
+\scratchcounter=\count362
+\scratchdimen=\dimen322
+\scratchbox=\box92
+\nofMPsegments=\count363
+\nofMParguments=\count364
+\everyMPshowfont=\toks51
+\MPscratchCnt=\count365
+\MPscratchDim=\dimen323
+\MPnumerator=\count366
+\makeMPintoPDFobject=\count367
+\everyMPtoPDFconversion=\toks52
 )
 (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-b
 ase.sty
@@ -1107,34 +1131,43 @@ s/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}{C:/Users/joses/Ap
 pData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}] (mainV1.tex
 [2]
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 31.
+(Font)              <12> on input line 32.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 31.
+(Font)              <8> on input line 32.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 31.
+(Font)              <6> on input line 32.
  [3{C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.e
 nc}{C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}{
 C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}{
 C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}]
  [4]
-<figures/2_VisRvarTrueEstPars.png, id=67, 637.1805pt x 394.47375pt>
+<figures/2_VisRvarTrueEstPars.png, id=68, 637.1805pt x 394.47375pt>
 File: figures/2_VisRvarTrueEstPars.png Graphic file (type png)
 <use figures/2_VisRvarTrueEstPars.png>
 Package pdftex.def Info: figures/2_VisRvarTrueEstPars.png  used on input line 6
-8.
+9.
 (pdftex.def)             Requested size: 462.26999pt x 286.1938pt.
-<figures/1_VisParExample.png, id=68, 637.1805pt x 546.24075pt>
+<figures/1_VisParExample.png, id=69, 637.1805pt x 546.24075pt>
 File: figures/1_VisParExample.png Graphic file (type png)
 <use figures/1_VisParExample.png>
-Package pdftex.def Info: figures/1_VisParExample.png  used on input line 74.
+Package pdftex.def Info: figures/1_VisParExample.png  used on input line 75.
 (pdftex.def)             Requested size: 462.26999pt x 396.30196pt.
- [5 <./figures/2_VisRvarTrueEstPars.png>] [6 <./figures/1_VisParExample.png>]
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1
-35.
- (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
-File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
-[7] [8] [9] [10]) (MainPaper.bbl [11]) [12] (MainPaper.aux)
+ [5 <./figures/2_VisRvarTrueEstPars.png>] [6 <./figures/1_VisParExample.png>] [
+7] [8] [9] [10]
+<sims_4/621_ByPnN_d30_sigma2_0.1.pdf, id=147, page=4, 578.16pt x 361.35pt>
+File: sims_4/621_ByPnN_d30_sigma2_0.1.pdf Graphic file (type pdf)
+<use sims_4/621_ByPnN_d30_sigma2_0.1.pdf, page 4>
+Package pdftex.def Info: sims_4/621_ByPnN_d30_sigma2_0.1.pdf , page4 used on in
+put line 229.
+(pdftex.def)             Requested size: 416.04016pt x 260.02293pt.
+<sims_4/621_ByPnN_d20_sigma2_0.1.pdf, id=148, page=4, 578.16pt x 361.35pt>
+File: sims_4/621_ByPnN_d20_sigma2_0.1.pdf Graphic file (type pdf)
+<use sims_4/621_ByPnN_d20_sigma2_0.1.pdf, page 4>
+Package pdftex.def Info: sims_4/621_ByPnN_d20_sigma2_0.1.pdf , page4 used on in
+put line 230.
+(pdftex.def)             Requested size: 416.04016pt x 260.02293pt.
+) (MainPaper.bbl [11]) [12] [13 <./sims_4/621_ByPnN_d30_sigma2_0.1.pdf> <./sims
+_4/621_ByPnN_d20_sigma2_0.1.pdf>] (MainPaper.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
@@ -1145,11 +1178,11 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 32202 strings out of 474457
- 646676 string characters out of 5742755
- 1949190 words of memory out of 5000000
- 53938 multiletter control sequences out of 15000+600000
- 664413 words of font info for 121 fonts, out of 8000000 for 9000
+ 32829 strings out of 474457
+ 657674 string characters out of 5742755
+ 1951190 words of memory out of 5000000
+ 54555 multiletter control sequences out of 15000+600000
+ 664095 words of font info for 120 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  94i,16n,96p,984b,1066s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
@@ -1177,12 +1210,11 @@ ic/lm/lmr8.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public
 /lm/lmsy5.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/
 lm/lmsy6.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/l
 m/lmsy7.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm
-/lmsy8.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/
-lmtt12.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
+/lmsy8.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/symbols/msbm10.pfb>
-Output written on MainPaper.pdf (12 pages, 443517 bytes).
+Output written on MainPaper.pdf (13 pages, 451043 bytes).
 PDF statistics:
- 317 PDF objects out of 1000 (max. 8388607)
- 43 named destinations out of 1000 (max. 500000)
- 87 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 347 PDF objects out of 1000 (max. 8388607)
+ 46 named destinations out of 1000 (max. 500000)
+ 105 words of extra memory for PDF output out of 10000 (max. 10000000)
 
