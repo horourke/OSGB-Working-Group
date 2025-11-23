@@ -1,0 +1,404 @@
+---
+title: "Cleaning and Importing Data"
+author: "Jose Angel Sanchez Gomez"
+date: "2025-11-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+source("002_requirements_lite.R"); search()
+
+
+source("041_rvar_supps_vect.R")
+source("043_lm_rvar_vectorized.r")
+source("044_glmnet_rvar_vectorized.r")
+source("045_cv.glmnet_rvar_vectorized.r")
+source("046_bic.glmnet_rvar_vectorized.r")
+source("047_glmnet_rvar_adaptive.r")
+
+library(magrittr)
+library(tidyverse)
+library(ggplot2)
+
+
+```
+
+
+
+
+```{r}
+
+df <- read.csv("BEED_Data.csv")
+
+dim(df)
+
+```
+
+
+
+```{r}
+
+df_split <- lapply(
+  1:40,
+  function(df, i) {
+    df[1:200 + 200 *(i - 1), ]
+  },
+  df = df)
+lapply(df_split, dim)
+
+repeats <- lapply(
+  df_split,
+  function(df) {
+    df$y %>% 
+      unique() %>%
+      length() %>%
+      return()
+  })  %>% unlist() %>% print()
+
+df$subject <- rep(1:40, rep(200, 40))
+df$timestamp <- rep(1:200, 40)
+
+df %>% group_by(subject) %>%
+  summarise(count1 = length(unique(y)),
+            count2 = length(unique(timestamp)))
+
+```
+
+
+
+```{r}
+
+sample_subj <- sample(1:40, 6, replace = FALSE)
+
+df %>% 
+  
+  mutate(y = factor(y)) %>%
+  
+  filter(subject %in% sample_subj) %>%
+  select(X1:X5, y, subject, timestamp) %>%
+  
+  pivot_longer(
+    cols = X1:X5,
+    names_to = "Var",
+    names_prefix = "X",
+    values_to = "EEG") %>%
+  
+  ggplot(aes(x = timestamp, y = EEG)) +
+    geom_line(aes(col = y)) +
+    facet_grid(rows = vars(Var), cols = vars(subject))
+
+```
+
+
+```{r}
+
+df_means <- df %>% 
+  
+  mutate(y = factor(y)) %>%
+  
+  pivot_longer(
+    cols = X1:X16,
+    names_to = "Var",
+    names_prefix = "X",
+    values_to = "EEG") %>%
+  
+  group_by(y, subject, Var) %>%
+  summarise(mean = mean(EEG)) %>%
+  
+  mutate(Var = as.numeric(Var)) %>%
+  arrange(subject, Var) %>%
+  
+  pivot_wider(
+    names_from = "Var",
+    names_prefix = "mean_V",
+    values_from = c("mean"))
+
+df_sds <- df %>% 
+  
+  mutate(y = factor(y)) %>%
+  
+  pivot_longer(
+    cols = X1:X16,
+    names_to = "Var",
+    names_prefix = "X",
+    values_to = "EEG") %>%
+  
+  group_by(y, subject, Var) %>%
+  summarise(sd = sd(EEG)) %>%
+  
+  mutate(Var = as.numeric(Var)) %>%
+  arrange(subject, Var) %>%
+  
+  pivot_wider(
+    names_from = "Var",
+    names_prefix = "sd_V",
+    values_from = c("sd"))
+
+```
+```{r fig.width=10, fig.height=5}
+
+df_means %>%
+  
+  pivot_longer(
+    cols = mean_V1:mean_V16,
+    names_to = "var",
+    names_prefix = "mean_V",
+    values_to = "mean")  %>%
+  
+  mutate(var = factor(var, levels = 1:20, ordered = TRUE)) %>%
+  
+  #filter(y != 0) %>%
+  
+  ggplot(aes(x = y, y = mean)) +
+    geom_boxplot(aes(col = y)) +
+    facet_grid( cols = vars(var))
+  
+
+df_sds %>%
+  
+  pivot_longer(
+    cols = sd_V1:sd_V16,
+    names_to = "var",
+    names_prefix = "sd_V",
+    values_to = "sd")  %>%
+  
+  mutate(var = factor(var, levels = 1:20, ordered = TRUE)) %>%
+  
+  #filter(y != 0) %>%
+  
+  ggplot(aes(x = y, y = sd)) +
+    geom_boxplot(aes(col = y)) +
+    facet_grid( cols = vars(var))
+
+```
+
+
+
+```{r}
+
+df_nonzero <- df %>%
+  filter(y != 0)
+subjects <- unique(df_nonzero$subject)
+
+
+Y_list <- lapply(
+  11:40,
+  function(i, df) {
+    df %>%
+      filter(subject == i) %>%
+      select(-subject, -y, -timestamp)
+  },
+  df = df_nonzero)
+
+
+
+X <- df_nonzero %>% 
+  select(-(X1:X16)) %>%
+  select(-timestamp) %>%
+  group_by(subject) %>%
+  summarise(y = mean(y)) %>%
+  select(-subject) %>%
+  mutate(y = factor(y))
+
+X <- model.matrix(~ y - 1, data = X) 
+
+  
+```
+
+
+################################################################################
+################################################################################
+################################################################################
+################################################################################
+################################################################################
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+Y_list_cent <- lapply(
+  Y_list,
+  function(df) {
+    return(scale(df, center = TRUE, scale =  FALSE))
+  })
+
+lambda.seq      <- 10^(seq(1,-4, length.out = 20))
+penalty.factor  <- 10^(seq(3, -3, length.out = 20))
+
+
+cdvar.fit <- cv.solve_rvar_glmnet_vectorized(
+  d = 16, p = 3, Y_list = Y_list_cent,
+  X = X, lambda.seq = lambda.seq, 
+  penalty.factor = penalty.factor, 
+  nfolds = 5, verbose = TRUE)
+
+save.image("1_cdvar.RData")
+
+```
+
+
+
+```{r fig.width=7, fig.height= 7}
+
+coefs <- cdvar.fit$rvar_opt_coeffs[, -(1:3)] %>%
+  as.matrix()
+
+coefs[1:16, 1:16] <- coefs[1:16, 1:16] - diag(diag(coefs[1:16, 1:16]))
+coefs[1:16, 16 + (1:16)] <- coefs[1:16, 16 + (1:16)] - diag(diag(coefs[1:16, 16 + (1:16)]))
+
+par(mar = c(5.1, 4.1, 4.1, 4.1),
+    mfrow = c(2,2))
+
+0:3 %>% lapply(
+  function(i) {
+    mat <- coefs[1:16, i * 16 + (1:16)] %>%
+      {. - diag(diag(.))} %>%
+      {. * (abs(.) > 10^(-5))}
+    
+    plot(mat, breaks = 100)
+  })
+
+sum(abs(coefs) > 10^(-5))
+sum(abs(coefs) <= 10^(-5))
+
+
+par(mfrow = c(1,1))
+coefs[abs(coefs) > 10^(-4)] %>% abs() %>% log(base = 10) %>% density() %>% plot()
+
+
+
+```
+
+
+```{r fig.width=7, fig.height= 7}
+
+par(mar = c(5.1, 4.1, 4.1, 4.1),
+    mfrow = c(2,2))
+
+0:3 %>% lapply(
+  function(i) {
+    mat <- coefs[1:16, i * 16 + (1:16)] %>%
+      {. - diag(diag(.))} %>%
+      {(abs(.) > 10^(-3))}
+    
+    plot(mat)
+  })
+
+```
+
+
+
+Train/testing exploration:
+
+
+```{r}
+
+train_set <- sample(1:30, 20, replace = FALSE)
+test_set <- (1:30)[-train_set]
+
+X_train       <- X[train_set,]
+Y_list_train  <- Y_list_cent[train_set]
+
+X_test        <- X[-train_set,]
+Y_list_test   <- Y_list_cent[-train_set]
+
+
+```
+
+
+```{r}
+
+lambda.seq      <- 10^(seq(1,-4, length.out = 20))
+penalty.factor  <- 10^(seq(3, -3, length.out = 20))
+
+
+cdvar.fit_train <- cv.solve_rvar_glmnet_vectorized(
+  d = 16, p = 3, Y_list = Y_list_train,
+  X = X_train, lambda.seq = lambda.seq, 
+  penalty.factor = penalty.factor, 
+  nfolds = 5, verbose = TRUE)
+
+
+
+
+lambda.seq      <- 10^(seq(4,-1, length.out = 20))
+cdvar.ada_train <- solve_rvar_glmnet_adaptive(
+  d = 16, p = 3, Y_list = Y_list_train, 
+  X = X_train, gamma = 2, rvar.fit = cdvar.fit_train,
+  lambda.seq = lambda.seq, nfolds = 5, verbose = TRUE)
+
+save.image("2_cdvar.RData")
+
+```
+
+
+```{r fig.width=7, fig.height= 7}
+
+coefs.ada <- cdvar.ada_train$rvar_opt_coeffs[, -(1:3)] %>%
+  as.matrix()
+
+
+par(mar = c(5.1, 4.1, 4.1, 4.1),
+    mfrow = c(2,2))
+0:3 %>% lapply(
+  function(i) {
+    mat <- coefs.ada[1:16, i * 16 + (1:16)] %>%
+      {. - diag(diag(.))} %>%
+      {(abs(.) > 10^(-3))}
+    
+    plot(mat)
+  })
+
+
+0:3 %>% lapply(
+  function(i) {
+    mat <- coefs.ada[1:16, i * 16 + (1:16)] %>%
+      {. - diag(diag(.))} %>%
+      {(.) * (abs(.) > 10^(-4))}
+    
+    plot(abs(mat), breaks = 30)
+  })
+
+```
+
+
+
+```{r}
+
+par(mfrow = c(1,1))
+coefs.ada[abs(coefs.ada) > 10^(-4)] %>% 
+  abs() %>% log(base = 10) %>% 
+  density(bw = 0.01) %>% plot()
+
+```
+
+
+
+
+
+
+
+```{r}
+
+library(igraph)
+
+par(mar = c(0,0,0,0),
+    mfrow = c(2,2))
+0:3 %>% lapply(
+  function(i) {
+    graph <- coefs.ada[1:16, i * 16 + (1:16)] %>%
+      {. - diag(diag(.))} %>%
+      {(abs(.) > 10^(-4))} %>%
+      graph.adjacency(mode = "undirected", add.colnames = TRUE)
+    plot(graph, layout = layout_in_circle(graph))
+  })
+
+```
