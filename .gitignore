@@ -1,3 +1,13 @@
+rvar_project/real_data/beed_+bangalore+eeg+epilepsy+dataset/req_lib
+rvar_project/real_data/EEGepilepsydata/Epilepsy-EEG/A
+rvar_project/real_data/EEGepilepsydata/Epilepsy-EEG/B
+rvar_project/real_data/EEGepilepsydata/Epilepsy-EEG/C
+rvar_project/real_data/EEGepilepsydata/Epilepsy-EEG/D
+rvar_project/real_data/EEGepilepsydata/Epilepsy-EEG/E
+rvar_project/real_data/SienaSleep/Siena_Sleep_EEG_Data.csv
+rvar_project/real_data/SienaFull/siena-scalp-eeg-database-1.0.0.zip
+
+
 rvar_project/experiments/05_glmnet_mgaussian_exploration/RMTL_0.9.9
 rvar_project/experiments/05_glmnet_mgaussian_exploration/RMTL_0.9.9.tar.gz
 rvar_project/experiments/06_RMTL_AddingWeights/RMTL_0.9.9
@@ -62,4 +72,5 @@ rvar_project/experiments_cluster/sims_4/400_rvar/experiments1/
 rvar_project/experiments_cluster/sims_4/042_cv_rvar.R
 rvar_project/experiments_cluster/sims_4/042_lm_rvar.r
 rvar_project/experiments_cluster/sims_4/500_AggregatedDataExperiments/data_all 
+
 
