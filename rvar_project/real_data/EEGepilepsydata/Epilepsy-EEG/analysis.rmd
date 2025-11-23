@@ -1,0 +1,136 @@
+---
+output: reprex::reprex_document
+knit: reprex::reprex_render
+---
+
+Lets clean this data.
+
+```{r}
+
+library(magrittr)
+library(glmnet)
+library(tidyverse)
+
+```
+
+```{r}
+
+subjects <- c("A", "B", "C", "D", "E")
+folders <- paste0(subjects, "/")
+
+
+data_list <- lapply(
+    seq_along(folders),
+    function(folder_ind) {
+        folder <- folders[folder_ind]
+        files <- list.files(path = folder, full.names = FALSE)
+        print(files)
+        mat <- read.csv(paste0(folder, files[1]))
+        print(dim(mat))
+        for(i in files[-1]) {
+            data <- read.csv(paste0(folder, i))
+            mat <- cbind(mat, data)
+        }
+
+        mat$subject = subjects[folder_ind]
+        
+        return(mat)
+    })
+
+
+lapply(data_list, dim)
+
+```
+
+
+```{r}
+
+data_red <- data_list[1:2]
+
+times <- 3
+X = data.frame(
+    EyesOpen = rep(c(0,1), c(times, times)),
+    Time = rep(1:times, 2))
+
+count <- 1
+subjects <- c("A", "B")
+times <- c(1,2,3)
+X <- data.frame(eyes = 1, time = 1)
+timedat <- list()
+for (yind in 1:2) {
+    for (time_ind in 1:3) {
+        timedat[[count]] <- data_red[[yind]][1000 * (time_ind) + 1:100, -101]
+        X <- rbind(
+            X, 
+            data.frame(eyes = yind - 1, 
+            time = time_ind))
+        count <- count + 1
+    }
+}
+X <- X[-1, ]
+
+lapply(timedat, dim)
+lapply(timedat, colnames)
+
+ynames <- colnames(timedat[[1]])
+
+timedat <- lapply(
+    timedat, 
+    function(data) {
+        colnames(data) <- paste0("V", 1:100)
+        rownames(data) <- NULL
+        return(data)
+    })
+
+lapply(timedat, dim)
+lapply(timedat, colnames)
+lapply(
+    timedat, 
+    function(x) {sum(is.na(x))})
+
+```
+
+
+
+```{r}
+
+source("002_requirements_lite.R")
+
+source("041_rvar_supps_vect.R")
+source("043_lm_rvar_vectorized.r")
+source("044_glmnet_rvar_vectorized.r")
+source("045_cv.glmnet_rvar_vectorized.r")
+source("046_bic.glmnet_rvar_vectorized.r")
+source("047_glmnet_rvar_adaptive.r")
+
+library(magrittr)
+library(tidyverse)
+library(ggplot2)
+
+
+```
+
+```{r}
+
+lambda.seq      <- 10^(seq(1,-4, length.out = 20))
+penalty.factor  <- 10^(seq(3, -3, length.out = 20))
+
+colnames(X) <- NULL
+cdvar.fit_train <- cv.solve_rvar_glmnet_vectorized(
+  d = 100, p = 2, Y_list = timedat,
+  X = X, lambda.seq = lambda.seq, 
+  penalty.factor = penalty.factor, 
+  nfolds = 5, verbose = FALSE)
+
+
+
+
+lambda.seq      <- 10^(seq(4,-1, length.out = 20))
+cdvar.ada_train <- solve_rvar_glmnet_adaptive(
+  d = 16, p = 3, Y_list = Y_list_train, 
+  X = X_train, gamma = 2, rvar.fit = cdvar.fit_train,
+  lambda.seq = lambda.seq, nfolds = 5, verbose = FALSE)
+
+save.image("cdvar.RData")
+
+```
