@@ -1,3 +1,5 @@
+rvar_project/real_data/src/req_lib
+
 rvar_project/real_data/beed_+bangalore+eeg+epilepsy+dataset/req_lib
 rvar_project/real_data/EEGepilepsydata/Epilepsy-EEG/A
 rvar_project/real_data/EEGepilepsydata/Epilepsy-EEG/B
@@ -6,6 +8,7 @@ rvar_project/real_data/EEGepilepsydata/Epilepsy-EEG/D
 rvar_project/real_data/EEGepilepsydata/Epilepsy-EEG/E
 rvar_project/real_data/SienaSleep/Siena_Sleep_EEG_Data.csv
 rvar_project/real_data/SienaFull/siena-scalp-eeg-database-1.0.0.zip
+rvar_project/real_data/college_scorecards
 
 
 rvar_project/experiments/05_glmnet_mgaussian_exploration/RMTL_0.9.9
