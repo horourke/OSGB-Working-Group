@@ -149,7 +149,7 @@ where $\bvec(\Ab) = [A_{\cdot 1}^\mt , A_{\cdot 2}^\mt ,  \ldots A_{\cdot n}^\mt
 
 To improve upon the performance of our original estimator, we propose a refinement of our CD-VAR estimator through an adaptive approach. For this, let $\bhat{\bPsi}$ be an initial estimator of the CD-VAR model. Then, given a constant $\gamma > 0$ we define the adaptively-weighted $\ell_1$ penalty as:
 \begin{equation}
-	P_{ada}(\bPsi)  = \sum_{\ell = 1}^{p}\sum_{i, j=1}^{d}  |\Psi^{(\ell)}_{ij}|^{-\gamma}\cdot |\bPsi^{(w)}_{ij}|
+	P_{ada}(\bPsi)  = \sum_{\ell = 1}^{p}\sum_{i, j=1}^{d}  |\hat \Psi^{(\ell)}_{ij}|^{-\gamma}\cdot |\bPsi^{(w)}_{ij}|
 \end{equation}
 Then, for $\lambda >0$, our adaptive CD-VAR estimator is given as a solution to the optimization problem
 \begin{equation*}\label{eq:rvar_opt}
@@ -231,4 +231,49 @@ The results of the MRAE for $d = 30$ are presented in Figure \ref{fig:30mrae}. T
 	\caption{This is the caption for the inserted PDF page.}
 	\label{fig:30mrae}
 \end{figure}
+
+
+
+
+
+\section{Extension to High-Dimensional Covariate Selection}
+
+
+So far, we have introduced the CD-VAR as a method for the estimation of covariate-dependent VAR models, which is capable of recovering the effects that underlying covariates have in the estimated network of causal relationships. There are several potential extensions that we consider important to consider and explore. 
+
+\begin{itemize}
+	\item Developing consistency theory for our CD-VAR procedure.
+	\item Implement the group penalized CD-VAR for high-dimensional selection of covariate dependent VAR models (GPCD-VAR).
+	\item Develop consistency theory for our CD-VAR prodedure.
+	\item Develop a debiasing procedure for the CD-VAR framework, or GPCD-VAR framework.
+	\item Analyze real EEG data to determine effects of underlying covariates on different spectral frequencies.
+	\item Analyze real f-MRI data to determine the effects that different mental states/activities have on the brain connectivity networks of individuals.
+	\item Implement the GPCD-VAR procedure and explore its properties for the recovery of structure.
+	\item Explore how to perform the estimation of CD-USEMs. This seems somewhat challenging.
+	\item Following the work of Yang Li, I think that before working on this project too deeply, it would be necessary to understand under what conditions are variables 
+	\item Maybe I can reach out to him and see if we can develop a theory of model identification for CD-USEMs. Would this be too hard? I wonder. 
+	\item I think that you should probably read more than what you are currently reading dude.  But its ok, you can do a combination of reading and also working on developing what you currently have. Right now, the priority would probably be to make sure that you have a concrete set of "next steps".
+\end{itemize}
+
+
+What are the next steps that you should focus on to achieve all of these goals?
+
+\begin{itemize}
+	\item I think I shouldn't work on the implementation of the GPCD-VAR model, since I am planning for Nathalie to complete this work.
+	\item I think that I could complete the consistency theory for the CD-VAR model, since this will provide some nice orientation on how to develop the theory of the GPCD-VAR model. I can start with that and move forward from there.
+	\item 
+\end{itemize}
+
+
+\subsection{Inference for CD-VAR}
+
+In many scientific applications, where the aim is not to build predictive models but instead to derive knowledge from the data, inference is a vital. For example, in electroencephalogram data (EEG), we often observe the relationship among different  
+
+In particular, a common question is: given a point-estimator, are the relationships detected in fact significant? LASSO and variants for time series are well-known to select variables only in strict incoherence conditions \jose{[Ref of incoherence]}, which limit the reliability of the selected variables. 
+	
+In the particular context of the CD-VAR model, we would like to define a procedure that can assert confidence on the network that is selected by our CD-VAR procedure. Here, there are a couple of potential ideas that could be pursued. 
+	
+
+
+
 
