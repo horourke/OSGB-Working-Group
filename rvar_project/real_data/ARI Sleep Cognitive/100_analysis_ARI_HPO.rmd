@@ -22,11 +22,21 @@ source("./047_glmnet_rvar_adaptive.r")
 
 ```{r}
 
-eeg_data <- read.csv("electrode_bandpower_3s_ol50_padded.csv")
-cov_data <- read.csv("ajh_aggwide.csv")
+library(openxlsx)
+ari_data <- read.xlsx("daily_ass.xlsx")
 
-dim(eeg_data)
-dim(cov_data)
+dim(ari_data)
+
+ari_data <- ari_data %>%
+  mutate(across(where(is.character), na_if, "NA"))
+
+# create subset for testing with 3 Y variables & 2 X variables
+# Y = gender, employed
+# X = depression, anxiety, subjective_sleep
+
+ari_data$f0m1 <- ari_data$gender - 1
+
+ari_test
 
 eeg_data <- eeg_data %>% 
   mutate(subject = factor(subject),
