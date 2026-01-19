@@ -1,0 +1,301 @@
+---
+output: reprex::reprex_document
+knit: reprex::reprex_render
+---
+
+Lets clean this data.
+
+```{r}
+
+library(magrittr)
+
+source("./002_requirements_lite.R")
+
+source("./041_rvar_supps_vect.R")
+source("./043_lm_rvar_vectorized.r")
+source("./044_glmnet_rvar_vectorized.r")
+source("./045_cv.glmnet_rvar_vectorized.r")
+source("./046_bic.glmnet_rvar_vectorized.r")
+source("./047_glmnet_rvar_adaptive.r")
+
+```
+
+```{r}
+
+eeg_data <- read.csv("electrode_bandpower_3s_ol50_padded.csv")
+cov_data <- read.csv("ajh_aggwide.csv")
+
+dim(eeg_data)
+dim(cov_data)
+
+eeg_data <- eeg_data %>% 
+  mutate(subject = factor(subject),
+         eyes = factor(eyes),
+         prepost = factor(prepost))
+
+summary(eeg_data$subject)
+summary(eeg_data$eyes)
+summary(eeg_data$prepost)
+
+
+
+table(eeg_data$subject, eeg_data$eyes, eeg_data$prepost)
+colnames(eeg_data)
+
+(ncol(eeg_data) - 5) / 3
+
+```
+Analyzing colnames:
+
+```{r}
+
+cnames <- colnames(eeg_data)[-(1:5)]
+
+print(cnames)
+names2 <- str_split(cnames, pattern = "_") %>%
+  lapply(function(x) x[[2]])  %>%
+  unlist() %>% 
+  unique() 
+  
+print(names2)
+
+``` 
+
+```{r}
+
+eeg_data_red1 <- eeg_data %>%
+  filter(prepost == "PRE", eyes == "ec") %>%
+  select(subject:beta_x10l) %>%
+  
+  select(-file, -eyes, -prepost)
+
+
+head(eeg_data_red1)
+
+subject_vec <- levels(eeg_data_red1$subject)
+
+eeg_data_list <- lapply(
+  subject_vec,
+  function(data, subj) {
+    data %>% 
+      filter(subject == subj) %>%
+        arrange(epoch_index) %>%
+        select(-epoch_index) %>%
+        return()
+    },
+    data = eeg_data_red1)
+
+### Gene Inserted Code Here
+### Goal is to Create a New Dataframe with Area Specific Regions of Interest (e.g., anterior theta and posterior alpha)
+
+library(dplyr)
+
+bands <- c("alpha", "theta", "beta")
+anterior_sites  <- c("1l","1r","1z","1lb","1rb","1lc","1rc","1ld","1rd")
+posterior_sites <- c("9l","9r","9z","10l","10r")
+
+# Build column names
+bands <- c("alpha","theta","beta")
+
+anterior_sites  <- c("1l","1r","1z","1lb","1rb","1lc","1rc","1ld","1rd")
+posterior_sites <- c("9l","9r","9z","10l","10r")
+
+anterior_vars <- as.vector(
+  outer(bands, anterior_sites, function(b, s) paste0(b, "_x", s))
+)
+
+posterior_vars <- as.vector(
+  outer(bands, posterior_sites, function(b, s) paste0(b, "_x", s))
+)
+
+keep_vars <- intersect(c(anterior_vars, posterior_vars), names(eeg_data))
+
+eeg_data_red2 <- eeg_data %>%
+  filter(prepost == "PRE", eyes == "ec") %>%
+  select(subject, epoch_index, all_of(keep_vars))
+
+head(eeg_data_red2)
+
+# Compute Anterior and Posterior Mean Powers for the 3 frequencies
+
+eeg_means <- eeg_data %>%
+  mutate(
+    alpha_anterior  = rowMeans(across(paste0("alpha_x", anterior_sites)),  na.rm = TRUE),
+    alpha_posterior = rowMeans(across(paste0("alpha_x", posterior_sites)), na.rm = TRUE),
+
+    theta_anterior  = rowMeans(across(paste0("theta_x", anterior_sites)),  na.rm = TRUE),
+    theta_posterior = rowMeans(across(paste0("theta_x", posterior_sites)), na.rm = TRUE),
+
+    beta_anterior   = rowMeans(across(paste0("beta_x", anterior_sites)),   na.rm = TRUE),
+    beta_posterior  = rowMeans(across(paste0("beta_x", posterior_sites)),  na.rm = TRUE)
+  ) %>%
+  select(subject, epoch_index,
+         alpha_anterior, alpha_posterior,
+         theta_anterior, theta_posterior,
+         beta_anterior,  beta_posterior)
+
+
+subject_vec <- levels(eeg_means$subject)
+
+eeg_data_list2 <- lapply(
+  subject_vec,
+  function(data, subj) {
+    data %>% 
+      filter(subject == subj) %>%
+        arrange(epoch_index) %>%
+        select(-epoch_index) %>%
+        return()
+    },
+    data = eeg_means)
+
+
+```
+
+```{r}
+
+cov_data$id <- subject_vec
+
+
+cov_data$bdi_sum_Pre
+cov_data$gender
+
+cov_data_red1 <- cov_data %>%
+  select(gender, bdi_sum_Pre) %>%
+  mutate(gender = gender - 1,
+         bdi_sum_Pre = bdi_sum_Pre - mean(bdi_sum_Pre),
+         bdi_ab_av_Pre = ifelse(bdi_sum_Pre > 0 , 1, 0))
+cov_data_red1
+
+plot(cov_data_red1$bdi_sum_Pre)
+
+
+```
+
+
+```{r}
+
+eeg_data_red1 %>% 
+  select(-epoch_index) %>%
+  group_by(subject) %>%
+  summarise(across(everything(), mean, na.rm = TRUE))
+
+eeg_data_red1 %>% 
+  select(-epoch_index) %>%
+  group_by(subject) %>%
+  summarise(across(everything(), sd, na.rm = TRUE))
+
+
+eeg_centered_list <- lapply(
+  eeg_data_list,
+  function(x) {
+    x %>% 
+      select(-subject) %>%
+      scale(center = TRUE, scale = FALSE) %>%
+      return()
+    })
+
+lapply(eeg_centered_list, dim)
+
+# Gene added based on eeg_means for anterior and posterior frequencies
+
+eeg_means %>% 
+  select(-epoch_index) %>%
+  group_by(subject) %>%
+  summarise(across(everything(), mean, na.rm = TRUE))
+
+eeg_means %>% 
+  select(-epoch_index) %>%
+  group_by(subject) %>%
+  summarise(across(everything(), sd, na.rm = TRUE))
+
+
+eeg_means_centered_list <- lapply(
+  eeg_data_list2,
+  function(x) {
+    x %>% 
+      select(-subject) %>%
+      scale(center = TRUE, scale = TRUE) %>%
+      return()
+    })
+
+lapply(eeg_means_centered_list, dim)
+
+```
+CD-VAR using depression + gender
+
+```{r}
+
+library(glmnet)
+library(plot.matrix)
+
+cd_var_output <- cv.solve_rvar_glmnet_vectorized(
+  d = 3, p = 2,
+  Y_list = eeg_centered_list, 
+  X = as.matrix(cov_data_red1[, -3]),
+  #### TUNE LAMBDA AND PENALTY FACTOR
+  lambda.seq = 10^seq(-12, 0, length.out = 50), 
+  penalty.factor = 10^seq(-15, 15, length.out = 50),  
+  ####
+  nfolds = 3, 
+  verbose = T)
+
+library(plot.matrix)
+par(mar = c(5.1, 4.1, 4.1, 4.1))
+cd_var_output$rvar_opt_coeffs[, - (1:3)] %>%
+  as.matrix() %>%
+  abs() %>%
+  plot(breaks = 20)
+#View(cd_var_output$rvar_opt_coeffs[, - (1:3)])
+
+cd_var_output$rvar_opt_coeffs[, - (1:3)]
+
+# Gene Added for the Anterior and Posterior Mean analysis
+
+cd_var_output2 <- cv.solve_rvar_glmnet_vectorized(
+  d = 6, p = 2,
+  Y_list = eeg_means_centered_list, 
+  X = as.matrix(cov_data_red1[, -3]),
+  #### TUNE LAMBDA AND PENALTY FACTOR
+  lambda.seq = 10^seq(-12, 12, length.out = 50), 
+  penalty.factor = 10^seq(-30, 15, length.out = 50),  
+  ####
+  nfolds = 3, 
+  verbose = T)
+
+library(plot.matrix)
+par(mar = c(5.1, 4.1, 4.1, 4.1))
+cd_var_output2$rvar_opt_coeffs[, - (1:3)] %>%
+  as.matrix() %>%
+  abs() %>%
+  plot(breaks = 20)
+#View(cd_var_output$rvar_opt_coeffs[, - (1:3)])
+
+cd_var_output2$rvar_opt_coeffs[, - (1:3)]
+
+
+
+```
+
+
+CD-VAR model using discrete depression + gender
+
+
+```{r}
+
+cd_var_output <- cv.solve_rvar_glmnet_vectorized(
+  d = 3, p = 2,
+  Y_list = eeg_centered_list, 
+  X = as.matrix(cov_data_red1[, -2]),
+  lambda.seq = 10^seq(-10, -2, length.out = 50), 
+  penalty.factor = 10^seq(-15, 15, length.out = 50),  
+  nfolds = 3, 
+  verbose = T)
+
+library(plot.matrix)
+par(mar = c(5.1, 4.1, 4.1, 4.1))
+plot(as.matrix(cd_var_output$rvar_opt_coeffs[, - (1:3)]))
+
+
+cd_var_output$rvar_opt_coeffs[, - (1:3)]
+
+```
