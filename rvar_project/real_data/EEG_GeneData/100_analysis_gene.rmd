@@ -10,7 +10,6 @@ Lets clean this data.
 library(magrittr)
 
 source("./002_requirements_lite.R")
-
 source("./041_rvar_supps_vect.R")
 source("./043_lm_rvar_vectorized.r")
 source("./044_glmnet_rvar_vectorized.r")
@@ -19,6 +18,7 @@ source("./046_bic.glmnet_rvar_vectorized.r")
 source("./047_glmnet_rvar_adaptive.r")
 
 ```
+Read in data.
 
 ```{r}
 
@@ -36,8 +36,6 @@ eeg_data <- eeg_data %>%
 summary(eeg_data$subject)
 summary(eeg_data$eyes)
 summary(eeg_data$prepost)
-
-
 
 table(eeg_data$subject, eeg_data$eyes, eeg_data$prepost)
 colnames(eeg_data)
@@ -66,9 +64,7 @@ print(names2)
 eeg_data_red1 <- eeg_data %>%
   filter(prepost == "PRE", eyes == "ec") %>%
   select(subject:beta_x10l) %>%
-  
   select(-file, -eyes, -prepost)
-
 
 head(eeg_data_red1)
 
@@ -76,7 +72,7 @@ subject_vec <- levels(eeg_data_red1$subject)
 
 eeg_data_list <- lapply(
   subject_vec,
-  function(data, subj) {
+    function(data, subj) {
     data %>% 
       filter(subject == subj) %>%
         arrange(epoch_index) %>%
@@ -90,23 +86,16 @@ eeg_data_list <- lapply(
 
 library(dplyr)
 
-bands <- c("alpha", "theta", "beta")
-anterior_sites  <- c("1l","1r","1z","1lb","1rb","1lc","1rc","1ld","1rd")
-posterior_sites <- c("9l","9r","9z","10l","10r")
-
 # Build column names
-bands <- c("alpha","theta","beta")
-
-anterior_sites  <- c("1l","1r","1z","1lb","1rb","1lc","1rc","1ld","1rd")
+bands <- c("alpha", "theta", "beta")
+anterior_sites  <- c("1l","1r","1z","1lb","1rb","2l","2r","2z")
 posterior_sites <- c("9l","9r","9z","10l","10r")
 
 anterior_vars <- as.vector(
-  outer(bands, anterior_sites, function(b, s) paste0(b, "_x", s))
-)
+  outer(bands, anterior_sites, function(b, s) paste0(b, "_x", s)))
 
 posterior_vars <- as.vector(
-  outer(bands, posterior_sites, function(b, s) paste0(b, "_x", s))
-)
+  outer(bands, posterior_sites, function(b, s) paste0(b, "_x", s)))
 
 keep_vars <- intersect(c(anterior_vars, posterior_vars), names(eeg_data))
 
@@ -118,14 +107,12 @@ head(eeg_data_red2)
 
 # Compute Anterior and Posterior Mean Powers for the 3 frequencies
 
-eeg_means <- eeg_data %>%
+eeg_means <- eeg_data_red2 %>%
   mutate(
     alpha_anterior  = rowMeans(across(paste0("alpha_x", anterior_sites)),  na.rm = TRUE),
     alpha_posterior = rowMeans(across(paste0("alpha_x", posterior_sites)), na.rm = TRUE),
-
     theta_anterior  = rowMeans(across(paste0("theta_x", anterior_sites)),  na.rm = TRUE),
     theta_posterior = rowMeans(across(paste0("theta_x", posterior_sites)), na.rm = TRUE),
-
     beta_anterior   = rowMeans(across(paste0("beta_x", anterior_sites)),   na.rm = TRUE),
     beta_posterior  = rowMeans(across(paste0("beta_x", posterior_sites)),  na.rm = TRUE)
   ) %>%
@@ -133,7 +120,6 @@ eeg_means <- eeg_data %>%
          alpha_anterior, alpha_posterior,
          theta_anterior, theta_posterior,
          beta_anterior,  beta_posterior)
-
 
 subject_vec <- levels(eeg_means$subject)
 
@@ -154,8 +140,6 @@ eeg_data_list2 <- lapply(
 ```{r}
 
 cov_data$id <- subject_vec
-
-
 cov_data$bdi_sum_Pre
 cov_data$gender
 
@@ -184,13 +168,12 @@ eeg_data_red1 %>%
   group_by(subject) %>%
   summarise(across(everything(), sd, na.rm = TRUE))
 
-
 eeg_centered_list <- lapply(
   eeg_data_list,
   function(x) {
     x %>% 
       select(-subject) %>%
-      scale(center = TRUE, scale = FALSE) %>%
+      scale(center = TRUE, scale = TRUE) %>%
       return()
     })
 
@@ -208,19 +191,19 @@ eeg_means %>%
   group_by(subject) %>%
   summarise(across(everything(), sd, na.rm = TRUE))
 
-
 eeg_means_centered_list <- lapply(
   eeg_data_list2,
   function(x) {
     x %>% 
       select(-subject) %>%
-      scale(center = TRUE, scale = TRUE) %>%
+      scale(center = TRUE, scale = FALSE) %>%
       return()
     })
 
 lapply(eeg_means_centered_list, dim)
 
 ```
+
 CD-VAR using depression + gender
 
 ```{r}
@@ -266,13 +249,11 @@ library(plot.matrix)
 par(mar = c(5.1, 4.1, 4.1, 4.1))
 cd_var_output2$rvar_opt_coeffs[, - (1:3)] %>%
   as.matrix() %>%
-  abs() %>%
-  plot(breaks = 20)
+# abs() %>%
+  plot(breaks = 20,digits=2, text.cell=list(cex=0.5))
 #View(cd_var_output$rvar_opt_coeffs[, - (1:3)])
 
 cd_var_output2$rvar_opt_coeffs[, - (1:3)]
-
-
 
 ```
 
@@ -295,12 +276,89 @@ library(plot.matrix)
 par(mar = c(5.1, 4.1, 4.1, 4.1))
 plot(as.matrix(cd_var_output$rvar_opt_coeffs[, - (1:3)]))
 
-
 cd_var_output$rvar_opt_coeffs[, - (1:3)]
-
 
 # Gene Addition for Anterior Posterior 
 
+cd_var_output2 <- cv.solve_rvar_glmnet_vectorized(
+  d = 6, p = 2,
+  Y_list = eeg_means_centered_list, 
+  X = as.matrix(cov_data_red1[, -2]),
+  lambda.seq = 10^seq(-10, 10, length.out = 50), 
+  penalty.factor = 10^seq(-15, 15, length.out = 50),  
+  nfolds = 3, 
+  verbose = T)
 
+library(plot.matrix)
+par(mar = c(5.1, 4.1, 4.1, 4.1))
+plot(as.matrix(cd_var_output2$rvar_opt_coeffs[, - (1:3)]),digits=2, text.cell=list(cex=0.5))
+
+cd_var_output2$rvar_opt_coeffs[, - (1:3)]
 
 ```
+
+Gene Added Some Correlations and Plotting Below to Examine Power for each ROI and Frequency Band per Participant to help facilitate interpretation.
+
+```{r}
+
+library(tidyverse)
+
+# correlations
+
+eeg_means %>%
+  group_by(subject) %>%
+  summarise(
+    r_alpha_theta_ant = cor(
+      alpha_posterior,
+      theta_anterior,
+      use = "complete.obs"
+    )
+  )
+
+# Time Series Plots for Each Subject
+
+eeg_plots <- eeg_means %>%
+  pivot_longer(
+    cols = c(
+      alpha_anterior, alpha_posterior,
+      theta_anterior, theta_posterior,
+      beta_anterior,  beta_posterior
+    ),
+    names_to = "frequency_band",
+    values_to = "power"
+  )
+
+ggplot(eeg_plots, aes(x = epoch_index, y = power, color = frequency_band)) +
+  geom_line(linewidth = 1) +
+  facet_wrap(~ subject, scales = "free_y") +
+  labs(
+    x = "Epoch",
+    y = "Power",
+    color = "Frequency",
+    title = "EEG Frequency Power Over Time by Participant"
+  ) +
+  theme_minimal(base_size = 14)
+
+eeg_plots2 <- eeg_means %>%
+  pivot_longer(
+    cols = c(
+      alpha_posterior,
+      theta_anterior
+    ),
+    names_to = "frequency_band",
+    values_to = "power"
+  )
+
+ggplot(eeg_plots2, aes(x = epoch_index, y = power, color = frequency_band)) +
+  geom_line(linewidth = 1) +
+  facet_wrap(~ subject, scales = "free_y") +
+  labs(
+    x = "Epoch",
+    y = "Power",
+    color = "Frequency",
+    title = "EEG Frequency Power Over Time by Participant"
+  ) +
+  theme_minimal(base_size = 14)
+
+```
+
