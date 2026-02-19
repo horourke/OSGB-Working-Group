@@ -23,7 +23,7 @@ source("./047_glmnet_rvar_adaptive.r")
 ```{r}
 
 library(openxlsx)
-ari_data <- read.xlsx("daily_ass.xlsx")
+ari_data <- read.xlsx("daily_full_ass.xlsx")
 
 dim(ari_data)
 
