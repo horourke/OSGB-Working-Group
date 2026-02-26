@@ -83,8 +83,10 @@ build_design <- function(Ylist, X = NULL, multi = FALSE) {
 ##  validation for multi-subject data based on Ymat and Wmat.
 ##
 ##  INPUTS:
-##      Ts  : numeric vector containing the number of time measurements
-##              per subject.  
+##      Ts          : numeric vector containing the number of time measurements
+##                      per subject.
+##      folds_max   : maximum number of windows to use.
+##                      aimed at improving computational performance.
 ##      
 ##  OUTPUTS:
 ##      cv.train_list   : List. Contains the rows of Wmat and Ymat
@@ -95,10 +97,10 @@ build_design <- function(Ylist, X = NULL, multi = FALSE) {
 ##      nfolds          : Numeric counting the number of 
 ##                          rolling windows.
 ##
-build_rolling_windows <- function(Ts) {
+build_rolling_windows <- function(Ts, folds_max = 20) {
     n <- length(Ts)
     Tms <- Ts - 1
-    trange  <- min(floor(Ts / 3)) 
+    trange  <- min(c(floor(Ts / 3), folds_max)) 
     T1s     <- Tms - trange - 3
     starts  <- cumsum(c(1, Tms))[-(n+1)]
 
