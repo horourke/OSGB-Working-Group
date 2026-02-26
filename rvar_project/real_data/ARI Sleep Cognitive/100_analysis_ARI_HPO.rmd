@@ -164,7 +164,7 @@ ari_y_list <- lapply(
   data = ari_y_complete
 )
 ```
-CD-VAR using gender + employment
+MOD-VAR using gender + employment
 
 ```{r}
 
@@ -206,6 +206,7 @@ cd_var_output$rvar_opt_coeffs[, - (1:3)] %>%
 pwg <- colorRampPalette(colors = c("deeppink1", "white", "darkgreen")) 
 pwg_vec <- pwg(12)
 
+# According to Jose: rows "var" are y_t, columns are y_t-1
 one <- as.matrix(cd_var_output$rvar_opt_coeffs[, -c(1:3)][1:3]) 
 two <- as.matrix(cd_var_output$rvar_opt_coeffs[, -c(1:3)][7:9])
 three <- as.matrix(cd_var_output$rvar_opt_coeffs[, -c(1:3)][4:6])
