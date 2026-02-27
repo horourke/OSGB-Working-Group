@@ -46,7 +46,12 @@ FullSimulation <- function(args, microrun) {
     TPR     = numeric(args$nsim * n_methods),
     FPR     = numeric(args$nsim * n_methods),
     l1      = numeric(args$nsim * n_methods),
-    Fr      = numeric(args$nsim * n_methods))
+    Fr      = numeric(args$nsim * n_methods),
+    sens    = numeric(args$nsim * n_methods),
+    spec    = numeric(args$nsim * n_methods),
+    fcast1  = numeric(args$nsim * n_methods),
+    fcast2  = numeric(args$nsim * n_methods),
+    fcast3  = numeric(args$nsim * n_methods))
   attach(output)
 
   #################################################
@@ -91,9 +96,17 @@ FullSimulation <- function(args, microrun) {
         rvar_pars1 = rvar_model_pars, 
         X = X, 
         N = args$N, 
-        Ti = rep(args$T, args$N))
-        
-      Y_list <- data$Y_list
+        Ti = rep(args$T + (2 * args$hrange), args$N))
+
+      Y_list <- lapply(
+        data$Y_list,
+        function(Y, Ti) {return(Y[1:Ti, ])},
+         Ti = args$T)
+      
+      Y_forecast <- lapply(
+        data$Y_list,
+        function(Y, Ti) {return(Y[-(1:Ti), ])},
+        Ti = args$T)
   
     }
     ############################
@@ -120,7 +133,7 @@ FullSimulation <- function(args, microrun) {
       output[count, 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
           as.numeric()
-      # output[count, -(1:4)] <- eval_msr(data$B_list, (fit$mats)$total)
+      # output[count, -(1:4)] <- eval_msr(data$B_list, (fit$mats)$total, Y_forecast, args$hrange)
       
       memory_in_bytes <- mem_used()
       print(paste0("Memory used GIMME:", memory_in_bytes / (1024^3), "GB"))

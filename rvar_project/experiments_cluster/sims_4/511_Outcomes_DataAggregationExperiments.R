@@ -59,7 +59,7 @@ attach(sim_par_table)
 
 
 ###################### Creating folders:
-subfolder_new        <- paste0("500_AggregatedDataExperiments/")
+subfolder_new        <- paste0("510_AggregatedDataExperiments_wForecast/")
 subfolder_data_new   <- paste0(subfolder_new, "data_all/")
 subfolder_plots_new  <- paste0(subfolder_new, "plots_all/")
 
