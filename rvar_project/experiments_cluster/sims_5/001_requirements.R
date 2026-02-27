@@ -21,12 +21,12 @@ if(!require(e1071, lib = req_lib_dir)){
 if(!require(Rcpp, lib = req_lib_dir)){
   .libPaths(req_lib_dir)
   install.packages("Rcpp", repos = "https://archive.linux.duke.edu/cran/")
-  library(e1071)
+  library(Rcpp)
 }
 if(!require(RcppArmadillo, lib = req_lib_dir)){
   .libPaths(req_lib_dir)
   install.packages("RcppArmadillo", repos = "https://archive.linux.duke.edu/cran/")
-  library(e1071)
+  library(RcppArmadillo)
 }
 if(!require(magrittr, lib = req_lib_dir)){
   .libPaths(req_lib_dir)

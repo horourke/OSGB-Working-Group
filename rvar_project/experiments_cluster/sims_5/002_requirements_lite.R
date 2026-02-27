@@ -10,6 +10,8 @@ subfolder_new        <- paste0("req_lib/")
 ## Technical requirements:
 .libPaths(req_lib_dir)
 library(e1071)
+library(Rcpp)
+library(RcppArmadillo)
 library(magrittr)
 library(lubridate)
 library(tidyverse)

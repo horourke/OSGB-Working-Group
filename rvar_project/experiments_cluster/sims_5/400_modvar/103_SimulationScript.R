@@ -18,8 +18,9 @@ source("002_requirements_lite.R"); search()
 source("003_Generating_RvarData.R")
 
 Rcpp::sourceCpp("my_implementation/matrix_fista.cpp")
-source("040_cv.modvar/auxfunct.r")
-source("040_cv.modvar/cv.modvar.r")
+source("040_modvar/auxfunct.r")
+source("040_modvar/bic.modvar.r")
+source("040_modvar/cv.modvar.r")
 
 source("051_Simulation_CreatingParameters.R")
 source("052_Simulation_EvaluatingMeasures.r")
