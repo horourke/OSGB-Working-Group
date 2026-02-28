@@ -42,6 +42,7 @@ bic.modvar <- function(
     Ylist, X, 
     lambdas1, 
     ratios, 
+    weights = NULL,
     multi = FALSE,
     alpha = 0.90) { 
 
@@ -57,6 +58,12 @@ bic.modvar <- function(
     d <- ncol(Ymat)
     p <- ifelse(is.null(X), 0, ncol(X))
 
+    ############################
+    ## Construct weights
+    if (is.null(weights)) {
+        weights <- matrix(1, nrow = q, ncol = d)
+    }
+    
     ############################
     ## Building the training indexes:
     nlam1 <- length(lambdas1)
@@ -79,6 +86,7 @@ bic.modvar <- function(
         Y = Ymat.train,
         lambda1vec = lambdas1,
         ratiovec = ratios,
+        weights = weights,
         max_iter = 2000,
         Bcvprev = Bcvprev,
         tol = 1e-8)
@@ -112,6 +120,7 @@ bic.modvar <- function(
         Y = Ymat,
         lambda1vec = lambda1_opt,
         ratiovec = ratio_opt,
+        weights = weights,
         max_iter = 2000,
         Bcvprev = array(0, c(q, d, nlam1 * nrat)),
         tol = 1e-8)

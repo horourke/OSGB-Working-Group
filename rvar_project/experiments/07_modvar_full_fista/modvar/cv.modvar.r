@@ -38,6 +38,7 @@ cv.modvar <- function(
     Ylist, X, 
     lambdas1, 
     ratios, 
+    weights = NULL,
     multi = FALSE,
     cv.type = c("rolling", "bysubject"), ## "bysubject" only valid if "multi = FALSE"
     nfolds = NULL                        ## Only needed if multi = FALSE, and cv.type = "bysubject"
@@ -54,6 +55,12 @@ cv.modvar <- function(
     N <- nrow(Ymat)
     d <- ncol(Ymat)
     p <- ifelse(is.null(X), 0, ncol(X))
+
+    ############################
+    ## Construct weights
+    if (is.null(weights)) {
+        weights <- matrix(1, nrow = q, ncol = d)
+    }
 
     ############################
     ## Building the cross validation indexes:
@@ -107,6 +114,7 @@ cv.modvar <- function(
             Y = Ymat.cv,
             lambda1vec = lambdas1,
             ratiovec = ratios,
+            weights = weights,
             max_iter = 2000,
             Bcvprev = Bcvprev,
             tol = 1e-8)
@@ -141,6 +149,7 @@ cv.modvar <- function(
         Y = Ymat,
         lambda1vec = lambda1_opt,
         ratiovec = ratio_opt,
+        weights = weights,
         max_iter = 2000,
         Bcvprev = array(0, c(q, d, nlam1 * nrat)),
         tol = 1e-8)
