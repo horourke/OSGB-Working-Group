@@ -147,6 +147,7 @@ arma::cube weighted_lasso_path(
     const arma::mat& Y,
     const arma::vec& lambda1vec,
     const arma::vec& ratiovec,
+    const arma::mat& weights, 
     const arma::cube& Bcvprev,   // NEW
     int max_iter = 1000,
     double tol = 1e-6
@@ -179,14 +180,13 @@ arma::cube weighted_lasso_path(
 
             // ---- Construct W ----
             arma::mat W(q, d, fill::zeros);
-
             // first d rows (d x d block)
             W.rows(0, d-1).fill(lambda1);
-
             // remaining (q-d) x d
-            if (q > d)
+            if (q > d) {
                 W.rows(d, q-1).fill(lambda2);
-
+            }
+            W <- W % weights;
 
             // Setting initialization:
             arma::mat Binit(q, d, fill::zeros);

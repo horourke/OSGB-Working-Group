@@ -1,5 +1,12 @@
 ###########################################################
 ###########################################################
+source("modvar/auxfunct.r")
+###########################################################
+###########################################################
+
+
+###########################################################
+###########################################################
 ## bic.modvar:
 ##  Solver that applies BIC for the selection
 ##  of tuning parameters for our proposed MOD-VAR.
@@ -25,16 +32,30 @@
 ##      alpha       : Balance between in-sample and out-of-sample data. 
 ##      
 ##  OUTPUTS:
-##      Bopt        : optimal estimation of the model B.
-##      lambda1_opt : optimal value of lambda1 according to the cv procedure.
-##      lambda2_opt : optimal value of lambda2 according to the cv procedure.
-##      BIC.MSFE    : matrix of cross validation forecasting error. rows correspond
-##                      to lambdas1 range and columns to ratios)
+##      lambda1           : vector with lambda1 values to explore with BIC.
+##      ratios            : vector with values of ratio explored with BIC.
+##      eval.type         : Always returns "BIC".
+##      eval.mat          : matrix of BIC forecasting error. rows correspond
+##                              to lambdas1 range and columns to ratios)
+##      lambda1_opt       : optimal value of lambda1 according to the BIC procedure.
+##      ratio_opt         : optimal value of ratio according to our BIC procedure.
+##      lambda2_opt       : optimal value of lambda2 according to the BIC procedure.
+##      opt_coeffs        : matrix (d x q) containing optimal coefficients of MOD-VAR
+##                          model selected by BIC.
+##      joint_coeffs      : (d x d) matrix containing optimal joint autoregressive 
+##                              effects across all subjects.
+##      moderator_coeffs  : list of length p, containing (d x d) matrices, which
+##                              correspond to the autoregressive moderator effects.
+##      idiographic_coeffs: list of length n, containing (d x d) matrices, which
+##                              correspond to fully idiographic autoregressive effects
+##      bysubject_coeffs  : list of length n, containing the aggregregated autoregressive 
+##                              effects for each subject. 
 ##
 bic.modvar <- function(
     Ylist, X, 
     lambdas1, 
     ratios, 
+    weights = NULL,
     multi = FALSE,
     alpha = 0.90) { 
 
@@ -50,6 +71,12 @@ bic.modvar <- function(
     d <- ncol(Ymat)
     p <- ifelse(is.null(X), 0, ncol(X))
 
+    ############################
+    ## Construct weights
+    if (is.null(weights)) {
+        weights <- matrix(1, nrow = q, ncol = d)
+    }
+    
     ############################
     ## Building the training indexes:
     nlam1 <- length(lambdas1)
@@ -72,6 +99,7 @@ bic.modvar <- function(
         Y = Ymat.train,
         lambda1vec = lambdas1,
         ratiovec = ratios,
+        weights = weights,
         max_iter = 2000,
         Bcvprev = Bcvprev,
         tol = 1e-8)
@@ -105,6 +133,7 @@ bic.modvar <- function(
         Y = Ymat,
         lambda1vec = lambda1_opt,
         ratiovec = ratio_opt,
+        weights = weights,
         max_iter = 2000,
         Bcvprev = array(0, c(q, d, nlam1 * nrat)),
         tol = 1e-8)
@@ -148,7 +177,8 @@ bic.modvar <- function(
     OUTPUT <- list(
         lambda1 = lambdas1,
         ratios = ratios,
-        BIC = BIC.train,
+        eval.type = "BIC",
+        eval.mat = BIC.train,
         lambda1_opt = lambda1_opt,
         ratio_opt = ratio_opt,
         lambda2_opt = lambda1_opt * ratio_opt,
