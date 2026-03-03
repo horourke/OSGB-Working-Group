@@ -1,89 +1,7 @@
-library(Rcpp)
-library(RcppArmadillo)
-library(magrittr)
-library(plot.matrix)
-Rcpp::sourceCpp("modvar/matrix_fista.cpp")
-
-set.seed(123)
-
-N  <- 100
-q  <- 7
-d  <- 3
-
-# Design matrix
-X <- matrix(rnorm(N * q), N, q)
-
-# True sparse coefficient matrix
-Btrue <- matrix(0, q, d)
-Btrue[1:d, ] <- 5 * diag(3)
-Btrue[d + (1:d), ] <- -5 * diag(3)
-Btrue
-
-# Response
-Y <- X %*% Btrue + matrix(rnorm(N * d, sd = 0.5), N, d)
-
-
-lambda1vec <- seq(0.5, 0.1, length.out = 5)
-ratiovec   <- seq(5, 0.2, length.out = 4)
-Bcvprev <- array(0, c(7,d, 4*5))
-
-Barray <- weighted_lasso_path(
-  X = X,
-  Y = Y,
-  lambda1vec = lambda1vec,
-  ratiovec = ratiovec,
-  max_iter = 2000,
-  Bcvprev = Bcvprev,
-  tol = 1e-8
-)
-
-dim(Barray)
-dim(Bcvprev)
-
-
-dim(Barray) <- c(q, d, length(lambda1vec), length(ratiovec))
-dim(Barray)
-
-Barray[,,1,1]
-
-
-objective <- function(B, X, Y, W, N) {
-  loss <- sum((Y - X %*% B)^2) / (2 * N)
-  pen  <- sum(W * abs(B))
-  loss + pen
-}
-
-
-dim(Barray) <- c(q, d, length(lambda1vec), length(ratiovec))
-dim(Barray)
-
-
-
-i <- 4
-j <- 4
-
-lambda1 <- lambda1vec[i]
-lambda2 <- lambda1 * ratiovec[j]
-
-W <- matrix(lambda2, q, d)
-W[1:d, ] <- lambda1
-Btest <- Barray[, , i, j]
-objective(Btest, X, Y, W, N)
-image(abs(Barray[, , i, j]) > 1e-6)
-
-
-i <- 1
-j <- 1
-lambda1 <- lambda1vec[i]
-lambda2 <- lambda1 * ratiovec[j]
-W <- matrix(lambda2, q, d)
-W[1:d, ] <- lambda1
-Btest <- Barray[, , i, j]
-objective(Btest, X, Y, W, N)
-image(abs(Barray[, , i, j]) > 1e-6)
-
-
-
+## Pending:
+## 1: Finish testing if ada.modvar works properly and without typos.
+## 2: Implement ada.modvar in simulations.
+## 3: run and analyze results.
 
 
 #####################################################
@@ -97,11 +15,12 @@ library(Rcpp)
 library(RcppArmadillo)
 library(magrittr)
 library(plot.matrix)
-setwd("rvar_project/experiments/07_modvar_full_fista/")
 Rcpp::sourceCpp("modvar/matrix_fista.cpp")
 source("modvar/auxfunct.r")
 source("modvar/cv.modvar.R")
-
+source("modvar/bic.modvar.r")
+source("modvar/adaweights.r")
+source("modvar/ada.modvar.r")
 
 
 set.seed(123)
@@ -141,19 +60,34 @@ res <- cv.modvar(
     cv.type = "rolling")
 opt_coeffs <- res$opt_coeffs
 
-par(mar = c(5.1, 4.1, 4.1, 4.1), mfrow = c(2,1))
-plot(log(res$eval.mat, 10))
-plot(opt_coeffs, breaks = 30)
+adaW <- adaweights(
+    modvar_fit = res, 
+    p = 0,
+    multi = TRUE, 
+    alpha = 3, 
+    inf = 1e10, 
+    thr = 1e-4)
+
+res.ada <- cv.modvar(
+    Ylist, X = NULL, lambda1vec, c(1), weights = adaW,
+    multi = TRUE, cv.type = "rolling")
+opt_coeffs_ada <- res.ada$opt_coeffs
+
+par(mar = c(5.1, 4.1, 4.1, 4.1), mfcol = c(4,1))
+plot(log(res.ada$eval.mat, 10))
+plot(t(adaW), breaks = 30)
+plot(opt_coeffs_ada, breaks = 30)
+plot(abs(opt_coeffs_ada) > 10^(-1))
 res$lambda1_opt
 res$lambda2_opt
 
 par(mar = c(5.1, 4.1, 4.1, 4.1), mfrow = c(1,1))
-plot(res$joint_coeffs, breaks = seq(-0.6,0.6, length.out = 30))
-res$moderator_coeffs
+plot(res.ada$joint_coeffs, breaks = seq(-0.6,0.6, length.out = 30))
+res.ada$moderator_coeffs
 
 par(mfrow = c(3,1)) 
 for(i in 1:3) {
-    plot(res$bysubject_coeffs[[i]], breaks = seq(-1,1, length.out = 30))
+    plot(res.ada$bysubject_coeffs[[i]], breaks = seq(-1,1, length.out = 30))
 } 
 
 
@@ -220,22 +154,41 @@ res <- cv.modvar(
     cv.type = "rolling")
 opt_coeffs <- res$opt_coeffs
 
-par(mar = c(5.1, 4.1, 4.1, 4.1), mfrow = c(3,1))
-plot(res$eval.mat, 10)
-plot(log(res$eval.mat, 10))
-plot(opt_coeffs, breaks = 30)
+adaW <- adaweights(
+    modvar_fit = res, 
+    p = p,
+    multi = FALSE, 
+    alpha = 3, 
+    inf = 1e10, 
+    thr = 1e-4)
+
+res.ada <- cv.modvar(
+    Ylist, X = X, lambda1vec, c(1), weights = adaW,
+    multi = FALSE, cv.type = "rolling")
+opt_coeffs_ada <- res.ada$opt_coeffs
+
+
+par(mar = c(5.1, 4.1, 4.1, 4.1), mfcol = c(3,1))
+plot(abs(opt_coeffs) > 10^(-4))
+plot(adaW)
+plot(abs(opt_coeffs_ada) > 10^(-4))
+
+par(mar = c(5.1, 4.1, 4.1, 4.1), mfcol = c(4,1))
+plot(log(res.ada$eval.mat, 10))
+plot(t(adaW), breaks = 30)
+plot(opt_coeffs_ada, breaks = 30)
+plot(abs(opt_coeffs_ada) > 10^(-5))
 res$lambda1_opt
 res$lambda2_opt
 
-par(mar = c(5.1, 4.1, 4.1, 4.1), mfrow = c(3,1))
-plot(res$joint_coeffs, breaks = seq(-0.6,0.6, length.out = 30))
-for(i in 1:p) {
-    plot(res$moderator_coeffs[[i]], breaks = seq(-1,1, length.out = 30))
-}
+
+par(mar = c(5.1, 4.1, 4.1, 4.1), mfrow = c(1,1))
+plot(res.ada$joint_coeffs, breaks = seq(-0.6,0.6, length.out = 30))
+res.ada$moderator_coeffs
 
 par(mfrow = c(3,1)) 
 for(i in 1:3) {
-    plot(res$bysubject_coeffs[[i]], breaks = seq(-1,1, length.out = 30))
+    plot(res.ada$bysubject_coeffs[[i]], breaks = seq(-1,1, length.out = 30))
 } 
 
 
@@ -307,28 +260,43 @@ res <- cv.modvar(
     cv.type = "rolling")
 opt_coeffs <- res$opt_coeffs
 
-par(mar = c(5.1, 4.1, 4.1, 4.1), mfrow = c(3,1))
-plot(res$eval.mat, 10)
-plot(log(res$eval.mat, 10))
-plot(opt_coeffs, breaks = 30)
+adaW <- adaweights(
+    modvar_fit = res, 
+    p = p,
+    multi = TRUE, 
+    alpha = 3, 
+    inf = 1e10, 
+    thr = 1e-4)
+plot(log(adaW, base = 10))
+
+res.ada <- cv.modvar(
+    Ylist, X = X, lambda1vec, c(1), weights = adaW,
+    multi = TRUE, cv.type = "rolling")
+opt_coeffs_ada <- res.ada$opt_coeffs
+
+par(mar = c(5.1, 4.1, 4.1, 4.1), mfcol = c(3,1))
+plot(abs(opt_coeffs) > 10^(-4))
+plot(adaW)
+plot(abs(opt_coeffs_ada) > 10^(-4))
+
+par(mar = c(5.1, 4.1, 4.1, 4.1), mfcol = c(4,1))
+plot(log(t(adaW), base = 10))
+plot(t(adaW), breaks = 30)
+plot(opt_coeffs_ada, breaks = 30)
+plot(abs(opt_coeffs_ada) > 10^(-5))
 res$lambda1_opt
 res$lambda2_opt
 
-par(mar = c(5.1, 4.1, 4.1, 4.1), mfrow = c(3,1))
-plot(res$joint_coeffs, breaks = seq(-0.6,0.6, length.out = 30))
-for(i in 1:p) {
-    plot(res$moderator_coeffs[[i]], breaks = seq(-1,1, length.out = 30))
-}
 
-par(mar = c(5.1, 4.1, 4.1, 4.1), mfrow = c(3,1))
-for(i in 1:3) {
-    plot(res$idiographic_coeffs[[i]], breaks = seq(-1,1, length.out = 30))
-}
+par(mar = c(5.1, 4.1, 4.1, 4.1), mfrow = c(1,1))
+plot(res.ada$joint_coeffs, breaks = seq(-0.6,0.6, length.out = 30))
+res.ada$moderator_coeffs
 
 par(mfrow = c(3,1)) 
 for(i in 1:3) {
-    plot(res$bysubject_coeffs[[i]], breaks = seq(-1,1, length.out = 30))
+    plot(res.ada$bysubject_coeffs[[i]], breaks = seq(-1,1, length.out = 30))
 } 
+
 
 
 
@@ -401,23 +369,45 @@ res <- cv.modvar(
     cv.type = "bysubject", nfolds = 5)
 opt_coeffs <- res$opt_coeffs
 
-par(mar = c(5.1, 4.1, 4.1, 4.1), mfrow = c(3,1))
-plot(res$eval.mat, 10)
-plot(log(res$eval.mat, 10))
-plot(opt_coeffs, breaks = 30)
+
+adaW <- adaweights(
+    modvar_fit = res, 
+    p = p,
+    multi = FALSE, 
+    alpha = 3, 
+    inf = 1e10, 
+    thr = 1e-4)
+
+res.ada <- cv.modvar(
+    Ylist, X = X, lambda1vec, c(1), weights = adaW,
+    multi = FALSE, cv.type = "rolling")
+opt_coeffs_ada <- res.ada$opt_coeffs
+
+par(mar = c(5.1, 4.1, 4.1, 4.1), mfcol = c(3,1))
+plot(abs(opt_coeffs) > 10^(-4))
+plot(adaW)
+plot(abs(opt_coeffs_ada) > 10^(-4))
+
+par(mar = c(5.1, 4.1, 4.1, 4.1), mfcol = c(3,1))
+plot(abs(opt_coeffs) > 10^(-4))
+plot(adaW)
+plot(abs(opt_coeffs_ada) > 10^(-4))
+
+par(mar = c(5.1, 4.1, 4.1, 4.1), mfcol = c(4,1))
+plot(log(res.ada$eval.mat, 10))
+plot(t(adaW), breaks = 30)
+plot(opt_coeffs_ada, breaks = 30)
+plot(abs(opt_coeffs_ada) > 10^(-5))
 res$lambda1_opt
 res$lambda2_opt
 
-par(mar = c(5.1, 4.1, 4.1, 4.1), mfrow = c(3,1))
-plot(res$joint_coeffs, breaks = seq(-0.6,0.6, length.out = 30))
-for(i in 1:p) {
-    plot(res$moderator_coeffs[[i]], breaks = seq(-1,1, length.out = 30))
-}
-res$idiographic_coeffs
+
+par(mar = c(5.1, 4.1, 4.1, 4.1), mfrow = c(1,1))
+plot(res.ada$joint_coeffs, breaks = seq(-0.6,0.6, length.out = 30))
+res.ada$moderator_coeffs
 
 par(mfrow = c(3,1)) 
 for(i in 1:3) {
-    plot(res$bysubject_coeffs[[i]], breaks = seq(-1,1, length.out = 30))
+    plot(res.ada$bysubject_coeffs[[i]], breaks = seq(-1,1, length.out = 30))
 } 
-
 

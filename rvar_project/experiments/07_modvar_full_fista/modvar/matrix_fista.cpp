@@ -147,7 +147,7 @@ arma::cube weighted_lasso_path(
     const arma::mat& Y,
     const arma::vec& lambda1vec,
     const arma::vec& ratiovec,
-    const arma::vec& weights, 
+    const arma::mat& weights, 
     const arma::cube& Bcvprev,   // NEW
     int max_iter = 1000,
     double tol = 1e-6

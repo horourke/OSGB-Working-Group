@@ -55,7 +55,7 @@ res <- bic.modvar(
 opt_coeffs <- res$opt_coeffs
 
 par(mar = c(5.1, 4.1, 4.1, 4.1), mfrow = c(2,1))
-plot(res$BIC, 10)
+plot(res$eval.mat, 10)
 plot(opt_coeffs, breaks = 30)
 res$lambda1_opt
 res$lambda2_opt
@@ -134,7 +134,7 @@ res <- bic.modvar(
 opt_coeffs <- res$opt_coeffs
 
 par(mar = c(5.1, 4.1, 4.1, 4.1), mfrow = c(2,1))
-plot(res$BIC, 10)
+plot(res$eval.mat, 10)
 plot(opt_coeffs, breaks = 30)
 res$lambda1_opt
 res$lambda2_opt
@@ -220,7 +220,7 @@ res <- bic.modvar(
 opt_coeffs <- res$opt_coeffs
 
 par(mar = c(5.1, 4.1, 4.1, 4.1), mfrow = c(2,1))
-plot(res$BIC, 10)
+plot(res$eval.mat, 10)
 plot(opt_coeffs, breaks = 30)
 res$lambda1_opt
 res$lambda2_opt
