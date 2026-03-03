@@ -21,7 +21,7 @@ library(lobstr)
 library(glmnet)
 library(mvtnorm)
 library(gimme)
-library(multivar)
+#library(multivar)
 library(BigVAR)
 
 ## Plotting packages:

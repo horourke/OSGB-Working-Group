@@ -65,11 +65,11 @@ if(!require(gimme, lib = req_lib_dir)){
   install.packages("gimme", repos = "https://archive.linux.duke.edu/cran/")
   library(gimme)
 }
-if(!require(multivar, lib = req_lib_dir)){
-  .libPaths(req_lib_dir)
-  install.packages("multivar", repos = "https://archive.linux.duke.edu/cran/")
-  library(multivar)
-}
+#if(!require(multivar, lib = req_lib_dir)){
+#  .libPaths(req_lib_dir)
+#  install.packages("multivar", repos = "https://archive.linux.duke.edu/cran/")
+#  library(multivar)
+#}
 if(!require(BigVAR, lib = req_lib_dir)){
   .libPaths(req_lib_dir)
   install.packages("BigVAR", repos = "https://archive.linux.duke.edu/cran/")

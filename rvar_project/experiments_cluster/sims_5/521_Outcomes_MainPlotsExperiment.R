@@ -87,13 +87,11 @@ if (!dir.exists(subfolder_plots_new)) {
 method_names <- c(
     "var_standard",
     "mvar_standard", "mvar_adaptive",
-    "rvar_bic", "rvar_bic_ad",
-    "rvar_cv", "rvar_cv_ad")
+    "modvar_bic", "modvar_cv_roll", "modvar_cv_bsubj")
 method_names_clean <- c(
     "VAR",          
     "M-VAR: Standard", "M-VAR: Adaptive",
-    "R-VAR: BIC", "R-VAR: BIC Ada", 
-    "R-VAR: CV", "R-VAR: CV Ada")
+    "MOD-VAR: BIC", "MOD-VAR: RWCV", "MOD-VAR: BSCV")
 
 
 for (d_val in c(10, 20, 30)) {
@@ -137,7 +135,7 @@ for (d_val in c(10, 20, 30)) {
 
   file_name <- paste0(
   subfolder_plots_new, 
-  "621_MainTPR",
+  "521_MainTPR",
   "_d", d_val, 
   ".pdf")
   pdf(file_name, width = 8, height = 5)

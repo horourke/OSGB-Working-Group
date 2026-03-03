@@ -52,6 +52,7 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
   if(id_task == 0) {
     args <- list(
     running_days  = 2,
+    hrange        = 3,
     entry_min     = 0.1,        ## entry_min : minimum entry magnitude
     entry_max     = 0.9,        ## entry_max : maximum entry magnitude
     
@@ -98,6 +99,7 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
   ## TABLE OF ALL PARAMETER COMBINATIONS.
   sim_par_table <- expand.grid(
     running_days  = 2,
+    hrange        = 3,
     entry_min     = 0.3,                            ## entry_min : minimum B0,B1,...,Bp entry magnitude
     entry_max     = 0.9,                            ## entry_max : maximum B0,B1,...,Bp entry magnitude
     
