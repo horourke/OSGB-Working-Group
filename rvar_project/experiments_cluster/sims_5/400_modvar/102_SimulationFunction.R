@@ -31,7 +31,8 @@ FullSimulation <- function(args, microrun) {
   
   ## What methods do you want to run?
   method_names  <- c(
-    "modvar_bic", "modvar_cv_roll", "modvar_cv_bsubj")
+    "modvar_bic", "modvar_cv_roll", "modvar_cv_bsubj",
+    "modvar_ada.CVpBIC", "modvar_ada.CVpCV")
   n_methods     <- length(method_names)
 
   ## Output of simulation:
@@ -199,6 +200,92 @@ FullSimulation <- function(args, microrun) {
       output[count, 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
           as.numeric()
+      cv_time <- output[count, 4]
+      output[count, -(1:4)] <- eval_msr(data$B_list, cv.model$bysubject_coeffs, Y_forecast, args$hrange)
+      
+      memory_in_bytes <- mem_used()
+      print(paste0("Memory used CV:", memory_in_bytes / (1024^3), "GB"))
+
+      count <- count + 1
+    }
+
+    ####################################################################################
+    ####################################################################################
+    ####################################################################################
+    ######## BIC.MOD-VAR
+    {
+      ## 
+      print(paste0("Step ", sim_ind,".1: adaBIC.MOD-VAR"))
+      start_time                  <- Sys.time()
+      lambdas1  <- 10^(seq(1, -5, length.out = 20))
+      ratios    <- 10^(seq(3, -3, length.out = 20))
+
+      W.ada <- adaweights(
+        cv.model, 
+        p = 0,
+        multi = FALSE, 
+        alpha = 2, 
+        inf = 1e10, 
+        thr = 1e-5)
+
+      ada.model <- bic.modvar(
+        Ylist = Y_list,
+        X = X, 
+        lambdas1 = lambdas1, 
+        ratios = 1, 
+        weights = W.ada,
+        multi = FALSE,
+        alpha = 0.90)
+      end_time  <- Sys.time()
+
+      ## Saving things! bla bla bla
+      output[count, 2]      <- "modvar_ada.bic"
+      output[count, 3]      <- sim_ind
+      output[count, 4]      <- difftime(
+          time1 = end_time, time2 = start_time, units = "s") %>%
+          as.numeric() %>% {. + cv_time}
+      output[count, -(1:4)] <- eval_msr(data$B_list, ada.model$bysubject_coeffs, Y_forecast, args$hrange)
+      
+      memory_in_bytes <- mem_used()
+      print(paste0("Memory used BIC:", memory_in_bytes / (1024^3), "GB"))
+      
+      count <- count + 1
+    }
+    ####################################################################################
+    ####################################################################################
+    ####################################################################################
+    ######## CV.MOD-VAR by subject
+    {
+      print(paste0("Step ", sim_ind,".3: CV.MOD-VAR by subject"))
+      start_time                  <- Sys.time()
+      lambdas1  <- 10^(seq(1, -5, length.out = 20))
+      ratios    <- 10^(seq(3, -3, length.out = 20))
+
+      W.ada <- adaweights(
+        cv.model, 
+        p = 0,
+        multi = FALSE, 
+        alpha = 2, 
+        inf = 1e10, 
+        thr = 1e-5)
+
+      cv.model  <- cv.modvar(
+        Ylist = Y_list, 
+        X = X, 
+        lambdas1 = lambdas1, 
+        ratios = 1, 
+        weights = W.ada,
+        multi = FALSE,
+        cv.type = "bysubject",
+        nfolds = 5)
+      end_time  <- Sys.time()
+
+      ## Saving things! bla bla bla
+      output[count, 2]      <- "modvar_ada.cv"
+      output[count, 3]      <- sim_ind
+      output[count, 4]      <- difftime(
+          time1 = end_time, time2 = start_time, units = "s") %>%
+          as.numeric() %>% {. + cv_time}
       output[count, -(1:4)] <- eval_msr(data$B_list, cv.model$bysubject_coeffs, Y_forecast, args$hrange)
       
       memory_in_bytes <- mem_used()

@@ -1,4 +1,3 @@
-
 ###########################################################
 ###########################################################
 ## cv.modvar:
@@ -28,16 +27,30 @@
 ##                      cv.type = "bysubject".
 ##      
 ##  OUTPUTS:
-##      Bopt        : optimal estimation of the model B.
-##      lambda1_opt : optimal value of lambda1 according to the cv procedure.
-##      lambda2_opt : optimal value of lambda2 according to the cv procedure.
-##      CV.MSFE     : matrix of cross validation forecasting error. rows correspond
-##                      to lambdas1 range and columns to ratios)
+##      lambda1           : vector with lambda1 values to explore with BIC.
+##      ratios            : vector with values of ratio explored with BIC.
+##      eval.type         : measure for evaluating our CV performance.
+##      eval.mat          : matrix of cross validation forecasting error. rows correspond
+##                              to lambdas1 range and columns to ratios)
+##      lambda1_opt       : optimal value of lambda1 according to the BIC procedure.
+##      ratio_opt         : optimal value of ratio according to our BIC procedure.
+##      lambda2_opt       : optimal value of lambda2 according to the BIC procedure.
+##      opt_coeffs        : matrix (d x q) containing optimal coefficients of MOD-VAR
+##                          model selected by BIC.
+##      joint_coeffs      : (d x d) matrix containing optimal joint autoregressive 
+##                              effects across all subjects.
+##      moderator_coeffs  : list of length p, containing (d x d) matrices, which
+##                              correspond to the autoregressive moderator effects.
+##      idiographic_coeffs: list of length n, containing (d x d) matrices, which
+##                              correspond to fully idiographic autoregressive effects
+##      bysubject_coeffs  : list of length n, containing the aggregregated autoregressive 
+##                              effects for each subject. 
 ##
 cv.modvar <- function(
     Ylist, X, 
     lambdas1, 
     ratios, 
+    weights = NULL,
     multi = FALSE,
     cv.type = c("rolling", "bysubject"), ## "bysubject" only valid if "multi = FALSE"
     nfolds = NULL                        ## Only needed if multi = FALSE, and cv.type = "bysubject"
@@ -54,6 +67,12 @@ cv.modvar <- function(
     N <- nrow(Ymat)
     d <- ncol(Ymat)
     p <- ifelse(is.null(X), 0, ncol(X))
+
+    ############################
+    ## Construct weights
+    if (is.null(weights)) {
+        weights <- matrix(1, nrow = q, ncol = d)
+    }
 
     ############################
     ## Building the cross validation indexes:
@@ -107,6 +126,7 @@ cv.modvar <- function(
             Y = Ymat.cv,
             lambda1vec = lambdas1,
             ratiovec = ratios,
+            weights = weights,
             max_iter = 2000,
             Bcvprev = Bcvprev,
             tol = 1e-8)
@@ -141,6 +161,7 @@ cv.modvar <- function(
         Y = Ymat,
         lambda1vec = lambda1_opt,
         ratiovec = ratio_opt,
+        weights = weights,
         max_iter = 2000,
         Bcvprev = array(0, c(q, d, nlam1 * nrat)),
         tol = 1e-8)
@@ -183,7 +204,8 @@ cv.modvar <- function(
     OUTPUT <- list(
         lambda1 = lambdas1,
         ratios = ratios,
-        CV.MSFE = CV.MSFE,
+        eval.type = paste0("cv.", cv.type),
+        eval.mat = CV.MSFE,
         lambda1_opt = lambda1_opt,
         ratio_opt = ratio_opt,
         lambda2_opt = lambda1_opt * ratio_opt,

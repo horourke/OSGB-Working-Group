@@ -19,8 +19,10 @@ source("003_Generating_RvarData.R")
 
 Rcpp::sourceCpp("040_modvar/matrix_fista.cpp")
 source("040_modvar/auxfunct.r")
+source("040_modvar/adaweights.r")
 source("040_modvar/bic.modvar.r")
 source("040_modvar/cv.modvar.r")
+source("040_modvar/ada.modvar.r")
 
 source("051_Simulation_CreatingParameters.R")
 source("052_Simulation_EvaluatingMeasures.r")
