@@ -98,7 +98,7 @@ FullSimulation <- function(args, microrun) {
         modvar_pars1 = modvar_model_pars, 
         X = X, 
         n = args$n, 
-        Ti = rep(args$T + (2 * args$hrange), args$n))
+        Ti = rep(args$T +  2 * (args$range + args$horizon), args$n))
 
       Y_list <- lapply(
         data$Y_list,
@@ -146,7 +146,7 @@ FullSimulation <- function(args, microrun) {
       output[count, 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
           as.numeric()
-      output[count, -(1:4)] <- eval_msr(data$B_list, B_est_list, Y_forecast, args$hrange)
+      output[count, -(1:4)] <- eval_msr(data$B_list, B_est_list, Y_forecast, args$range, args$horizon)
       
       count <- count + 1
     }

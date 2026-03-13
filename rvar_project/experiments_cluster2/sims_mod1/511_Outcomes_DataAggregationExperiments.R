@@ -40,7 +40,7 @@ sim_par_table <- expand.grid(
                     1, 
                     ifelse(runtype == 2, 2, 10)), ## nsim     : no of simulation repetitions.
   sigma2        = c(0.1),                         ## sigma2   : variance o VAR error term.
-  N             = c(10, 20),                      ## N        : No. of individuals
+  n             = c(10, 20),                      ## n        : No. of individuals
   T             = c(30, 50, 100),                 ## T        : timepoints per individual.
   p             = c(2, 5),                        ## p        : covariate dimension
   d             = c(10, 20, 30))                  ## d        : Time series dimension
@@ -139,7 +139,7 @@ for (id_task in 1:72) {
           d = args_temp$d,
           p = args_temp$p,
           T = args_temp$T,
-          N = args_temp$N,
+          n = args_temp$n,
           sigma2 = args_temp$sigma2,
           prob_c = args_temp$prob_c,
           signed = args_temp$signed,

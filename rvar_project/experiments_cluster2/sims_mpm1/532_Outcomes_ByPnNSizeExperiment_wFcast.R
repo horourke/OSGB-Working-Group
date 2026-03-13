@@ -44,7 +44,7 @@ sim_par_table <- expand.grid(
                     1, 
                     ifelse(runtype == 2, 2, 10)), ## nsim     : no of simulation repetitions.
   sigma2        = c(0.1),                         ## sigma2   : variance o VAR error term.
-  N             = c(10, 20),                      ## N        : No. of individuals
+  n             = c(10, 20),                      ## n        : No. of individuals
   T             = c(30, 50, 100),                 ## T        : timepoints per individual.
   p             = c(2, 5),                        ## p        : covariate dimension
   d             = c(10, 20, 30))                  ## d        : Time series dimension
@@ -117,10 +117,10 @@ for(sigma2_val in c(0.05, 0.1)) {
     output_merged  <- distinct(bind_rows(mget(ls(pattern = '^output\\d+')))) %>%
       filter(method %in% method_names) %>%
       #mutate(method = str_replace_all(method, setNames(method_names_clean, method_names))) %>%
-      #mutate(total_N = N * T) %>% 
+      #mutate(total_N = n * T) %>% 
       filter(sigma2 == 0.1, signed == TRUE) %>%
       select(-sigma2) %>%
-      group_by(d, p, T, N, prob_c, method) %>%
+      group_by(d, p, T, n, prob_c, method) %>%
 
     summarise(
       meanTPR = mean(TPR),
@@ -156,7 +156,7 @@ for(sigma2_val in c(0.05, 0.1)) {
       geom_line(aes(col = method, linetype = method), linewidth = 1) +
       geom_ribbon(aes(ymin = meanTPR - sdTPR, ymax = meanTPR + sdTPR, fill = method), alpha = 0.1) +
       geom_hline(yintercept = c(0,1), linetype = 2) +
-      facet_grid(p ~ prob_c + N, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
       theme(legend.position="bottom")
     print(p1)
 
@@ -164,7 +164,7 @@ for(sigma2_val in c(0.05, 0.1)) {
       geom_line(aes(col = method, linetype = method), linewidth = 1) +
       geom_ribbon(aes(ymin = meanFPR - sdFPR, ymax = meanFPR + sdFPR, fill = method), alpha = 0.1) +
       geom_hline(yintercept = c(0), linetype = 2) +
-      facet_grid(p ~ prob_c + N, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
       theme(legend.position="bottom")
     print(p2)
 
@@ -172,7 +172,7 @@ for(sigma2_val in c(0.05, 0.1)) {
       geom_line(aes(col = method, linetype = method), linewidth = 1) +
       geom_ribbon(aes(ymin = meanL1 - sdL1, ymax = meanL1 + sdL1, fill = method), alpha = 0.1) +
       geom_hline(yintercept = c(0), linetype = 2) +
-      facet_grid(p ~ prob_c + N, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
       theme(legend.position="bottom")
     print(p3)
 
@@ -180,7 +180,7 @@ for(sigma2_val in c(0.05, 0.1)) {
       geom_line(aes(col = method, linetype = method), linewidth = 1) +
       geom_ribbon(aes(ymin = meanFr - sdFr, ymax = meanFr + sdFr, fill = method), alpha = 0.1) +
       geom_hline(yintercept = c(0), linetype = 2) +
-      facet_grid(p ~ prob_c + N, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
       theme(legend.position="bottom")
     print(p4)
 
@@ -196,7 +196,7 @@ for(sigma2_val in c(0.05, 0.1)) {
         annotate("text", x = 55 * 0.93, y = 1.15, label = "1 m", size = 2.5) + 
         annotate("text", x = 55 * 0.93, y = 1.71, label = "10 m", size = 2.5) + 
         annotate("text", x = 55 * 0.93, y = 2.15, label = "1 h", size = 2.5) + 
-        facet_grid(p ~ prob_c + N, scales = "free_x", labeller = label_parsed) +
+        facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
         theme(legend.position="bottom")
     print(p5)
 
@@ -205,7 +205,7 @@ for(sigma2_val in c(0.05, 0.1)) {
       geom_line(aes(col = method, linetype = method), linewidth = 1) +
       geom_ribbon(aes(ymin = meanfc1 - sdfc1, ymax = meanfc1 + sdfc1, fill = method), alpha = 0.1) +
       geom_hline(yintercept = c(sqrt(sigma2_val)), linetype = 2, col = "red") +
-      facet_grid(p ~ prob_c + N, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
       theme(legend.position="bottom")
     print(p6)
     
@@ -213,7 +213,7 @@ for(sigma2_val in c(0.05, 0.1)) {
       geom_line(aes(col = method, linetype = method), linewidth = 1) +
       geom_ribbon(aes(ymin = meanfc2 - sdfc2, ymax = meanfc2 + sdfc2, fill = method), alpha = 0.1) +
       geom_hline(yintercept = c(sqrt(sigma2_val)), linetype = 2, col = "red") +
-      facet_grid(p ~ prob_c + N, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
       theme(legend.position="bottom")
     print(p7)
     
@@ -221,7 +221,7 @@ for(sigma2_val in c(0.05, 0.1)) {
       geom_line(aes(col = method, linetype = method), linewidth = 1) +
       geom_ribbon(aes(ymin = meanfc3 - sdfc3, ymax = meanfc3 + sdfc3, fill = method), alpha = 0.1) +
       geom_hline(yintercept = c(sqrt(sigma2_val)), linetype = 2, col = "red") +
-      facet_grid(p ~ prob_c + N, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
       theme(legend.position="bottom")
     print(p8)
     
@@ -230,7 +230,7 @@ for(sigma2_val in c(0.05, 0.1)) {
       geom_line(aes(col = method, linetype = method), linewidth = 1) +
       geom_ribbon(aes(ymin = meanSens - sdSens, ymax = meanSens + sdSens, fill = method), alpha = 0.1) +
       #geom_hline(yintercept = c(0), linetype = 2) +
-      facet_grid(p ~ prob_c + N, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
       theme(legend.position="bottom")
     print(p9)
     
@@ -238,7 +238,7 @@ for(sigma2_val in c(0.05, 0.1)) {
       geom_line(aes(col = method, linetype = method), linewidth = 1) +
       geom_ribbon(aes(ymin = meanSpec - sdSpec, ymax = meanSpec + sdSpec, fill = method), alpha = 0.1) +
       geom_hline(yintercept = c(0), linetype = 2) +
-      facet_grid(p ~ prob_c + N, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
       theme(legend.position="bottom")
     print(p10)
     

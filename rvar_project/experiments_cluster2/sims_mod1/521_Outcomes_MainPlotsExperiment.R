@@ -44,7 +44,7 @@ sim_par_table <- expand.grid(
                     1, 
                     ifelse(runtype == 2, 2, 10)), ## nsim     : no of simulation repetitions.
   sigma2        = c(0.1),                         ## sigma2   : variance o VAR error term.
-  N             = c(10, 20),                      ## N        : No. of individuals
+  n             = c(10, 20),                      ## n        : No. of individuals
   T             = c(30, 50, 100),                 ## T        : timepoints per individual.
   p             = c(2, 5),                        ## p        : covariate dimension
   d             = c(10, 20, 30))                  ## d        : Time series dimension
@@ -117,8 +117,8 @@ for (d_val in c(10, 20, 30)) {
   output_merged  <- distinct(bind_rows(mget(ls(pattern = '^output\\d+')))) %>%
     filter(method %in% method_names) %>%
     #mutate(method = str_replace_all(method, setNames(method_names_clean, method_names))) %>%
-    mutate(total_N = N * T) %>% 
-    select(-N, -T) %>%
+    mutate(total_N = n * T) %>% 
+    select(-n, -T) %>%
     group_by(d, p, total_N, sigma2, prob_c, signed, method) %>%
 
     summarise(

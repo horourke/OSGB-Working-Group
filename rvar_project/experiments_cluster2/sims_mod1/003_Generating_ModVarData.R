@@ -464,9 +464,9 @@ if (example) {
   
   plot(sims_data$X[,1], sims_data$X[,2], 
        xlab = "X1", ylab = "X2", main = "Exogenous Covariates X",
-       xlim = xrange, ylim = xrange, col = rep(c("red","black"), c(5, N-5)))
+       xlim = xrange, ylim = xrange, col = rep(c("red","black"), c(5, n-5)))
   text(x = sims_data$Y[,1], y = 0.3 + sims_data$Y[,2],  # Fine-tune the position
-       label = c(1:5, rep("", N-5)), col = rep(c("red","black"), c(5, N-5))) 
+       label = c(1:5, rep("", n-5)), col = rep(c("red","black"), c(5, n-5))) 
   
   plot(sims_data$B_list[[1]], main = "Sample 1", breaks = col_lims)
   plot(sims_data$B_list[[2]], main = "Sample 2", breaks = col_lims)

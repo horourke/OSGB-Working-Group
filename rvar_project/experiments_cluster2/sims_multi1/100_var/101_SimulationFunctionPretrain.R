@@ -88,7 +88,7 @@ FullSimulation <- function(args, microrun) {
 
       # Generate exogenous data.
       X  <-  simulate_exogenous_vars(
-        p = args$p, N = args$N, type = args$type,
+        p = args$p, n = args$n, type = args$type,
         u_min = args$u_min, u_max = args$u_max, g_sd = args$g_sd,
         signed = args$signed, nz_x_prob = args$nz_x_prob) 
 
@@ -96,8 +96,8 @@ FullSimulation <- function(args, microrun) {
       data <- simulate_rvar1(
         rvar_pars1 = rvar_model_pars, 
         X = X, 
-        N = args$N, 
-        Ti = rep(args$T + (2 * args$hrange), args$N))
+        n = args$n, 
+        Ti = rep(args$T +  2 * (args$range + args$horizon), args$n))
 
       Y_list <- lapply(
         data$Y_list,
@@ -125,7 +125,7 @@ FullSimulation <- function(args, microrun) {
       ## 
       start_time                  <- Sys.time()
       results <- list()
-      for (n_ind in 1:args$N) {
+      for (n_ind in 1:args$n) {
         model <- BigVAR::constructModel(
           Y = Y_list[[n_ind]], 
           p = 1,
@@ -152,7 +152,7 @@ FullSimulation <- function(args, microrun) {
       output[count, 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
           as.numeric()
-      output[count, -(1:4)] <- eval_msr(data$B_list, B_est_list, Y_forecast, args$hrange)
+      output[count, -(1:4)] <- eval_msr(data$B_list, B_est_list, Y_forecast, args$range, args$horizon)
       
       count <- count + 1
 

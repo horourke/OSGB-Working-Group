@@ -44,7 +44,7 @@ sim_par_table <- expand.grid(
                     1, 
                     ifelse(runtype == 2, 2, 10)), ## nsim     : no of simulation repetitions.
   sigma2        = c(0.1),                         ## sigma2   : variance o VAR error term.
-  N             = c(10, 20),                      ## N        : No. of individuals
+  n             = c(10, 20),                      ## n        : No. of individuals
   T             = c(30, 50, 100),                 ## T        : timepoints per individual.
   p             = c(2, 5),                        ## p        : covariate dimension
   d             = c(10, 20, 30))                  ## d        : Time series dimension
@@ -123,10 +123,10 @@ for(sigma2_val in c(0.05, 0.1)) {
         "mvar_standard" = "M-VAR: Standard",
         "mvar_adaptive" = "M-VAR: Adaptive",
         "modvar_cv_roll" = "MOD-VAR")) %>%
-      #mutate(total_N = N * T) %>% 
+      #mutate(total_N = n * T) %>% 
       mutate(is_rvar = ifelse(method == "MOD-VAR", "MOD-VAR", "Other Methods")) %>%
       mutate(no_cov = factor(paste0("p == ", p))) %>%
-      mutate(no_subj = factor(paste0("N == ", N))) %>%
+      mutate(no_subj = factor(paste0("n == ", n))) %>%
       filter(sigma2 == 0.1, signed == TRUE) %>%
       select(-sigma2, -prob_c) %>%
       group_by(d, no_cov, T, no_subj, method, is_rvar) %>%

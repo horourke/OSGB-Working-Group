@@ -39,7 +39,7 @@
 ##    prob_tot  : total proportion of non-zero entries.
 ##    nsim      : no of simulation repetitions.
 ##    sigma2    : variance o VAR error term.
-##    N         : No. of individuals
+##    n         : No. of individuals
 ##    T         : timepoints per individual.
 ##    p         : covariate dimension
 ##    d         : Time series dimension
@@ -71,7 +71,7 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
 
     nsim          = 2,          ## nsim     : no of simulation repetitions.
     sigma2        = 0.05,       ## sigma2   : variance o VAR error term.
-    n             = 5,          ## N        : No. of individuals
+    n             = 5,          ## n        : No. of individuals
     T             = 30,         ## T        : timepoints per individual.
     p             = 2,          ## p        : covariate dimension
     d             = 5)          ## d        : Time series dimension
@@ -117,7 +117,7 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
                       1, 
                       ifelse(runtype == 2, 2, 10)), ## nsim     : no of simulation repetitions.
     sigma2        = c(0.1),                         ## sigma2   : variance o VAR error term.
-    N             = c(15, 20, 25),                      ## N        : No. of individuals
+    n             = c(15, 20, 25),                      ## n        : No. of individuals
     T             = c(30, 60, 90),                 ## T        : timepoints per individual.
     p             = c(2, 5),                        ## p        : covariate dimension
     d             = c(10, 20, 30))                  ## d        : Time series dimension
@@ -177,7 +177,7 @@ if (example) {
 
   sim_par_table %>% tibble() %>% 
   mutate(index = 1:nrow(sim_par_table), .before = 1) %>%
-  filter(d == 10,  p == 2, T == 100, N == 100, sigma2 == 0.05, prob_c == 1/3)
+  filter(d == 10,  p == 2, T == 100, n == 100, sigma2 == 0.05, prob_c == 1/3)
 
 }
 
