@@ -85,8 +85,8 @@ FullSimulation <- function(args, microrun) {
         args$delta_min, args$delta_max,
         args$vmin, args$vmax, signed = args$signed)
       phi_list <- c(
-        rvar_model_pars$phi0, 
-        rvar_model_pars$phip_list) ## Concatenated phi0 and phip's.
+        modvar_model_pars$phi0, 
+        modvar_model_pars$phip_list) ## Concatenated phi0 and phip's.
 
       # Generate exogenous data.
       X  <-  simulate_exogenous_vars(

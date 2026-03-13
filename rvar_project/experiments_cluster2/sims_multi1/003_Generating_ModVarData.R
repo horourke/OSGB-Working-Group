@@ -514,7 +514,7 @@ if (example) {
 
 ######################################################################
 ######################################################################
-## rvar_to_blist:
+## modvar_to_blist:
 ##  Given the p + n + 1 matrices d x d that determine the MOD-VAR model, this 
 ##  function constructs the n matrices d x d of VAR parameters.
 ##

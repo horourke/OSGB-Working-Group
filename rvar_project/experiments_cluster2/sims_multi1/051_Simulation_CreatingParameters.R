@@ -80,6 +80,8 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
     args$phi0_max <- args$entry_max
     args$phip_min <- args$entry_min
     args$phip_max <- args$entry_max
+    args$delta_min <- args$entry_min
+    args$delta_max <- args$entry_max
   
     args$vmax <- args$sigma2
     args$vmin <- 0.5 * args$sigma2

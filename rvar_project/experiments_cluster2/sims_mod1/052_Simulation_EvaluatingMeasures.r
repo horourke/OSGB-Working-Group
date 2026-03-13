@@ -3,7 +3,7 @@
 #################################################
 #################################################
 #################################################
-## bic.solve_rvar_glmnet_vectorized: 
+## eval_msr:
 ##    For data Xlist and Y, perform cross-validation
 ##    and model selection for the R-VAR model. 
 ##

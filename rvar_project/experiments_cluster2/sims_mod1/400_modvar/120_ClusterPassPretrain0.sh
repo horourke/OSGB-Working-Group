@@ -1,5 +1,5 @@
 #!/bin/sh
-#SBATCH --job-name=rvarp
+#SBATCH --job-name=modvp
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=josesa@ucr.edu
 #SBATCH --cpus-per-task=1

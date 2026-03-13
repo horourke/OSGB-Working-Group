@@ -85,8 +85,8 @@ FullSimulation <- function(args, microrun) {
         args$delta_min, args$delta_max,
         args$vmin, args$vmax, signed = args$signed)
       phi_list <- c(
-        rvar_model_pars$phi0, 
-        rvar_model_pars$phip_list) ## Concatenated phi0 and phip's.
+        modvar_model_pars$phi0, 
+        modvar_model_pars$phip_list) ## Concatenated phi0 and phip's.
 
       # Generate exogenous data.
       X  <-  simulate_exogenous_vars(
@@ -164,11 +164,12 @@ FullSimulation <- function(args, microrun) {
       end_time                    <- Sys.time()
 
       ## Saving things! bla bla bla
-      output[count, 2]      <- "modvar_cv_roll"
-      output[count, 3]      <- sim_ind
-      output[count, 4]      <- difftime(
+      cv_time <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
           as.numeric()
+      output[count, 2]      <- "modvar_cv_roll"
+      output[count, 3]      <- sim_ind
+      output[count, 4]      <- cv_time
       output[count, -(1:4)] <- eval_msr(data$B_list, cv.model$bysubject_coeffs, Y_forecast, args$range, args$horizon)
       
       memory_in_bytes <- mem_used()

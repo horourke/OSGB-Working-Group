@@ -80,6 +80,8 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
     args$phi0_max <- args$entry_max
     args$phip_min <- args$entry_min
     args$phip_max <- args$entry_max
+    args$delta_min <- args$entry_min
+    args$delta_max <- args$entry_max
   
     args$vmax <- args$sigma2
     args$vmin <- 0.5 * args$sigma2
@@ -131,6 +133,8 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
   sim_par_table$phi0_max <- sim_par_table$entry_max
   sim_par_table$phip_min <- sim_par_table$entry_min
   sim_par_table$phip_max <- sim_par_table$entry_max
+  sim_par_table$delta_min <- sim_par_table$entry_min
+  sim_par_table$delta_max <- sim_par_table$entry_max
   
   sim_par_table$vmax <- sim_par_table$sigma2
   sim_par_table$vmin <- 0.5 * sim_par_table$sigma2
