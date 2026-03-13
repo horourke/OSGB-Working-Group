@@ -53,6 +53,11 @@ if(!require(remotes, lib = req_lib_dir)){
   install.packages("remotes", repos = "https://archive.linux.duke.edu/cran/")
   library(remotes)
 }
+if(!require(expm, lib = req_lib_dir)){
+  .libPaths(req_lib_dir)
+  install.packages("expm", repos = "https://archive.linux.duke.edu/cran/")
+  library(expm)
+}
 
 
 
