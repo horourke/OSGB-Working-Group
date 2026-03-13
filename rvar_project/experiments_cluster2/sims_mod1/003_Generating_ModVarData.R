@@ -203,7 +203,7 @@ if (example) {
     vmin, vmax, signed = TRUE)
   
   pdf("plot.pdf", width = 7, height = 3)
-  par(mfrow = c(1,3), mar = c(5.1, 4.1, 4.1, 4.1))
+  par(mfrow = c(2,3), mar = c(5.1, 4.1, 4.1, 4.1))
   plot(output$phi0)
   plot(output$phip_list[[1]])
   plot(output$phip_list[[2]])
@@ -388,15 +388,15 @@ if (example) {
   d           <- 5
   p           <- 2
   n           <- 3
-  prob_phi0   <- 0.20
-  prob_phip   <- 0.05
-  prob_delta  <- 0.05
-  min0        <- 0.1
-  max0        <- 0.2
-  minp        <- 0.3
-  maxp        <- 0.4
-  mind        <- 0.5
-  maxd        <- 0.6
+  prob_phi0   <- 0.1
+  prob_phip   <- 0.1
+  prob_delta  <- 0.0
+  min0        <- 0.7
+  max0        <- 0.8
+  minp        <- 0.8
+  maxp        <- 0.9
+  mind        <- 0.8
+  maxd        <- 0.9
   vmin        <- 0.3
   vmax        <- 0.5
   
@@ -415,7 +415,7 @@ if (example) {
     mind, maxd,
     vmin, vmax)
   
-  par(mfrow = c(3,1), mar = c(5.1, 4.1, 4.1, 4.1))
+  par(mfrow = c(2,3), mar = c(5.1, 4.1, 4.1, 4.1))
   plot(output$phi0)
   plot(output$phip_list[[1]])
   plot(output$phip_list[[2]])
@@ -436,7 +436,18 @@ if (example) {
   
   lapply(sims_data$B_list, dim)
   lapply(sims_data$B_list, function(x) {sum(x != 0)})
-  
+
+  par(mfrow = c(3,3))
+  plot(output$phi0, breaks = seq(-1,1,length.out = 20))
+  plot(output$phip_list[[1]], breaks = seq(-1,1,length.out = 20))
+  plot(output$phip_list[[2]], breaks = seq(-1,1,length.out = 20))
+  plot(output$delta_list[[1]], breaks = seq(-1,1,length.out = 20))
+  plot(output$delta_list[[2]], breaks = seq(-1,1,length.out = 20))
+  plot(output$delta_list[[3]], breaks = seq(-1,1,length.out = 20))
+  for (i in 1:3) {
+    plot(sims_data$B_list[[i]], breaks = seq(-1,1,length.out = 20))
+  }
+
   
   #########################
   ## Visualizing parameters:

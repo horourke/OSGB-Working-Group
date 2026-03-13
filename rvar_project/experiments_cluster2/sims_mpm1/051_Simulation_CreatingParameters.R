@@ -60,26 +60,21 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
     u_min         = 0.5,        ## u_min : minimum entry of exogenous X for type = "unif".
     u_max         = 1,          ## u_max : maximum entry of exogenous X for type = "unif".
     type          = "unif",     ## type  : distribution of exogenous variables.
-    nz_x_prob     = 0.75,        ## nz_x_prob : proportion of entries in exogenous
+    nz_x_prob     = 0.75,       ## nz_x_prob : proportion of entries in exogenous
                                 ##              data matrix X with non-zero values.
-    signed        = TRUE,       ## signed    : are entries signed or all positive?
 
-
-    signed        = TRUE,       ## signed   : are entries signed or all positive?
-    prob_c        = 0.5,        ## prob_c   : proportion of common entries.
-    prob_tot      = 0.2,       ## prob_tot : total proportion of non-zero entries.
+    signed        = TRUE,       ## signed     : are entries signed or all positive?
+    prob_phi0     = 0.05,       ## prob_phi0  : common components.
+    prob_phip     = 0.05,       ## prob_phip  : moderator components.
+    prob_delta    = 0.05,       ## prob_delta : idiographic components.
 
     nsim          = 2,          ## nsim     : no of simulation repetitions.
     sigma2        = 0.05,       ## sigma2   : variance o VAR error term.
-    N             = 5,          ## N        : No. of individuals
+    n             = 5,          ## N        : No. of individuals
     T             = 30,         ## T        : timepoints per individual.
     p             = 2,          ## p        : covariate dimension
     d             = 5)          ## d        : Time series dimension
 
-    ## Add specific parameters to table:
-    args$prob_phi0 <- args$prob_tot * args$prob_c
-    args$prob_phip <- args$prob_tot * (1 - args$prob_c)
-  
     args$phi0_min <- args$entry_min
     args$phi0_max <- args$entry_max
     args$phip_min <- args$entry_min
@@ -89,7 +84,6 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
     args$vmin <- 0.5 * args$sigma2
 
     args$id_task <- 0
-    
     return(args)
   }
   ## id_task in 1-288
@@ -114,7 +108,7 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
 
     prob_c        = c(0.25, 0.75),                  ## prob_c   : proportion of common entries.
     prob_tot      = 0.1,                            ## prob_tot : total proportion of non-zero entries.
-    prob_delta    = 0.025,                          ## prob_delta : total proportion of idiographic entries.
+    prob_delta    = 0.03,                          ## prob_delta : total proportion of idiographic entries.
 
     nsim          = ifelse(
                       runtype == 1, 

@@ -143,7 +143,7 @@ if (example) {
 
 
   
-  pdf("plot.pdf", width = 7, height = 3)
+  #pdf("plot.pdf", width = 7, height = 3)
   par(mfrow = c(2,3), mar = c(5.1, 4.1, 4.1, 4.1))
   plot(output$phi0)
   plot(output$phip_list[[1]])
@@ -203,7 +203,7 @@ if (example) {
     vmin, vmax, signed = TRUE)
   
   pdf("plot.pdf", width = 7, height = 3)
-  par(mfrow = c(1,3), mar = c(5.1, 4.1, 4.1, 4.1))
+  par(mfrow = c(2,3), mar = c(5.1, 4.1, 4.1, 4.1))
   plot(output$phi0)
   plot(output$phip_list[[1]])
   plot(output$phip_list[[2]])
