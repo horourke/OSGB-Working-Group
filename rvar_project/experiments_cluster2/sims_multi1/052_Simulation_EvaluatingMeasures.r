@@ -10,7 +10,7 @@
 ##  INPUTS
 ##    
 ##
-eval_msr <-function(B_true_list, B_est_list, Y_forecast, hrange) {
+eval_msr <-function(B_true_list, B_est_list, Y_forecast, range, horizon) {
 
     l0_est <- mapply(
         function(a, b) {
@@ -83,7 +83,7 @@ eval_msr <-function(B_true_list, B_est_list, Y_forecast, hrange) {
     ) %>% unlist() %>% mean()
 
     ## Forecast performance:
-    forecast <- eval_forecast(Y_forecast, B_est_list, hrange)
+    forecast <- eval_forecast(Y_forecast, B_est_list, range, horizon)
 
     return(c(
         l0_est = l0_est, l0_true = l0_true, 
@@ -92,36 +92,32 @@ eval_msr <-function(B_true_list, B_est_list, Y_forecast, hrange) {
         forecast))
 }
 
-eval_forecast <- function(Y_forecast, B_est_list, hrange) {
-  
-  RMSFE_h <- numeric(hrange)
-
-
-  for (h in 1:hrange) {
-
-    val <- mapply(
-      function(Y, B, h) {
-        d     <- ncol(Y)
-        Ytrue <-  Y[1 + h,]
+eval_forecast <- function(Y_forecast, B_est_list, range, horizon) {
+    
+    n <- length(Y_forecast)
+    
+    msfe <- numeric(horizon)
+    for (h in 1:horizon) {
         
-        Yfore <- Y[1,]
-        for (ind in 1:h) {
-          Yfore <- B %*% Yfore
+        bysubj_msfe <- numeric(n)
+        for (k in 1:n) {
+            Y <- Y_forecast[[k]]
+            B <- B_est_list[[k]] %^% h
+
+            Z <- Y[h + 1:(range - h),]
+            X <- Y[1:(range - h),]
+
+            err_mat <- Z - X %*% t(B)
+
+            bysubj_msfe[k] <- sqrt(mean(err_mat^2))
+
         }
+        msfe[h] <- mean(bysubj_msfe)
         
-        error <- sqrt(sum((Yfore - Ytrue)^2) / d)
-        
-        return(error)
-      },
-      Y = Y_forecast, B = B_est_list, h = h) %>%
-
-      unlist() 
-
-    RMSFE_h[h] <- mean(val)
-  }
-  
-  names(RMSFE_h) <- paste0("f_l2_step", 1:h)
-
-  return(RMSFE_h)
+    }
+    
+    names(msfe) <- paste0("msfe_step", 1:h)
+    
+    return(msfe)
 
 }
