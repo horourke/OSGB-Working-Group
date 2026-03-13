@@ -258,7 +258,7 @@ FullSimulation <- function(args, microrun) {
     ####################################################################################
     ######## CV.MOD-VAR by subject
     {
-      print(paste0("Step ", sim_ind,".3: CV.MOD-VAR by subject"))
+      print(paste0("Step ", sim_ind,".3: adaCV.MOD-VAR"))
       start_time                  <- Sys.time()
       lambdas1  <- 10^(seq(1, -5, length.out = 20))
       ratios    <- 10^(seq(3, -3, length.out = 20))
