@@ -17,7 +17,7 @@ library(lubridate)
 library(tidyverse)
 library(lobstr)
 library(remotes)
-library(exmp)
+library(expm)
 
 ## Model fitting packages:
 library(glmnet)
