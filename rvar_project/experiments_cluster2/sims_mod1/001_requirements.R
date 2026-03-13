@@ -48,6 +48,13 @@ if(!require(lobstr, lib = req_lib_dir)){
   install.packages("lobstr", repos = "https://archive.linux.duke.edu/cran/")
   library(lobstr)
 }
+if(!require(remotes, lib = req_lib_dir)){
+  .libPaths(req_lib_dir)
+  install.packages("remotes", repos = "https://archive.linux.duke.edu/cran/")
+  library(remotes)
+}
+
+
 
 ## Model fitting packages:
 if(!require(glmnet, lib = req_lib_dir)){
@@ -60,22 +67,21 @@ if(!require(mvtnorm, lib = req_lib_dir)){
   install.packages("mvtnorm", repos = "https://archive.linux.duke.edu/cran/")
   library(mvtnorm)
 }
-if(!require(gimme, lib = req_lib_dir)){
-  .libPaths(req_lib_dir)
-  install.packages("gimme", repos = "https://archive.linux.duke.edu/cran/")
-  library(gimme)
-}
-#if(!require(multivar, lib = req_lib_dir)){
+#if(!require(gimme, lib = req_lib_dir)){
 #  .libPaths(req_lib_dir)
-#  install.packages("multivar", repos = "https://archive.linux.duke.edu/cran/")
-#  library(multivar)
+#  install.packages("gimme", repos = "https://archive.linux.duke.edu/cran/")
+#  library(gimme)
 #}
+if(!require(multivar, lib = req_lib_dir)){
+  .libPaths(req_lib_dir)
+  remotes::install_github("zackfisher/multivar", lib = req_lib_dir)
+  library(multivar)
+}
 if(!require(BigVAR, lib = req_lib_dir)){
   .libPaths(req_lib_dir)
   install.packages("BigVAR", repos = "https://archive.linux.duke.edu/cran/")
   library(BigVAR)
 }
-
 
 ## Plotting packages:
 if(!require(ggh4x, lib = req_lib_dir)){
