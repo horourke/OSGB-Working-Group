@@ -31,8 +31,8 @@ FullSimulation <- function(args, microrun) {
   
   ## What methods do you want to run?
   method_names  <- c(
-    "rvar_bic", "rvar_bic_ad", 
-    "rvar_cv", "rvar_cv_ad")
+    "modvar_bic", "modvar_cv_roll", "modvar_cv_bsubj",
+    "modvar_ada.CVpBIC", "modvar_ada.CVpCV")
   n_methods     <- length(method_names)
 
   ## Output of simulation:
@@ -47,7 +47,12 @@ FullSimulation <- function(args, microrun) {
     TPR     = numeric(args$nsim * n_methods),
     FPR     = numeric(args$nsim * n_methods),
     l1      = numeric(args$nsim * n_methods),
-    Fr      = numeric(args$nsim * n_methods))
+    Fr      = numeric(args$nsim * n_methods),
+    sens    = numeric(args$nsim * n_methods),
+    spec    = numeric(args$nsim * n_methods),
+    fcast1  = numeric(args$nsim * n_methods),
+    fcast2  = numeric(args$nsim * n_methods),
+    fcast3  = numeric(args$nsim * n_methods))
   attach(output)
 
   #################################################
@@ -73,14 +78,14 @@ FullSimulation <- function(args, microrun) {
       print(paste0("Seed val: ", seed_val))
 
       # Generate Phi0, Phi1, ... Phip parameters:
-      rvar_model_pars <- generate_rvar_pars(
+      modvar_model_pars <- generate_modvar_pars(
         args$d, args$p, args$prob_phi0, args$prob_phip,
         args$phi0_min, args$phi0_max,
         args$phip_min, args$phip_max,
         args$vmin, args$vmax, signed = args$signed)
       phi_list <- c(
-        list(rvar_model_pars$phi0), 
-        rvar_model_pars$phip_list) ## Concatenated phi0 and phip's.
+        list(modvar_model_pars$phi0), 
+        modvar_model_pars$phip_list) ## Concatenated phi0 and phip's.
 
       # Generate exogenous data.
       X  <-  simulate_exogenous_vars(
@@ -89,15 +94,15 @@ FullSimulation <- function(args, microrun) {
         signed = args$signed, nz_x_prob = args$nz_x_prob) 
 
       # Generate R-VAR Y data.
-      data <- simulate_rvar1(
-        rvar_pars1 = rvar_model_pars, 
+      data <- simulate_modvar1(
+        rvar_pars1 = modvar_model_pars, 
         X = X, 
         n = args$n, 
         Ti = rep(args$T, args$n))
 
       Y_list <- data$Y_list
 
-      gather$model_pars <- rvar_model_pars
+      gather$model_pars <- modvar_model_pars
       gather$phi_list   <- phi_list
       gather$X          <- X
       gather$data       <- data
@@ -106,141 +111,185 @@ FullSimulation <- function(args, microrun) {
     ####################################################################################
     ####################################################################################
     ####################################################################################
-    ######## Sparse RVAR: adaptive
+    ######## BIC.MOD-VAR
     {
       ## 
-      print(paste0("Step ", sim_ind,".1: bic.solve_rvar"))
+      print(paste0("Step ", sim_ind,".1: BIC.MOD-VAR"))
       start_time                  <- Sys.time()
-      lambda.seq      <- 10^(seq(1, -5, length.out = 20))
-      penalty.factor  <- 10^(seq(3, -3, length.out = 20))
-      bic.model <- bic.solve_rvar_glmnet_vectorized(
-        d = args$d, p = args$p,
-        Y_list = Y_list, X = X,
-        lambda.seq = lambda.seq,
-        penalty.factor = penalty.factor,
-        verbose = FALSE)
-      print(bic.model$rvar_opt_coeffs)
-      end_time                    <- Sys.time()
+      lambdas1  <- 10^(seq(1, -5, length.out = 20))
+      ratios    <- 10^(seq(3, -3, length.out = 20))
+      bic.model <- bic.modvar(
+        Ylist = Y_list,
+        X = X, 
+        lambdas1 = lambdas1, 
+        ratios = ratios, 
+        multi = FALSE,
+        alpha = 0.90)
+      end_time  <- Sys.time()
 
       ## Saving things! bla bla bla
-      output[count, 2]      <- "rvar_bic"
+      output[count, 2]      <- "modvar_bic"
       output[count, 3]      <- sim_ind
       output[count, 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
           as.numeric()
-      output[count, -(1:4)] <- eval_msr(data$B_list, bic.model$var_ind_coeffs)
+      output[count, -(1:4)] <- eval_msr(data$B_list, bic.model$bysubject_coeffs, Y_forecast, args$range, args$horizon)
       
       memory_in_bytes <- mem_used()
       print(paste0("Memory used BIC:", memory_in_bytes / (1024^3), "GB"))
       
       count <- count + 1
-
-      gather$BICmodel <- bic.model
-
-    }
-    ############################
-    ############################
-    ######## BIC adaptive
-    {
-      ## 
-      print(paste0("Step ", sim_ind,".2: bic.solve_rvar_ad"))
-      start_time                  <- Sys.time()
-      lambda.seq      <- 10^(seq(1, -5, length.out = 20))
-      bic.model_ad <- solve_rvar_glmnet_adaptive(
-        d = args$d, p = args$p,
-        Y_list = Y_list, X = X,
-        gamma = 2,
-        rvar.fit = bic.model, 
-        lambda.seq = lambda.seq,
-        verbose = FALSE)
-      print(bic.model_ad$rvar_opt_coeffs)
-      end_time                    <- Sys.time()
-
-      ## Saving things! bla bla bla
-      output[count, 2]      <- "rvar_bic_ad"
-      output[count, 3]      <- sim_ind
-      output[count, 4]      <- difftime(
-          time1 = end_time, time2 = start_time, units = "s") %>%
-          {as.numeric(.) + output[count - 1, 4]}
-      output[count, -(1:4)] <- eval_msr(data$B_list, bic.model_ad$var_ind_coeffs)
-      
-      memory_in_bytes <- mem_used()
-      print(paste0("Memory used BIC:", memory_in_bytes / (1024^3), "GB"))
-      
-      count <- count + 1
-
-      gather$BICmodel_ad <- bic.model_ad
-
     }
     ####################################################################################
     ####################################################################################
     ####################################################################################
-    ######## CV-RVAR
+    ######## CV.MOD-VAR rolling window
     {
-      print(paste0("Step ", sim_ind,".3: cv.solve_rvar"))
+      print(paste0("Step ", sim_ind,".2: CV.MOD-VAR rolling window"))
       start_time                  <- Sys.time()
-      lambda.seq      <- 10^(seq(1, -5, length.out = 20))
-      penalty.factor  <- 10^(seq(3, -3, length.out = 20))
+      lambdas1  <- 10^(seq(1, -5, length.out = 20))
+      ratios    <- 10^(seq(3, -3, length.out = 20))
 
-      cv.model <- cv.solve_rvar_glmnet_vectorized(
-        d = args$d, p = args$p,
-        Y_list = Y_list, X = X,
-        lambda.seq = lambda.seq,
-        penalty.factor = penalty.factor,
-        nfolds = 5,
-        verbose = FALSE)
-      print(cv.model$rvar_opt_coeffs)
+      cv.model <- cv.modvar(
+        Ylist = Y_list, 
+        X = X, 
+        lambdas1 = lambdas1, 
+        ratios = ratios, 
+        multi = FALSE,
+        cv.type = "rolling")
       end_time                    <- Sys.time()
 
       ## Saving things! bla bla bla
-      output[count, 2]      <- "rvar_cv"
+      output[count, 2]      <- "modvar_cv_roll"
       output[count, 3]      <- sim_ind
       output[count, 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
           as.numeric()
-      output[count, -(1:4)] <- eval_msr(data$B_list, cv.model$var_ind_coeffs)
+      output[count, -(1:4)] <- eval_msr(data$B_list, cv.model$bysubject_coeffs, Y_forecast, args$range, args$horizon)
       
       memory_in_bytes <- mem_used()
       print(paste0("Memory used CV:", memory_in_bytes / (1024^3), "GB"))
 
       count <- count + 1
-
-      gather$CVmodel <- cv.model
-
     }
-    ############################
-    ############################
-    ######## CV adaptive
+    ####################################################################################
+    ####################################################################################
+    ####################################################################################
+    ######## CV.MOD-VAR by subject
     {
-      ## 
-      print(paste0("Step ", sim_ind,".4: bic.solve_rvar_ad"))
+      print(paste0("Step ", sim_ind,".3: CV.MOD-VAR by subject"))
       start_time                  <- Sys.time()
-      lambda.seq      <- 10^(seq(1, -5, length.out = 20))
-      cv.model_ad <- solve_rvar_glmnet_adaptive(
-        d = args$d, p = args$p,
-        Y_list = Y_list, X = X,
-        gamma = 2,
-        rvar.fit = cv.model, 
-        lambda.seq = lambda.seq,
-        verbose = FALSE)
-      print(cv.model_ad$rvar_opt_coeffs)
-      end_time                    <- Sys.time()
+      lambdas1  <- 10^(seq(1, -5, length.out = 20))
+      ratios    <- 10^(seq(3, -3, length.out = 20))
+
+      cv.model  <- cv.modvar(
+        Ylist = Y_list, 
+        X = X, 
+        lambdas1 = lambdas1, 
+        ratios = ratios, 
+        multi = FALSE,
+        cv.type = "bysubject",
+        nfolds = 5)
+      end_time  <- Sys.time()
 
       ## Saving things! bla bla bla
-      output[count, 2]      <- "rvar_cv_ad"
+      output[count, 2]      <- "modvar_cv_bsubj"
       output[count, 3]      <- sim_ind
       output[count, 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
-          {as.numeric(.) + output[count - 1, 4]}
-      output[count, -(1:4)] <- eval_msr(data$B_list, cv.model_ad$var_ind_coeffs)
+          as.numeric()
+      cv_time <- output[count, 4]
+      output[count, -(1:4)] <- eval_msr(data$B_list, cv.model$bysubject_coeffs, Y_forecast, args$range, args$horizon)
+      
+      memory_in_bytes <- mem_used()
+      print(paste0("Memory used CV:", memory_in_bytes / (1024^3), "GB"))
+
+      count <- count + 1
+    }
+
+    ####################################################################################
+    ####################################################################################
+    ####################################################################################
+    ######## BIC.MOD-VAR
+    {
+      ## 
+      print(paste0("Step ", sim_ind,".1: adaBIC.MOD-VAR"))
+      start_time                  <- Sys.time()
+      lambdas1  <- 10^(seq(1, -5, length.out = 20))
+      ratios    <- 10^(seq(3, -3, length.out = 20))
+
+      W.ada <- adaweights(
+        cv.model, 
+        p = 0,
+        multi = FALSE, 
+        alpha = 2, 
+        inf = 1e10, 
+        thr = 1e-5)
+
+      ada.model <- bic.modvar(
+        Ylist = Y_list,
+        X = X, 
+        lambdas1 = lambdas1, 
+        ratios = 1, 
+        weights = W.ada,
+        multi = FALSE,
+        alpha = 0.90)
+      end_time  <- Sys.time()
+
+      ## Saving things! bla bla bla
+      output[count, 2]      <- "modvar_ada.bic"
+      output[count, 3]      <- sim_ind
+      output[count, 4]      <- difftime(
+          time1 = end_time, time2 = start_time, units = "s") %>%
+          as.numeric() %>% {. + cv_time}
+      output[count, -(1:4)] <- eval_msr(data$B_list, ada.model$bysubject_coeffs, Y_forecast, args$range, args$horizon)
       
       memory_in_bytes <- mem_used()
       print(paste0("Memory used BIC:", memory_in_bytes / (1024^3), "GB"))
       
       count <- count + 1
+    }
+    ####################################################################################
+    ####################################################################################
+    ####################################################################################
+    ######## CV.MOD-VAR by subject
+    {
+      print(paste0("Step ", sim_ind,".3: adaCV.MOD-VAR"))
+      start_time                  <- Sys.time()
+      lambdas1  <- 10^(seq(1, -5, length.out = 20))
+      ratios    <- 10^(seq(3, -3, length.out = 20))
 
-      gather$CVmodel_ad <- cv.model_ad
+      W.ada <- adaweights(
+        cv.model, 
+        p = 0,
+        multi = FALSE, 
+        alpha = 2, 
+        inf = 1e10, 
+        thr = 1e-5)
 
+      cv.model  <- cv.modvar(
+        Ylist = Y_list, 
+        X = X, 
+        lambdas1 = lambdas1, 
+        ratios = 1, 
+        weights = W.ada,
+        multi = FALSE,
+        cv.type = "bysubject",
+        nfolds = 5)
+      end_time  <- Sys.time()
+
+      ## Saving things! bla bla bla
+      output[count, 2]      <- "modvar_ada.cv"
+      output[count, 3]      <- sim_ind
+      output[count, 4]      <- difftime(
+          time1 = end_time, time2 = start_time, units = "s") %>%
+          as.numeric() %>% {. + cv_time}
+      output[count, -(1:4)] <- eval_msr(data$B_list, cv.model$bysubject_coeffs, Y_forecast, args$range, args$horizon)
+      
+      memory_in_bytes <- mem_used()
+      print(paste0("Memory used CV:", memory_in_bytes / (1024^3), "GB"))
+
+      count <- count + 1
     }
     ####################################################################################
     ####################################################################################

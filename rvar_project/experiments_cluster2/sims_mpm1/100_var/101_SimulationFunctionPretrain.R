@@ -77,14 +77,14 @@ FullSimulation <- function(args, microrun) {
       print(paste0("Seed val: ", seed_val))
 
       # Generate Phi0, Phi1, ... Phip parameters:
-      rvar_model_pars <- generate_rvar_pars(
+      modvar_model_pars <- generate_modvar_pars(
         args$d, args$p, args$prob_phi0, args$prob_phip,
         args$phi0_min, args$phi0_max,
         args$phip_min, args$phip_max,
         args$vmin, args$vmax, signed = args$signed)
       phi_list <- c(
-        list(rvar_model_pars$phi0), 
-        rvar_model_pars$phip_list) ## Concatenated phi0 and phip's.
+        list(modvar_model_pars$phi0), 
+        modvar_model_pars$phip_list) ## Concatenated phi0 and phip's.
 
       # Generate exogenous data.
       X  <-  simulate_exogenous_vars(
@@ -93,8 +93,8 @@ FullSimulation <- function(args, microrun) {
         signed = args$signed, nz_x_prob = args$nz_x_prob) 
 
       # Generate R-VAR Y data.
-      data <- simulate_rvar1(
-        rvar_pars1 = rvar_model_pars, 
+      data <- simulate_modvar1(
+        rvar_pars1 = modvar_model_pars, 
         X = X, 
         n = args$n, 
         Ti = rep(args$T +  2 * (args$range + args$horizon), args$n))
@@ -111,7 +111,7 @@ FullSimulation <- function(args, microrun) {
 
       print(str(Y_forecast))
 
-      gather$model_pars <- rvar_model_pars
+      gather$model_pars <- modvar_model_pars
       gather$phi_list   <- phi_list
       gather$X          <- X
       gather$data       <- data
