@@ -24,6 +24,8 @@ runtype       <- 2 # FOR EXPERIMENT RUNS
 index_old     <- 1 # run index to use
 sim_par_table <- expand.grid(
   running_days  = 2,
+  range        = 50,
+  horizon      = 3,
   entry_min     = 0.3,                            ## entry_min : minimum B0,B1,...,Bp entry magnitude
   entry_max     = 0.9,                            ## entry_max : maximum B0,B1,...,Bp entry magnitude
     
@@ -36,16 +38,17 @@ sim_par_table <- expand.grid(
   signed        = c(TRUE),                        ## signed    : are entries signed or all positive?
 
 
-  prob_c        = c(0.25, 0.75),                  ## prob_c   : proportion of common entries.
-  prob_tot      = 0.1,                            ## prob_tot : total proportion of non-zero entries.
+  prob_c        = c(0.25, 0.75),                  ## prob_c     : proportion of common entries.
+  prob_tot      = 0.1,                            ## prob_tot   : total proportion of non-zero entries.
+  prob_delta    = 0,                              ## prob_delta : total proportion of idiographic entries.
 
   nsim          = ifelse(
-                    runtype == 1, 
-                    1, 
-                    ifelse(runtype == 2, 2, 10)), ## nsim     : no of simulation repetitions.
+                      runtype == 1, 
+                      1, 
+                      ifelse(runtype == 2, 2, 5)),  ## nsim     : no of simulation repetitions.
   sigma2        = c(0.1),                         ## sigma2   : variance o VAR error term.
-  n             = c(10, 20),                      ## n        : No. of individuals
-  T             = c(30, 50, 100),                 ## T        : timepoints per individual.
+  n             = c(15, 20, 25),                  ## n        : No. of individuals
+  T             = c(30, 60, 90),                  ## T        : timepoints per individual.
   p             = c(2, 5),                        ## p        : covariate dimension
   d             = c(10, 20, 30))                  ## d        : Time series dimension
 
@@ -94,7 +97,7 @@ method_names_clean <- c(
     "MOD-VAR: BIC", "MOD-VAR: RWCV", "MOD-VAR: BSCV")
 
 
-for (d_val in c(10, 20, 30)) {
+for (d_val in c(10, 20)) {
   
   ##############################
   ##############################

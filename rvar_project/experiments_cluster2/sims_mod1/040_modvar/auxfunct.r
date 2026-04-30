@@ -97,7 +97,7 @@ build_design <- function(Ylist, X = NULL, multi = FALSE) {
 ##      nfolds          : Numeric counting the number of 
 ##                          rolling windows.
 ##
-build_rolling_windows <- function(Ts, folds_max = 20) {
+build_rolling_windows <- function(Ts, folds_max = 10) {
     n <- length(Ts)
     Tms <- Ts - 1
     trange  <- min(c(floor(Ts / 3), folds_max)) 
