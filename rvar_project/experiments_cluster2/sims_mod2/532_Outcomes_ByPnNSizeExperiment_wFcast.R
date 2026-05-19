@@ -14,8 +14,7 @@ library(lazyeval)
 library(pROC)
 
 input <- commandArgs(trailingOnly = TRUE)
-diag_shift_val <- as.numeric(input[1])
-T0_prop_val    <- as.numeric(input[2])
+version <- as.numeric(input[1])
 
 
 ###################### Parameter table:
@@ -153,7 +152,8 @@ for(sigma2_val in c(0.1)) {
 
     file_name <- paste0(
       subfolder_plots_new, 
-      "532_ByPnN",
+      "v", version,
+      "_532_ByPnN",
       "_d", d_val, 
       "_sigma2_", sigma2_val,
       ".pdf")
