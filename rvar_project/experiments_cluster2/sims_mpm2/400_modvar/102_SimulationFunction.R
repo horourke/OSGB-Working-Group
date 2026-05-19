@@ -121,7 +121,7 @@ FullSimulation <- function(args, microrun) {
       print(paste0("Step ", sim_ind,".1: BIC.MOD-VAR"))
       start_time                  <- Sys.time()
       lambdas1  <- 10^(seq(1, -3, length.out = 20))
-      ratios    <- 10^(seq(3, -3, length.out = 20))
+      ratios    <- 10^(seq(3, 0, length.out = 20))
       bic.model <- bic.modvar(
         Ylist = Y_list,
         X = X, 
@@ -152,7 +152,7 @@ FullSimulation <- function(args, microrun) {
       print(paste0("Step ", sim_ind,".2: CV.MOD-VAR rolling window"))
       start_time                  <- Sys.time()
       lambdas1  <- 10^(seq(1, -3, length.out = 20))
-      ratios    <- 10^(seq(3, -3, length.out = 20))
+      ratios    <- 10^(seq(3, 0, length.out = 20))
 
       cv.model <- cv.modvar(
         Ylist = Y_list, 
@@ -186,7 +186,7 @@ FullSimulation <- function(args, microrun) {
       print(paste0("Step ", sim_ind,".1: adaBIC.MOD-VAR"))
       start_time                  <- Sys.time()
       lambdas1  <- 10^(seq(1, -3, length.out = 20))
-      ratios    <- 10^(seq(3, -3, length.out = 20))
+      ratios    <- 10^(seq(3, 0, length.out = 20))
 
       W.ada <- adaweights(
         cv.model, 
@@ -227,7 +227,7 @@ FullSimulation <- function(args, microrun) {
       print(paste0("Step ", sim_ind,".3: CV.MOD-VAR rolling"))
       start_time                  <- Sys.time()
       lambdas1  <- 10^(seq(1, -3, length.out = 20))
-      ratios    <- 10^(seq(3, -3, length.out = 20))
+      ratios    <- 10^(seq(3, 0, length.out = 20))
 
       W.ada <- adaweights(
         cv.model, 
