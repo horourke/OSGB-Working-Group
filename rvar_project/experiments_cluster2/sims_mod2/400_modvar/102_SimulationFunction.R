@@ -224,11 +224,11 @@ FullSimulation <- function(args, microrun) {
 
       W.ada <- adaweights(
         cv.model, 
-        p = 0,
+        p = args$p,
         multi = FALSE, 
         alpha = 2, 
-        inf = 1e10, 
-        thr = 1e-5)
+        inf = 1e3, 
+        thr = 1e-4)
 
       ada.model <- bic.modvar(
         Ylist = Y_list,
@@ -265,11 +265,11 @@ FullSimulation <- function(args, microrun) {
 
       W.ada <- adaweights(
         cv.model, 
-        p = 0,
+        p = args$p,
         multi = FALSE, 
-        alpha = 2, 
-        inf = 1e10, 
-        thr = 1e-5)
+        alpha = 1, 
+        inf = 1e3, 
+        thr = 1e-4)
 
       cv.model  <- cv.modvar(
         Ylist = Y_list, 
