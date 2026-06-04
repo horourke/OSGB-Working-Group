@@ -149,6 +149,7 @@ arma::cube weighted_lasso_path(
     const arma::vec& ratiovec,
     const arma::mat& weights, 
     const arma::cube& Bcvprev,   // NEW
+    double L = -1,
     int max_iter = 1000,
     double tol = 1e-6
 ) {
@@ -159,7 +160,11 @@ arma::cube weighted_lasso_path(
     
     arma::mat XtX = X.t() * X;
     arma::mat XtY = X.t() * Y;
-    double L = (2.0 / N) * eig_sym(XtX).max();
+    
+    if (L == -1) {
+        L = (2.0 / N) * eig_sym(XtX).max();
+    }
+    
     
     int n_lambda1 = lambda1vec.n_elem;
     int n_ratio   = ratiovec.n_elem;
@@ -186,8 +191,9 @@ arma::cube weighted_lasso_path(
             if (q > d) {
                 W.rows(d, q-1).fill(lambda2);
             }
-            W <- W % weights;
-
+            
+            W %= weights;
+            
             // Setting initialization:
             arma::mat Binit(q, d, fill::zeros);
             int slice_index = i * n_ratio + j;

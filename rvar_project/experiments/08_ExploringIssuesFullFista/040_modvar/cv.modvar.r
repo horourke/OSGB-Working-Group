@@ -100,6 +100,8 @@ cv.modvar <- function(
     MSFE <- array(0, c(nlam1, nrat, length(cv.windows[[1]])))
     pb   <- txtProgressBar(1, length(cv.windows[[1]]), style=3)
 
+    L <- max(abs(eigen(t(Wmat) %*% Wmat)$values))
+
     for (ind in seq_along(cv.windows[[1]])) {
         
         setTxtProgressBar(pb, ind)
@@ -120,6 +122,7 @@ cv.modvar <- function(
         ## Fit model:
         Wmat.cv <- Wmat[cv.train, ]
         Ymat.cv <- Ymat[cv.train, ]
+        
 
         Bout  <- weighted_lasso_path(
             X = Wmat.cv,
@@ -129,6 +132,7 @@ cv.modvar <- function(
             weights = weights,
             max_iter = 2000,
             Bcvprev = Bcvprev,
+            L = L,
             tol = 1e-8)
 
         ############################
@@ -149,7 +153,6 @@ cv.modvar <- function(
     ############################
     ## Find minimal lambda1, lambda2:
     opt.inds <- which(CV.MSFE == min(CV.MSFE), arr.ind = TRUE)
-    print(opt.inds)
 
     lambda1_opt <- lambdas1[opt.inds[1,1]]
     ratio_opt <- ratios[opt.inds[1,2]]

@@ -19,7 +19,7 @@ adaweights <- function(
     p = 0,
     multi = FALSE, 
     alpha, 
-    inf = 1e10, 
+    inf = NULL, 
     thr = 1e-5) { 
 
     n <- length(modvar_fit$idiographic_coeffs)
@@ -30,13 +30,20 @@ adaweights <- function(
         0, 
         length(modvar_fit$moderator_coeffs))
 
-
+    min_nz <- modvar_fit$opt_coeffs[, 1:(d * (1 + p))] %>%
+        {(.)[abs(.) > thr]} %>%
+        abs() %>% min()
+    if (is.null(inf)) {
+        inf_val <- (min_nz/2)^(-alpha)
+    } else {
+        inf_val <- inf
+    }
     M1 <- modvar_fit$opt_coeffs[, 1:(d * (1 + p))] %>%
         apply(c(1,2), function(x) {
-            entry_adaweight(x, alpha = alpha, thr = thr, inf = inf)
-        })
+            entry_adaweight(x, alpha = alpha, thr = thr, inf = inf_val)
+        })## What if you use median?
 
-    if(multi) {
+    if(multi) { ## TODO: FIX 
         median_idiographic <- modvar_fit$idiographic_coeffs %>%
         unlist() %>% array(c(d,d,n)) %>%
         apply(c(1,2), FUN = stats::median)
@@ -46,13 +53,21 @@ adaweights <- function(
             lapply(function(x, median) {abs(x - median)},
             median = median_idiographic)
         print(str(M2))
+
+        min_nz <- M2 %>% {.[abs(.) > thr]} %>%
+            abs() %>% min()
+        if (is.null(inf)){ 
+            inf_val <- (min_nz / 2)^(-alpha)
+        } else {
+            inf_val <- inf  
+        }
         M2 <- M2 %>%
             lapply(
                 function(x) {
                     apply(
                         x, c(1,2), 
                         FUN = function(x) {
-                            entry_adaweight(x, alpha = alpha, thr = thr, inf = inf)
+                            entry_adaweight(x, alpha = alpha, thr = thr, inf = inf_val)
                         })
                 }
             ) 

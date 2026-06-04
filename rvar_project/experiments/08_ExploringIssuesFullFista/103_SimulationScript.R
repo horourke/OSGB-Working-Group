@@ -76,8 +76,8 @@ str(modvar_model_pars)
 
 options(device = "windows")
 layout(matrix(c(1,2,3), ncol = 1, byrow = FALSE))
-plot(modvar_model_pars$phi0)
-modvar_model_pars$phip_list %>% lapply(plot)
+plot(abs(modvar_model_pars$phi0))
+modvar_model_pars$phip_list %>% lapply(abs) %>% lapply(plot)
 
 
 
@@ -118,9 +118,6 @@ modvar_model_pars$phip_list %>% lapply(abs) %>% lapply(plot)
 bic.model$joint_coeffs %>% abs() %>% plot()
 bic.model$moderator_coeffs %>% lapply(abs) %>% lapply(plot)
 
-bic.model$joint_coeffs <- bic.model$joint_coeffs %>%
-       {. * (abs(.) > 0.01)}
-
 
 eval_msr(data$B_list, bic.model$bysubject_coeffs, Y_forecast, args$range, args$horizon)
 
@@ -131,7 +128,7 @@ eval_msr(data$B_list, bic.model$bysubject_coeffs, Y_forecast, args$range, args$h
 #################################################
 #################################################
 ## Evaluating BIC
-lambdas1  <- 10^(seq(3, -3, length.out = 20))
+lambdas1  <- 10^(seq(0, -4, length.out = 20))
 ratios    <- 10^(seq(3, -3, length.out = 20))
 cv.model <- cv.modvar(
        Ylist = Y_list, 
@@ -140,15 +137,17 @@ cv.model <- cv.modvar(
        ratios = ratios, 
        multi = FALSE,
        cv.type = "bysubject",
-        nfolds = 5)
+       nfolds = 5)
 
 
 str(cv.model)
 
-layout(matrix(1:2, ncol = 1))
+layout(matrix(1:3, ncol = 1))
 par(mar = c(5.1, 4.1, 4.1, 4.1))
 plot(log(bic.model$eval.mat - min(bic.model$eval.mat) + 0.01), breaks = 10)
 plot(log(cv.model$eval.mat - min(cv.model$eval.mat) + 0.01), breaks = 10)
+plot(cv.model$eval.mat == min(cv.model$eval.mat))
+
 #plot(cv.model$eval.mat <= 1.1* min(cv.model$eval.mat))
 
 
@@ -167,9 +166,6 @@ modvar_model_pars$phip_list %>% lapply(abs) %>% lapply(plot)
 cv.model$joint_coeffs %>% abs() %>% plot()
 cv.model$moderator_coeffs %>% lapply(abs) %>% lapply(plot)
 
-cv.model$joint_coeffs <- cv.model$joint_coeffs %>%
-       {. * (abs(.) > 0.05)}
-
 
 
 
@@ -177,31 +173,43 @@ cv.model$joint_coeffs <- cv.model$joint_coeffs %>%
 #################################################
 ## Evaluating BIC
 W.ada <- adaweights(
-       cv.model, 
+       bic.model, 
        p = 2,
        multi = FALSE, 
-       alpha = 1, 
-       inf = 1e3, 
-       thr = 1e-4)
+       alpha = 1,  
+       thr = 1e-5)
 
 ## Exploring ADA weights:
 layout(matrix(1:4, ncol = 1))
 par(mar = c(5.1, 4.1, 4.1, 8.1))
-plot(cv.model$opt_coeffs, breaks = 15)
-plot(t(log(W.ada)))
-plot(t(W.ada))
-plot(abs(cv.model$opt_coeffs) > 1e-5)
+plot(abs(cv.model$opt_coeffs), breaks = 15)
+plot(abs(bic.model$opt_coeffs), breaks = 15)
+plot(t(log(W.ada)), breaks = 15)
+plot(t(W.ada), breaks = 15)
 
 
-ada.model <- bic.modvar(
-       Ylist = Y_list,
+
+lambdas1  <- 10^(seq(3, -5, length.out = 20))
+ratios    <- 10^(seq(3, -3, length.out = 20))
+ada.model <- cv.modvar(
+       Ylist = Y_list, 
        X = X, 
        lambdas1 = lambdas1, 
-       ratios = 1, 
+       ratios = ratios, 
        weights = W.ada,
        multi = FALSE,
-       alpha = 0.90)
-dim(t(W.ada))
+       cv.type = "bysubject",
+       nfolds = 5)
+
+layout(matrix(1:4, ncol = 2))
+par(mar = c(5.1, 4.1, 4.1, 4.1))
+plot(log(bic.model$eval.mat - min(bic.model$eval.mat) + 0.01), breaks = 10)
+plot(log(cv.model$eval.mat - min(cv.model$eval.mat) + 0.01), breaks = 10)
+plot(log(ada.model$eval.mat - min(ada.model$eval.mat) + 0.01), breaks = 10)
+plot(ada.model$eval.mat == min(ada.model$eval.mat))
+
+
+
 
 #########################
 #########################
@@ -217,4 +225,28 @@ modvar_model_pars$phi0 %>% abs() %>% plot( )
 modvar_model_pars$phip_list %>% lapply(abs) %>% lapply(plot)
 ada.model$joint_coeffs %>% abs() %>% plot()
 ada.model$moderator_coeffs %>% lapply(abs) %>% lapply(plot)
+
+
+
+
+
+
+
+
+
+
+#########################
+#########################
+### Visualizing:
+options(device = "windows")
+layout(matrix(c(1:9), ncol = 3, byrow = FALSE))
+plot(cv.model$joint_coeffs != 0)
+cv.model$moderator_coeffs %>% lapply(function(x) {plot(x != 0)})
+
+plot(modvar_model_pars$phi0 != 0)
+modvar_model_pars$phip_list %>% lapply(function(x) {plot(x != 0)})
+
+plot(ada.model$joint_coeffs != 0)
+ada.model$moderator_coeffs %>% lapply(function(x) {plot(x != 0)})
+
 

@@ -86,6 +86,7 @@ bic.modvar <- function(
     n.train <- length(bic.train)
     Wmat.train  <- Wmat[bic.train, ]
     Ymat.train  <- Ymat[bic.train, ]
+    L <- max(abs(eigen(t(Wmat.train) %*% Wmat.train)$values))
 
     Bout  <- weighted_lasso_path(
         X = Wmat.train,
@@ -95,6 +96,7 @@ bic.modvar <- function(
         weights = weights,
         max_iter = 2000,
         Bcvprev = Bcvprev,
+        L = L,
         tol = 1e-8)
 
     ############################
