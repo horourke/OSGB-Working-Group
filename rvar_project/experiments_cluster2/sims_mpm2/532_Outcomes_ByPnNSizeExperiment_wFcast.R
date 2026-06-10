@@ -90,7 +90,8 @@ method_names <- c(
     "var_standard",
     "mvar_standard", "mvar_adaptive",
     "modvar_bic", "modvar_cv_roll", "modvar_cv_bsubj",
-    "modvar_ada.CVpBIC", "modvar_ada.CVpCV")
+    "modvar_ada.bic", "modvar_ada.cv")
+    
 method_names_clean <- c(
     "VAR",          
     "M-VAR: Standard", "M-VAR: Adaptive",

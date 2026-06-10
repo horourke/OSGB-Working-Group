@@ -32,7 +32,7 @@ FullSimulation <- function(args, microrun) {
   ## What methods do you want to run?
   method_names  <- c(
     "modvar_bic", "modvar_cv_roll",
-    "modvar_ada.CVpBIC", "modvar_ada.CVpCV")
+    "modvar_ada.bic", "modvar_ada.cv")
   n_methods     <- length(method_names)
 
   ## Output of simulation:
@@ -185,29 +185,28 @@ FullSimulation <- function(args, microrun) {
       ## 
       print(paste0("Step ", sim_ind,".1: adaBIC.MOD-VAR"))
       start_time                  <- Sys.time()
-      lambdas1  <- 10^(seq(1, -3, length.out = 20))
-      ratios    <- 10^(seq(3, 0, length.out = 20))
+      lambdas1  <- 10^(seq(1, -5, length.out = 10))
+      ratios    <- 10^(seq(3, -3, length.out = 10))
 
       W.ada <- adaweights(
-        cv.model, 
+        bic.model, 
         p = args$p,
         multi = TRUE, 
         alpha = 1, 
-        inf = 1e3, 
-        thr = 1e-4)
+        thr = 1e-5)
 
-      ada.model <- bic.modvar(
-        Ylist = Y_list,
+      ada.model <- cv.modvar(
+        Ylist = Y_list, 
         X = X, 
         lambdas1 = lambdas1, 
-        ratios = 1, 
+        ratios = ratios, 
         weights = W.ada,
-        multi = TRUE,
-        alpha = 0.90)
+        multi = TRUE, 
+        cv.type = "rolling")
       end_time  <- Sys.time()
 
       ## Saving things! bla bla bla
-      output[count, 2]      <- "modvar_ada.CVpBIC"
+      output[count, 2]      <- "modvar_ada.bic"
       output[count, 3]      <- sim_ind
       output[count, 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
@@ -226,29 +225,28 @@ FullSimulation <- function(args, microrun) {
     {
       print(paste0("Step ", sim_ind,".3: CV.MOD-VAR rolling"))
       start_time                  <- Sys.time()
-      lambdas1  <- 10^(seq(1, -3, length.out = 20))
-      ratios    <- 10^(seq(3, 0, length.out = 20))
+      lambdas1  <- 10^(seq(1, -5, length.out = 10))
+      ratios    <- 10^(seq(3, -3, length.out = 10))
 
       W.ada <- adaweights(
         cv.model, 
         p = args$p,
         multi = TRUE, 
         alpha = 1, 
-        inf = 1e3, 
-        thr = 1e-4)
+        thr = 1e-5)
 
       ada.model  <- cv.modvar(
         Ylist = Y_list, 
         X = X, 
         lambdas1 = lambdas1, 
-        ratios = 1, 
+        ratios = ratios, 
         weights = W.ada,
         multi = TRUE, 
         cv.type = "rolling")
       end_time  <- Sys.time()
 
       ## Saving things! bla bla bla
-      output[count, 2]      <- "modvar_ada.CVpCV"
+      output[count, 2]      <- "modvar_ada.cv"
       output[count, 3]      <- sim_ind
       output[count, 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%

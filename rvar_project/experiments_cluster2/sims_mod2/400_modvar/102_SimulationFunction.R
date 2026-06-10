@@ -32,7 +32,7 @@ FullSimulation <- function(args, microrun) {
   ## What methods do you want to run?
   method_names  <- c(
     "modvar_bic", "modvar_cv_roll", "modvar_cv_bsubj",
-    "modvar_ada.CVpBIC", "modvar_ada.CVpCV")
+    "modvar_ada.bic", "modvar_ada.cv")
   n_methods     <- length(method_names)
 
   ## Output of simulation:
@@ -219,25 +219,25 @@ FullSimulation <- function(args, microrun) {
       ## 
       print(paste0("Step ", sim_ind,".1: adaBIC.MOD-VAR"))
       start_time                  <- Sys.time()
-      lambdas1  <- 10^(seq(1, -3, length.out = 20))
-      ratios    <- 10^(seq(3, 0, length.out = 20))
+      lambdas1  <- 10^(seq(1, -5, length.out = 10))
+      ratios    <- 10^(seq(3, -3, length.out = 10))
 
       W.ada <- adaweights(
-        cv.model, 
+        bic.model, 
         p = args$p,
         multi = FALSE, 
-        alpha = 2, 
-        inf = 1e3, 
-        thr = 1e-4)
+        alpha = 1.5, 
+        thr = 1e-5)
 
-      ada.model <- bic.modvar(
-        Ylist = Y_list,
+      ada.model <- cv.modvar(
+        Ylist = Y_list, 
         X = X, 
         lambdas1 = lambdas1, 
-        ratios = 1, 
+        ratios = ratios, 
         weights = W.ada,
         multi = FALSE,
-        alpha = 0.90)
+        cv.type = "bysubject",
+        nfolds = 5)
       end_time  <- Sys.time()
 
       ## Saving things! bla bla bla
@@ -260,22 +260,21 @@ FullSimulation <- function(args, microrun) {
     {
       print(paste0("Step ", sim_ind,".3: adaCV.MOD-VAR"))
       start_time                  <- Sys.time()
-      lambdas1  <- 10^(seq(1, -3, length.out = 20))
-      ratios    <- 10^(seq(3, 0, length.out = 20))
+      lambdas1  <- 10^(seq(1, -5, length.out = 20))
+      ratios    <- 10^(seq(3, -3, length.out = 20))
 
       W.ada <- adaweights(
         cv.model, 
         p = args$p,
         multi = FALSE, 
-        alpha = 1, 
-        inf = 1e3, 
-        thr = 1e-4)
+        alpha = 1.5, 
+        thr = 1e-5)
 
-      cv.model  <- cv.modvar(
+      ada.model  <- cv.modvar(
         Ylist = Y_list, 
         X = X, 
         lambdas1 = lambdas1, 
-        ratios = 1, 
+        ratios = ratios, 
         weights = W.ada,
         multi = FALSE,
         cv.type = "bysubject",
@@ -288,7 +287,7 @@ FullSimulation <- function(args, microrun) {
       output[count, 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
           as.numeric() %>% {. + cv_time}
-      output[count, -(1:4)] <- eval_msr(data$B_list, cv.model$bysubject_coeffs, Y_forecast, args$range, args$horizon)
+      output[count, -(1:4)] <- eval_msr(data$B_list, ada.model$bysubject_coeffs, Y_forecast, args$range, args$horizon)
       
       memory_in_bytes <- mem_used()
       print(paste0("Memory used CV:", memory_in_bytes / (1024^3), "GB"))
