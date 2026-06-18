@@ -194,6 +194,7 @@ cv.modvar <- function(
         weights = weights,
         max_iter = 2000,
         Bcvprev = array(0, c(q, d, nlam1 * nrat)),
+        L = L / nrow(Wmat),
         tol = 1e-8)
 
     dim(Bopt) <- c(q,d)

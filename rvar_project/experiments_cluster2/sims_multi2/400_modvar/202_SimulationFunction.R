@@ -304,7 +304,7 @@ FullSimulation <- function(args, microrun) {
       output[count, 3]      <- sim_ind
       output[count, 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
-          as.numeric() %>% {. + cv_time}
+          as.numeric()
       output[count, -(1:4)] <- eval_msr(data$B_list, ada.model$bysubject_coeffs, Y_forecast, args$range, args$horizon)
       
       memory_in_bytes <- mem_used()
