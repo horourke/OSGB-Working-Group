@@ -132,7 +132,7 @@ cv.modvar <- function(
             weights = weights,
             max_iter = 2000,
             Bcvprev = Bcvprev,
-            L = L,
+            L = L  / nrow(Wmat.cv),
             tol = 1e-8)
 
         ############################

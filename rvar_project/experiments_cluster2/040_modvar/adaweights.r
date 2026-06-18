@@ -22,6 +22,13 @@ adaweights <- function(
     inf = NULL, 
     thr = 1e-5) { 
 
+    if( max(abs(modvar_fit$opt_coeffs)) < thr) {
+
+        mat <- modvar_fit$opt_coeffs
+        mat <- mat + 1 
+        return(t(mat))
+    } 
+
     n <- length(modvar_fit$idiographic_coeffs)
     d <- ncol(modvar_fit$joint_coeffs)
     q <- ncol(modvar_fit$opt_coeffs)
@@ -54,8 +61,9 @@ adaweights <- function(
             median = median_idiographic)
         print(str(M2))
 
-        min_nz <- M2 %>% {.[abs(.) > thr]} %>%
-            abs() %>% min()
+        min_nz <- M2 %>% 
+            lapply(function(x) {x[abs(x) > thr]}) %>%
+            unlist() %>% abs() %>% min()
         if (is.null(inf)){ 
             inf_val <- (min_nz / 2)^(-alpha)
         } else {
