@@ -104,7 +104,7 @@ run_info <- list(
 
   list(
     main_dir       = "400_modvar/",
-    run_index      = 1,
+    run_index      = 2,
     runtype        = runtype,
     abrev_name     = "RVAR")
   )
