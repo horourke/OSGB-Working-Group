@@ -162,7 +162,7 @@ arma::cube weighted_lasso_path(
     arma::mat XtY = X.t() * Y;
     
     if (L == -1) {
-        L = (1 / N) * eig_sym(XtX).max();
+        L = 4 * eig_sym(XtX).max() / N;
     }
     
     int n_lambda1 = lambda1vec.n_elem;

@@ -32,8 +32,7 @@ adaweights <- function(
     if (is.null(modvar_fit)) {
         if (is.null(var_fits)) {
             stop("modvar_fit or var_fits must be provided to compute adaptive weights.")
-        }
-        if (!(p == 0 && multi)) {
+        } else  if (!(p == 0 && multi)) {
             stop("var_fits-only adaptive weights are only supported when p == 0 and multi == TRUE.")
         }
 
@@ -47,7 +46,7 @@ adaweights <- function(
         if (is.null(inf)) {
             inf_val <- (min_nz/2)^(-alpha)
         } else {
-            inf_val <- inf
+            inf_val <- 1e10
         }
 
         W_common <- matrix(
@@ -141,4 +140,13 @@ adaweights <- function(
 
     output <- t(M1)
     return(output)
+}
+
+
+entry_adaweight <- function(x, alpha = 1, thr = 1e-5, inf = 10^(10)) {
+    w <- 0
+    if (abs(x) > thr) { 
+        w <- exp(-alpha * log(abs(x)))
+    } else w <- inf
+    return(w)
 }

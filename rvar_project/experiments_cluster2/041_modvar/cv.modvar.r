@@ -58,6 +58,7 @@ cv.modvar <- function(
     weights = NULL,
     var_fits = NULL,
     modvar_fit = NULL,
+    alpha = 1,
     multi = FALSE,
     cv.type = c("rolling", "bysubject"), ## "bysubject" only valid if "multi = FALSE"
     nfolds = NULL                        ## Only needed if multi = FALSE, and cv.type = "bysubject"
@@ -84,7 +85,7 @@ cv.modvar <- function(
                 var_fits = var_fits,
                 p = 0,
                 multi = TRUE,
-                alpha = 1,
+                alpha = alpha,
                 inf = NULL,
                 thr = 1e-5)
         } else if (!is.null(modvar_fit)) {
@@ -93,7 +94,7 @@ cv.modvar <- function(
                 var_fits = var_fits,
                 p = p,
                 multi = multi,
-                alpha = 1,
+                alpha = alpha,
                 inf = NULL,
                 thr = 1e-5)
         } else {
@@ -127,7 +128,7 @@ cv.modvar <- function(
     MSFE <- array(0, c(nlam1, nrat, length(cv.windows[[1]])))
     pb   <- txtProgressBar(1, length(cv.windows[[1]]), style=3)
 
-    L <- max(abs(eigen(t(Wmat) %*% Wmat)$values))
+    L <- 4.0 * max(abs(eigen(t(Wmat) %*% Wmat)$values))
 
     for (ind in seq_along(cv.windows[[1]])) {
         
@@ -194,7 +195,7 @@ cv.modvar <- function(
         weights = weights,
         max_iter = 2000,
         Bcvprev = array(0, c(q, d, nlam1 * nrat)),
-        L = L / nrow(Wmat),
+        L = L  / nrow(Wmat.cv),
         tol = 1e-8)
 
     dim(Bopt) <- c(q,d)
