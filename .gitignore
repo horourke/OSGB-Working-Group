@@ -159,6 +159,7 @@ rvar_project/experiments_cluster2/sims_mod2/300_mvar/pretrainings1
 rvar_project/experiments_cluster2/sims_mod2/300_mvar/experiments1
 rvar_project/experiments_cluster2/sims_mod2/400_modvar/pretrainings1/
 rvar_project/experiments_cluster2/sims_mod2/400_modvar/experiments1/
+rvar_project/experiments_cluster2/sims_mod2/400_modvar/experiments2/
 rvar_project/experiments_cluster2/sims_mod2/500_AggregatedDataExperiments/data_all 
 
 
@@ -171,6 +172,7 @@ rvar_project/experiments_cluster2/sims_mpm2/300_mvar/pretrainings1
 rvar_project/experiments_cluster2/sims_mpm2/300_mvar/experiments1
 rvar_project/experiments_cluster2/sims_mpm2/400_modvar/pretrainings1/
 rvar_project/experiments_cluster2/sims_mpm2/400_modvar/experiments1/
+rvar_project/experiments_cluster2/sims_mpm2/400_modvar/experiments2/
 rvar_project/experiments_cluster2/sims_mpm2/500_AggregatedDataExperiments/data_all 
 
 
@@ -185,4 +187,52 @@ rvar_project/experiments_cluster2/sims_multi2/300_mvar/experiments1
 rvar_project/experiments_cluster2/sims_multi2/400_modvar/pretrainings1/
 rvar_project/experiments_cluster2/sims_multi2/400_modvar/experiments1/
 rvar_project/experiments_cluster2/sims_multi2/400_modvar/experiments2/
+rvar_project/experiments_cluster2/sims_multi2/500_AggregatedDataExperiments/data_all 
+
+
+
+
+
+
+
+
+
+
+rvar_project/experiments_cluster2/sims_mod2/req_lib
+rvar_project/experiments_cluster2/sims_mod2/plot*
+rvar_project/experiments_cluster2/sims_mod2/100_var/pretrainings1
+rvar_project/experiments_cluster2/sims_mod2/100_var/outputs1/
+rvar_project/experiments_cluster2/sims_mod2/200_gimme/outputs1/
+rvar_project/experiments_cluster2/sims_mod2/300_mvar/pretrainings1
+rvar_project/experiments_cluster2/sims_mod2/300_mvar/outputs1/
+rvar_project/experiments_cluster2/sims_mod2/400_modvar/pretrainings1/
+rvar_project/experiments_cluster2/sims_mod2/400_modvar/outputs1/
+rvar_project/experiments_cluster2/sims_mod2/400_modvar/outputs2/
+rvar_project/experiments_cluster2/sims_mod2/500_AggregatedDataExperiments/data_all 
+
+
+rvar_project/experiments_cluster2/sims_mpm2/req_lib
+rvar_project/experiments_cluster2/sims_mpm2/plot*
+rvar_project/experiments_cluster2/sims_mpm2/100_var/pretrainings1
+rvar_project/experiments_cluster2/sims_mpm2/100_var/outputs1/
+rvar_project/experiments_cluster2/sims_mpm2/200_gimme/outputs1/
+rvar_project/experiments_cluster2/sims_mpm2/300_mvar/pretrainings1
+rvar_project/experiments_cluster2/sims_mpm2/300_mvar/outputs1/
+rvar_project/experiments_cluster2/sims_mpm2/400_modvar/pretrainings1/
+rvar_project/experiments_cluster2/sims_mpm2/400_modvar/outputs1/
+rvar_project/experiments_cluster2/sims_mpm2/400_modvar/outputs2/
+rvar_project/experiments_cluster2/sims_mpm2/500_AggregatedDataExperiments/data_all 
+
+
+
+rvar_project/experiments_cluster2/sims_multi2/req_lib
+rvar_project/experiments_cluster2/sims_multi2/plot*
+rvar_project/experiments_cluster2/sims_multi2/100_var/pretrainings1
+rvar_project/experiments_cluster2/sims_multi2/100_var/outputs1/
+rvar_project/experiments_cluster2/sims_multi2/200_gimme/experiments1
+rvar_project/experiments_cluster2/sims_multi2/300_mvar/pretrainings1
+rvar_project/experiments_cluster2/sims_multi2/300_mvar/outputs1/
+rvar_project/experiments_cluster2/sims_multi2/400_modvar/pretrainings1/
+rvar_project/experiments_cluster2/sims_multi2/400_modvar/outputs1/
+rvar_project/experiments_cluster2/sims_multi2/400_modvar/outputs2/
 rvar_project/experiments_cluster2/sims_multi2/500_AggregatedDataExperiments/data_all 
