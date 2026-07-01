@@ -1,0 +1,538 @@
+
+\newpage
+
+
+\begin{comment}
+\section{Studying Consistency of VAR}
+
+
+In order to show the consistency of our CD-VAR procedure, we must first explore and understand the consistency of the plain penalized VAR model. For this, we consider a sequence $\{\bX_t\}_{t\in\bbZ}\in\bbR^d$ distributed as a VAR($q$) model of the form:
+\begin{equation}
+    \bX_t = \sum_{\ell = 1}^q \Psi_\ell \bX_{t-\ell} + \varepsilon_t,
+\end{equation}
+where $\Psi_1,\Psi_2,\ldots ,\Psi_q \in \bbR^{d\times d}$ are the coefficient matrices. We first define the polynomial $\cA(z) = \Ir_d - \sum_\ell \Psi_\ell z^\ell $ for any $z\in\bbC$. To satisfy the stability condition, we need that $\det(\cA(z))\neq 0$ for all $z\in\bbC$ with $|z|\leq 1$. 
+
+We define the auto-correlation matrices $\Gamma_X(i) = cov(X_
+{t-i},X_t )$. Furthermore, we define the spectral density of the process as:
+\begin{equation}
+    f_X(\theta) = \frac{1}{2\pi} \sum_{\ell = -\infty}^{\infty} \Gamma_X(\ell) e^{-i\ell \theta},\hspace{5mm} \forall\, \theta\in[-\pi,\pi]. 
+\end{equation}
+Finally, we define the maximum spectral eigenvalue as,
+\begin{equation}
+    \cM(f_X) = \sup_{\theta\in[-\pi,\pi]} \Lambda_{\max} (f_X(\theta)) <\infty.
+\end{equation}
+Furthermore, for any $k$ we can define the sub-variable spectral density radius as,
+\begin{equation}
+    \cM(f_X,k) = \max_{\cJ\subset[d];\, |\cJ| = k} \cM(f_{X_\cJ})
+\end{equation}
+Similar to the spectral density radius, we can define the mimimum spectral density radius as:
+\begin{equation*}
+    m(f_X) = \inf_{\theta \in [-\pi,pi]} \Lambda_{\min} (f_X(\theta)).
+\end{equation*}
+
+There are several important observations:
+
+\begin{itemize}
+    \item The existence of the spectral density guarantees that 
+    \begin{equation}
+        \Gamma_X(\ell) = \int_{-\pi}^\pi f_X(\theta) e^{i\ell \theta}d\theta, \hspace{5mm} \forall\, \ell \in\bbZ.
+    \end{equation}
+
+    \item The spectral density radius $\cM(f_X)$ provides a measurement of the degree of dependence present in the data. If there is low dependence, then each of the terms $\|\Gamma_X(\ell)\|$ will decay fast for large $\ell$, so the eigenvalue $\Lambda_{\max}(f_X(\theta))$ will be small. If there is high dependence, then the terms $\|\Gamma_{X}(\ell)\|$ will stay large and the eigenvalues $\Lambda_{\max}(f_{X}(\theta))$ will remain large.
+
+    \item We have that:
+    $$ \cM(f_X, 1)\leq \cM(f_X, 1)\leq \ldots \leq \cM(f_X, d) = \cM(f_X).$$
+\end{itemize}
+
+Lets write down some useful facts.
+
+Let $\Xb = [\bX_1,\bX_2, \ldots \bX_n]^{'} \in\bbR^{n\times d}$ be the matrix of observations from our time series, and $vec(\Xb) = [\bX_1^{'},\bX_2^{'}, \ldots \bX_n^{'}]^{'}\in\bbR^{nd}$. Let $\Upsilon^{X}_n = cov(vec(\Xb))\in \bbR^{nd\times nd}$. In particular, we have that
+\begin{equation}
+    \Upsilon^X_n = \begin{pmatrix}
+        \Gamma_X(0) & \Gamma_X(1) & \dots & \Gamma_X(n) \\
+        \Gamma_X(-1) & \Gamma_X(0) & \dots & \Gamma_X(n - 1) \\
+        \vdots & \vdots & \ddots & \vdots \\
+        
+        \Gamma_X(-n) & \Gamma_X(-n+1) & \dots & \Gamma_X(0) \\
+    \end{pmatrix}\in\bbR^{nd\times nd}.
+\end{equation}
+
+First, we can show that the spectra of the covariance $\Upsilon^X_n$ is bounded by the spectral density.
+
+
+\begin{prop}[Proposition 2.3 of \ref{basu2015regularized}]
+    For any $n\geq 1$ and $d \geq 1$,
+    $$ 2\pi m(f_X) \leq \Gamma_{\min} (\Upsilon^X_n) \leq \Gamma_{\max}(\Upsilon^X_n) \leq 2\pi \cM(f_X) ; $$
+    and in particular,
+    $$ 2\pi m(f_X) \leq \Gamma_{\min} (\Lambda_X(0)) \leq \Gamma_{\max}(\Lambda_X(0)) \leq 2\pi \cM(f_X) . $$
+\end{prop}
+\begin{proof}
+    Observe that for any $\bv\in\bbR^{nd}$ with $\|\bv\|=1$, and $\bv = [\bv_1^{'}, \ldots, \bv_n^{'}]^{'} \in\bbR^{nd}$, we have that for $G(\theta) = \sum \bv_i e^{-ir\theta}$,
+    \begin{align*}
+        \int_{-\pi}^\pi G^*(\theta)G(\theta)d\theta = \sum_{r,s} \int_{-\pi}^\pi v_s^{'}v_r e^{i(r-s)\theta}d\theta = \sum_r 2\pi\|\bv_r\|^2_2  = 2\pi
+    \end{align*}
+    On the other hand,
+    \begin{align*}
+        \bv^{'} \Upsilon^X_n \bv &= \sum_{r,s} \bv_s^{'} \Gamma_X(s-r) \bv_r\\
+        %%
+        &= \sum_{s,r} \int_{-\pi}^\pi \bv_s^{'}  f_X(\theta) \bv_r e^{i(s-r)\theta} d\theta\\
+        %%
+        &= \int_{-\pi}^\pi   G^*(\theta)  f_X(\theta)  G(\theta)d\theta.
+        %%
+    \end{align*}
+    Finally, notice that for any $\theta\in[-\pi,\pi]$
+    \begin{align*}
+       & m(f_X)G^*(\theta) G(\theta) \leq G^*(\theta)  f_X(\theta)  G(\theta) \leq  \cM(f_X)G^*(\theta) G(\theta),\\
+       %%
+       \therefore \hspace{5mm}& 2\pi \cdot m(f_X) \leq  \Lambda_{\min}(\Upsilon^X_n) \leq  \Lambda_{\max}(\Upsilon^X_n) \leq 2\pi \cdot \cM(f_X).
+    \end{align*}
+\end{proof}
+
+
+Furthermore, we consider the following sub-matrix concentration inequality. Let $S = \Xb^{'}\Xb / n$. We want to study how the matrix $S$ concentrates around $\Gamma_X(0)\in\bbR^{d\times d}$.
+
+\begin{prop}[Proposition 2.4 of \ref{basu2015regularized}]
+    For a stationary centered process $\Xb$ and $k$-sparse vectors $\bv,\bu\in\bbR^d$ with $\|\bv\| = \|\bu\| = 1$,
+    \begin{align}
+        &\bbP[|\bv^{'}  (S - \Gamma_X(0)) \bv| > 2\pi \cM(f_X, k) \eta] \leq 2\exp\{ -cn\min\{\eta^2,\eta\}  \},
+        \label{eq:conc1}\\
+        %%
+        %%
+        &\bbP[|\bu^{'}  (S - \Gamma_X(0)) \bv| > 2\pi \cM(f_X, 2k) \eta] \leq 6\exp\{ -cn\min\{\eta^2,\eta\}  \},\\
+        %%
+        %%
+        &\bbP[|S_{ij} - [\Gamma_X(0)]_{ij}| > 2\pi \cM(f_X, 2) \eta] \leq 6\exp\{ -cn\min\{\eta^2,\eta\}  \}\,
+    \end{align}
+\end{prop}
+\begin{proof}
+    Lets just show \eqref{eq:conc1} first. Let $\cJ$ be the support of $\bv$. Observe that $vec(\Xb) \sim N_d(\bzero, \Upsilon^X_n )$. Then $vec(\Xb_J) \sim N_d(\bzero, \Upsilon^{X_{\cJ}}_n )$. From this $Y = \Xb \bv = \Xb_{\cJ} \bv_{\cJ}\in\bbR^{n}$. Then, we have $$cov(Y_r,Y_s) = cov( [\Xb_{\cJ}\bv_{\cJ}]_r, [\Xb_{\cJ}\bv_{\cJ}]_s ) = cov( \bX_r^{'} \bv , \bX_s^{'} \bv ) = \bv^{'}  cov( \bX_r , \bX_s ) \bv = \bv^{'} \Gamma_X(r-s) \bv.$$
+    Thus, $\bY \sim N_n(\bzero, \Qr)$ with $\Qr_{rs} =  \bv^{'} \Gamma_X(r-s) \bv.$. Then, with $\bv^{'} S\bv = \frac{1}{n} \bY^{'} \bY = \frac{1}{n} \bZ^{'} \Qr \bZ$ where $\bZ \sim N_n(\bzero, \Ir_n)$.
+    By the Hanson-Wright inequality, (Rudelson \& Vershynin, 2013) we have that:
+    \begin{align*}
+        \bbP[|\bv^{'} (S - \Gamma_X(0)) \bv| \geq \zeta] &= \bbP[|\bZ\Qr\bZ - \bbE[\bZ\Qr\bZ]| \geq n\zeta]  \\
+        %%
+        &\leq 2\exp\left\{  -cn\min\left[  \frac{n^2\zeta^2}{\vertiii{\Qr}_F^2} , \frac{n\zeta}{\vertiii{\Qr}_2} \right]  \right\}.
+    \end{align*}
+    Since $\vertiii{\Qr}_F^2 /n \leq \vertiii{\Qr}_2^2$, and setting $\zeta = \vertiii{\Qr}_2 \eta$, we have:
+    \begin{equation}\label{eq:hansonwright_inter}
+         \bbP[|\bv^{'} (S - \Gamma_X(0)) \bv| \geq \eta\vertiii{\Qr}_2] 
+         %%
+         \leq 2\exp\left\{  -cn\min[  \eta^2, \eta ]  \right\}.
+    \end{equation}
+    Finally, we observe that for $\bw \in\bbR^n$, and $\bW = [ w_1\bv^{'}_{\cJ} , w_2\bv^{'}_{\cJ} ,\ldots,  w_n\bv^{'}_{\cJ} ]^{'}$
+    \begin{align*}
+        \bw^{'} \Qr\bw &= \sum_{s,r} \bw_s\bw_r Q_{s,r} = \sum_{s,r} \bw_s\bw_r \bv^{'}_{\cJ} \Gamma_{X_{\cJ}}(r-s) \bv_{\cJ}\\
+        %%
+        &= \bW^{'} \Upsilon^{X_\cJ}_n \bW \leq \Lambda_{\max}(\Upsilon^{X_\cJ}_n) \leq 2\pi\cM(f_X, k)
+    \end{align*}
+    Thus, we can subsitute $\vertiii{\Qr}_2$ by $2\pi\cM(f_X, k)$ in \eqref{eq:hansonwright_inter}.
+\end{proof}
+
+\newpage
+
+\end{comment}
+
+
+
+	
+
+
+\section{Consistency of MOD-VAR}
+
+\subsection{Setting and Assumptions}
+
+Consider observations on $n$ subjects, with vector of $p$ moderators $\bX_1,  \bX_2,\ldots \bX_n \in \bbR^p$ random vectors with $\bbE[\bX_k] = 0$ and entrywise bounded support: $|X_{ki}|\leq B$. We consider  $\Phi^{*(0)}, \Phi^{*(M1)}, \ldots, \Phi^{*(Mp)} \in \bbR^{d\times d}$  be the true model parameters, and we define $\Phi^* :\bbR^p \to \bbR^{d\times d}$ via the mapping $\Phi^*(\bx) = \Phi^{*(0)} + \sum_{s = 0}^p x_i\Phi^{*(Ms)} $. For each subject $k\in[n]$, we have $T$ measurements of a $d$-dimensional time-series $\{\bY^{(k)}_t \,:\, 1\leq t\leq T\}$, with the distribution:
+\begin{equation}\label{eq:mod_var_vec}
+    \bY^{k}_t = \Phi^*(\bX_k) \bY^{k}_{t-1} + \bvarepsilon_{t}^{k}, \hspace{5mm} \forall\, 2\leq t\leq T,    
+\end{equation}
+where $\bvarepsilon^{(k)}_2, \bvarepsilon^k_2, \ldots ,\bvarepsilon^k_T\stackrel{i.i.d.}{\sim}  N_d(\bzero, \Sigma_\varepsilon)$.
+We denote:
+\begin{equation}
+    \Zb^{k} = \begin{pmatrix}
+        (\bY^{k}_T)'\\ (\bY^{k}_{T-1})'\\ \vdots \\(\bY^{k}_{2})'\\ 
+    \end{pmatrix}, \hspace{7mm}
+    \Yb^{k} =  \begin{pmatrix}
+        (\bY^{k}_{T-1})'\\ (\bY^{k}_{T-2})'\\ \vdots \\(\bY^{k}_{1})'\\ 
+    \end{pmatrix}, \hspace{7mm}
+    \Eb^{k} =  \begin{pmatrix}
+        (\bvarepsilon^{k}_{T})'\\ (\bvarepsilon^{k}_{T-1})'\\ \vdots \\(\bvarepsilon^{k}_{2})'\\ 
+    \end{pmatrix}.
+\end{equation}
+Thus, we can summarize the autoregressive structure for each subject given by \eqref{eq:mod_var_vec} via the matrix form equation:
+\begin{equation*}
+    \Zb^{k} = \Yb^{k} (\Phi^*(\bX_k))' + \Eb^{k}.
+\end{equation*}
+by a slight abuse of notation, we assume that for all $k\in[n]$, the vector of moderators $\bX_k\in\bbR^p$ contains a zero indexed entry $X_{k0} = 1$. We define $\Phi^* := [\Phi_0,\Phi_1,\ldots,\Phi_p]\in\bbR^{d\times (d+dp)}$, and 
+\begin{equation*}
+    \Wb^{k} = \left[\Yb^k , X_{k1}\Yb^k , \dots , X_{kp}\Yb^k \right] = \bX_k' \otimes \Yb^k \in \bbR^{(T-1) \times (d + pd)}.
+\end{equation*}
+Then, one can show that $\Yb^{k} (\Psi^*(\bX_k))' = \Wb^{k} (\Psi^*)'$. Now, we define
+\begin{equation}
+    \Zb = \begin{pmatrix}
+        \Zb^{1}\\ \Zb^{2} \\ \vdots \\ \Zb^{n}
+    \end{pmatrix}, \hspace{7mm}
+    \Wb =  \begin{pmatrix}
+        \Wb^{1} \\ \Wb^{2} \\ \vdots \\ \Wb^{n}  
+    \end{pmatrix}, \hspace{7mm}
+    \Eb =  \begin{pmatrix}
+        \Eb^{1} \\ \Eb^{2} \\ \vdots \\ \Eb^{n} 
+    \end{pmatrix}.
+\end{equation}
+Then, we can resume the entire model to our simplified matrix notation $\Zb = \Wb (\Phi^*)' + \Eb $.
+
+For a matrix $\Ar = [\ba_1, \ba_2,\ldots \ba_m] \in \bbR^{k\times m}$ with column vectors $\ba_1,\ldots,\ba_m\in\bbR^{k}$, we denote $\bvec( \Ar) = (\ba_1', \ba_2',\ldots \ba_m')'\in\bbR^{km}$. Notice that,for any $\Phi \in \bbR^{d \times (d+dp)}$,
+\begin{align*}
+    \vertiii{\Zb - \Wb \Phi'}_F^2 &= \| \bvec(\Zb) - \bvec(\Wb\Phi') \|_2^2 = \|  \bvec(\Zb) - (\Ir_d \otimes \Wb)\bvec(\Phi')\|_2^2\\
+    %%
+    &= \bvec(\Zb)' \bvec(\Zb)  - 2 \bvec(\Zb)' (\Ir_d \otimes \Wb)\bvec(\Phi') +   \bvec(\Psi')'(\Ir_d \otimes \Wb'\Wb)\bvec(\Phi').
+\end{align*}
+To simplify our notation, we define $\bbeta = \bvec(\Phi')$, $\by = \bvec(\Zb)$, $\bgamma = \frac{1}{N} (\Ir_d \otimes \Wb')\by $ and $\hat\Gamma = \frac{1}{N} (\Ir_d \otimes \Wb' \Wb)$. In particular, we denote $\bbeta^* =\bvec((\Phi^*)')$. Finally, we denote $N = (T-1)n$ and $q = pd^2$. Then, assuming that $\lambda_2 = 0$, we can denote our proposed optimization problem:
+\begin{equation}\label{eq:modvar_lasso_mat}
+    \hat\Phi = \argmin_{\Phi\in \bbR^{d\times (d+dp)}} \frac{1}{N} \vertiii{ \bvec(\Zb) - \bvec(\Wb\Phi')}_F^2 + \lambda \vertiii{\Phi}_1
+\end{equation}
+into the equivalent form 
+\begin{equation}\label{eq:modvar_lasso_vectorized}
+    \hat\bbeta = \argmin_{\bbeta \in \bbR^{pd^2}} -2\bbeta ' \bgamma + \bbeta' \hat\Gamma\bbeta + \lambda \|\bbeta\|_1.
+\end{equation}
+
+First, we consider the following set of high-level assumptions. 
+
+\begin{definition}[Restricted Eigenvalue]
+    We say symmetric matrix $\Gamma\in\bbR^{q\times q}$ satisfies the restricted eigenvalue condition with parameters $\alpha,\tau > 0$ if for all $\btheta\in\bbR^q$, 
+    \begin{equation}\label{eq:RE}
+        \btheta' \hat\Gamma\btheta \geq \alpha \|\btheta\|_2^2 - \tau \|\btheta\|_1^2.
+    \end{equation}
+    We denote that a matrix $\Gamma\in\bbR^{q\times q}$ satisfies \eqref{eq:RE} as $\Gamma\in \RE(\alpha,\tau)$.
+\end{definition}
+
+\begin{assumption}\label{as:error_bound}
+    There exists a function $Q(\bbeta^*, \Sigma_\varepsilon,B) >0$ such that,
+    \begin{align*}
+        \| \bgamma - \hat\Gamma \bbeta^* \|_\infty \leq Q(\bbeta^*, \Sigma_\varepsilon,B) \sqrt{\frac{2\log(d) + \log(p)}{N}}.
+    \end{align*}
+\end{assumption}
+
+
+\begin{definition}[Conditional spectral Density]
+    Assume $(\bX_k, \{ \bY^k_{t}\in\bbR^{d} \}_{t=1}^T)$ is a moderator vector autoregressive model, where $\{ \bY^k_{t}\in\bbR^{d} \}_{t=1}^T$ follows \eqref{eq:mod_var_vec}. We define the following.
+    \begin{itemize}
+        \item We define the \textit{conditional autocovariance function} as $\Gamma_{Y^k|X_k}(h) = \bcov(\bY^{k}_{t},  \bY^{k}_{t+ h}| \bX_k)$.
+        %%
+        %%
+        \item We define the \textit{conditional spectral density function} as $$ f_{Y^k | X_k} (\theta) := \frac{1}{2\pi} \sum_{\ell = -\infty}^\infty \Gamma_{Y^k | X_k } (\ell) e^{-i\ell \theta}, \hspace{10mm} \theta\in [-\pi , \pi]. $$
+        %%
+        %%
+        \item We denote the maximum spectral eigenvalue by 
+        $$ \cM(f_{Y^k|X_k}) :=  \sup_{\theta\in[-\pi,\pi]} \Lambda_{\max} (f_{Y^k | X_k} (\theta)) .$$
+        %%
+        %%
+        \item For any $\bx \in\bbR^p$, consider the matrix polynomial $\cA_{\bx}(z) = \Ir_d - \Phi^*(\bx) z $, for $z\in\bbC$. Then, we define the quantities:
+        \begin{align}
+            \mu_{\min}(\cA_{\bx})&:= \min_{|z| = 1} \Lambda_{\min} (\cA_{\bx}^*(z) \cA_{\bx}(z));\\
+            %%
+            %%
+            \mu_{\max}(\cA_{\bx})&:= \max_{|z| = 1} \Lambda_{\max} (\cA_{\bx}^*(z) \cA_{\bx}(z)).
+        \end{align}
+    \end{itemize}
+\end{definition}
+    
+\begin{definition}[$\alpha$-Orlicz norms]
+    For a random variable $X\in\bbR$ and $\alpha > 0$, we define the $\alpha$-Orlicz norm  of $X$ as 
+    \begin{equation*}
+        \|X\|_{\psi_\alpha} := \inf\{ c > 0 \,:\, \bbE[\exp\{ |X|^\alpha/c^\alpha \}] \leq 2 \}.
+    \end{equation*}
+\end{definition}
+
+\subsection{Useful Lemmas}
+
+
+
+
+\begin{lemma}[Lemma 12 in \citet{loh2011high}]\label{lemma:badRE_to_goodRE}
+    Let $\Gamma \in\bbR^{q\times q}$, $s\geq 1$ and $\delta > 0$. Suppose $\Gamma$ satisfies the deviation bound
+    \begin{equation*}
+       \sup_{\|\bv\|_2 = 1 ,\, \|\bv\|_0 \leq 2s} |\bv' \Gamma \bv| < \delta .
+    \end{equation*}
+    Then, for all $\bv\in\bbR^{q}$
+    \begin{equation*}
+        |\bv' \Gamma \bv| \leq 27\delta(\|\bv\|_2^2 + \frac{1}{s} \|\bv\|_1^2).
+    \end{equation*}
+\end{lemma}
+
+\begin{lemma}[Lemma B.1 of \citet{basu2015regularized}] \label{lemma:re_kronecker}
+    If $\Wb'\Wb / N \in \RE(\alpha,\tau)$, then the matrix $I_d \otimes \Wb'\Wb / N$ satisfies $I_d \otimes \Wb'\Wb / N \in \RE(\alpha,\tau)$ as well.
+\end{lemma}
+
+
+
+\begin{lemma}[Proposition 2.4 of \citet{basu2015regularized}]\label{lemma:ts_cov_concentration}
+    Consider a centered Gaussian time series $\{Y_t\}_{t\in\bbZ}$ with noise matrix $\Eb\in\bbR^{(T-1) \times d}$ such that $\cM(f_{Y}) <\infty$. Let $\Yb = [\bY_1, \bY_2,\ldots \bY_T]'\in\bbR^{T\times d}$ and $\Eb = [\bvarepsilon_1,\bvarepsilon_2,\ldots ,\bvarepsilon_T]'\in\bbR^{T\times d}$.  There exists a constant $c>0$ such that, for any $s$-sparse vectors $\bv,\bu\in\bbR^p$ with $\|\bv\|_2 , \|\bu\|_2 \leq 1$, 
+    $$\bbP\left[ |\bu' (\Yb' \Eb / T ) \bv| > 2\pi \Lambda_{\max}(\Sigma_\varepsilon) \left( 1 + \frac{1 + \mu_{\max}(\cA)}{\mu_{\min}(\cA)} \right) \eta \right] \leq 6 \exp\left[ - cn \min(\eta, \eta^2)\right].$$
+\end{lemma}
+
+
+
+\begin{lemma}[Exercises 2.24 and 2.44 of \citet{vershynin2018high}]
+    Let $X\in\bbR$ a random variable with $\|X\|_{\psi_\alpha} <\infty$. Then,  there exists a constant $c > 0 $ such that,
+    \begin{itemize}
+        \item $\|X-\bbE X\|_{\psi_\alpha} \leq c\|X\|_{\psi_\alpha}$; and,
+        \item if $|X| \leq B$, then $\|X\|_{\psi_\alpha} \leq c B$.
+    \end{itemize}
+\end{lemma}
+
+\begin{lemma}[Theorem 3.4 of \citet{kuchibhotla2022moving}]\label{lemma:cov_conc_hetero}
+    Suppose that $\bX_1, \bX_2,\ldots ,\bX_n \in\bbR^{q}$ are independent, mean-zero vectors such that, for some $\alpha > 0$ and $K_{n,q} , \eta_{n,q} > 0$, 
+    \begin{equation}
+        \max_{1\leq i\leq n} \max_{1\leq j\leq q} \|X_{ij}\|_{\psi_\alpha} \leq K_{n,q}, \hspace{10mm}  \max_{1\leq j \leq q} \frac{1}{n} \sum_{i=1}^n \bbE[X_{ij}^2] \leq \eta_{n,q}.
+    \end{equation}
+     Then, for any $t> 0$, with probability at least $1 - 3 e^{-t}$, 
+    \begin{equation}
+        \left\|\frac{1}{n} \sum_{i=1}^n X_i\right\|_{\infty} \leq 7\sqrt{ \frac{ \eta_{n,q} (\log(q) + t) }{n} } + \frac{C_\alpha K_{n,q} (\log(2n))^{1/\alpha} (\log(q) + t)^{1/\alpha^*} }{n},
+    \end{equation}
+    where $\alpha^* := \min\{1,\alpha\}$ and $C_\alpha > 0$ is some constant depending only on $\alpha$.
+\end{lemma}
+
+\begin{lemma}[Proposition D.2 of \citet{kuchibhotla2022moving}]
+    Let $W_1,W_2,\ldots,W_k$ are possibly dependent random variables satisfying $\|W_i\|_{\psi_{\alpha_i}} <\infty$ for some $\alpha_i > 0$. Then,
+    \begin{equation}
+        \left\| \prod_{i=1}^k W_i \right\|_{\psi_\beta} \leq \prod_{i=1}^k \|W_i\|_{\psi_{\alpha_i}}, \hspace{10mm} where \quad \frac{1}{\beta} := \sum_{i=1}^k \frac{1}{\alpha_i}.
+    \end{equation}
+    
+\end{lemma}
+
+\subsection{Proof of Theorem \ref{thm:modvar_normconsistency}}
+
+\begin{prop}
+    Consider the MOD-VAR estimator $\hat\bbeta$ defined by \eqref{eq:modvar_lasso_vectorized}. Assume that $\hat\Gamma \in\RE(\alpha,\tau)$ for $s\tau < \alpha/32$. Furthermore, suppose Assumption \ref{as:error_bound} holds. Finally, assume that $$ \lambda \geq 4Q(\bbeta^*, \Sigma_\varepsilon, B) \sqrt{\frac{2\log(d) + \log(p)}{N}}.$$
+    Then,
+    \begin{align*}
+        \|\hat\bbeta - \bbeta^* \|_2  \leq \frac{3\sqrt{s}\lambda}{\alpha} ; \hspace{10mm} \| \hat\bbeta - \bbeta^*\|_1 \leq \frac{12s \lambda}{\alpha}.
+    \end{align*}
+\end{prop}
+\begin{proof}
+    If $\hat\bbeta$ is the minimizer of \eqref{eq:modvar_lasso_vectorized}, 
+    $$  -2\hat\bbeta' \bgamma + \hat\bbeta'\hat\Gamma\hat\bbeta + \lambda\|\hat\bbeta\|_1  \leq  -2(\bbeta^*)' \bgamma + (\bbeta^*)'\hat\Gamma\bbeta^* + \lambda\|\bbeta^*\|_1. $$ 
+    By denoting $\bDelta = \hat\bbeta - \bbeta^*$, by basic manipulation and the triangle inequality,
+    \begin{equation}\label{eq:step1}
+        0\leq \bDelta' \hat\Gamma \bDelta  \leq 2\bDelta' ( \bgamma - \hat\Gamma \bbeta^* ) + \lambda\|\bDelta_{\cS}\|_1 - \lambda\| \bDelta_{\cS^c}\|_1.    
+    \end{equation}
+    By Assumption \ref{as:error_bound} and Hölder's inequality,
+    \begin{equation}\label{eq:step2}
+        2\bDelta' ( \bgamma - \hat\Gamma \bbeta^* ) \leq 2Q(\bbeta^*, \Sigma_\varepsilon, B) \sqrt{\frac{2\log(d) + \log(p)}{N}} \|\bDelta\|_1 \leq \frac{\lambda}{2} \|\bDelta\|_1.
+    \end{equation}
+    Combining \eqref{eq:step1} and \eqref{eq:step2}, we have the following two conclusions
+    \begin{equation*}
+        0\leq \frac{1}{\lambda}\bDelta' \hat\Gamma \bDelta  \leq \frac{3}{2}\|\bDelta_{\cS}\|_1 - \frac{1}{2}\|\bDelta_{\cS^c}\|_1 \leq  \frac{3}{2}\|\bDelta_{\cS}\|_1; \hspace{10mm} and,\hspace{10mm} \|\bDelta\|_1 \leq 4\|\bDelta_{\cS}\|_1.
+    \end{equation*}
+    Note that $\|\bDelta\|_1 \leq 4\|\bDelta_\cS\|_1 \leq 4\sqrt{s} \|\bDelta_\cS\|_2 \leq 4\sqrt{s} \|\bDelta\|_2$. Since $\hat\Gamma\in\RE(\alpha, \tau)$, we have that,
+    \begin{align*}
+        \bDelta'\hat\Gamma \bDelta\geq \alpha \|\bDelta\|_2^2 - \tau \|\bDelta\|_1^2 \geq \alpha \|\bDelta\|_2^2 - \frac{\alpha}{2}\|\bDelta\|_2^2 = \frac{\alpha}{2}\|\bDelta\|_2^2.
+    \end{align*}
+    Then, $$\frac{\alpha}{2} \|\bDelta\|_2^2 \leq \bDelta' \hat\Gamma \bDelta \leq \frac{3\lambda}{2}\|\bDelta_{\cS}\|_1 \leq \frac{3\sqrt{s}\lambda}{2} \|\bDelta\|_2.$$ 
+    Thus, we conclude $\|\hat\bbeta - \bbeta^*\|_2 \leq 3\sqrt{s}\lambda / \alpha$. Furthermore, $\|\hat\bbeta - \bbeta^*\|_1 \leq 4\sqrt{s}\|\bDelta\|_2 \leq 12s \lambda/\alpha$.
+\end{proof} 
+
+
+
+\begin{prop}\label{prop:errorbound_whp}
+    Assume that $N > 16\log(pd^2)$, and 
+    \begin{equation}
+        C_M := \sup_{\bx\in\bbR^p}  \Lambda_{\max}(\Sigma_\varepsilon) \left( 1 + \frac{1 + \mu_{\max}(\cA_x)} {\mu_{\min}(\cA_x)} \right) < \infty.
+    \end{equation}
+    Then, we have that,
+    \begin{equation*}
+        \bbP\left[ \|\bgamma - \hat\Gamma \bbeta^*\|_\infty  \geq 4\pi C_M B \sqrt{\frac{2\log(d) + \log(p)}{N}} \right] \leq 6\exp\{ -3c (2\log(d) + \log(p)) \}.
+    \end{equation*}
+\end{prop}
+\begin{proof}
+    First, observe that,
+    \begin{align*}
+        \bgamma &= \frac{1}{N} (\Ir_d \otimes \Wb') \bvec(\Zb) = \frac{1}{N} (\Ir_d \otimes \Wb'\Wb) \bvec({\Phi^{*}}') + \frac{1}{N}(\Ir_d \otimes \Wb') \bvec(\Eb);\\
+        %%
+        \hat\Gamma \bbeta^* &= \frac{1}{N} (\Ir_d \otimes \Wb'\Wb) \bvec({\Phi^{*}}').
+    \end{align*}
+    
+    Thus, observe that,
+    \begin{align*}
+        \| \bgamma - \hat\Gamma \bbeta^* \|_\infty &= \|\bvec(\Wb'\Eb)/N\|_\infty = \vertiii{ \Wb'\Eb/N }_{\max} = \max_{\substack{1\leq i\leq p;\\ 1\leq m,\ell\leq d }} \left|  \frac{1}{n} \sum_{k=1}^n \frac{1}{T-1} X_{ki} (\bY^{k}_{\cdot m})' \bE^{k}_{\cdot \ell} \right|.
+    \end{align*}
+    By Lemma \ref{lemma:ts_cov_concentration}, there exists $c> 1$ such that for any $\eta > 0$,
+    \begin{equation*}
+        \bbP\left[  \left|\frac{1}{T-1}  (\bY^{k}_{\cdot m})' \bE^{k}_{\cdot \ell} \right|  \geq 2\pi C_M \eta \right] \leq 6 \exp\left\{  - c (T-1) \min(\eta,\eta^2) \right\}.
+    \end{equation*}
+    Recall that $|X_{ki}| \leq B$. Using this fact, and aggregating all the independent sub-exponential bounds, 
+    \begin{equation*}
+        \bbP\left[  \left|\frac{1}{n} \sum_{k=1}^n \frac{1}{T-1} X_{ki} (\bY^{k}_{\cdot m})' \bE^{k}_{\cdot \ell}  \right|  \geq t \right] \leq 6 \exp\left\{ -\min\left[  \frac{cNt^2}{4\pi^2 C_M^2 B^2}, \frac{cNt}{2\pi C_M B} \right] \right\}.
+    \end{equation*}
+    Notice that, if $N > 16\log(pd^2) $, and $t^* = 4\pi C_M B \sqrt{\log(d^2p)/N}$, 
+    $$ \frac{cN(t^*)^2}{4\pi C_M B^2 } = 4c\log(pd^2) < 2c\sqrt{N \log(pd^2) }  = \frac{cNt^*}{2\pi C_M B}. $$
+    Thus, 
+    \begin{equation*}
+        \bbP\left[  \left|\frac{1}{n} \sum_{k=1}^n \frac{1}{T-1} X_{ki} (\bY^{k}_{\cdot m})' \bE^{k}_{\cdot \ell}  \right|  \geq   4\pi C_M B \sqrt{\frac{\log(d^2p)}{N}}  \right] \leq 6 \exp\left\{ -4c\log(pd^2) \right\}.
+    \end{equation*}
+    By applying the union bound, we obtain,
+    \begin{align*}
+        \bbP\left[  \max_{\substack{1\leq i\leq p;\\ 1\leq m,\ell\leq d }} \left|\frac{1}{N} \sum_{k=1}^n  X_{ki} (\bY^{k}_{\cdot m})' \bE^{k}_{\cdot \ell}  \right|  \geq   4\pi C_M B \sqrt{\frac{\log(d^2p)}{N}}  \right] &\leq 6 \exp\left\{ \log(pd^2) -4c\log(pd^2) \right\} \\
+        %%
+        %%
+        &\leq  6 \exp\left\{ -3c\log(pd^2) \right\} .
+    \end{align*}
+\end{proof}
+
+
+\begin{prop}\label{prop:RE_ours}
+    For any $t > 0$, consider 
+    \begin{align*}
+        \delta := \delta(t) &= 7\sqrt{\frac{\eta B^2 (\log(d^2p) + t)}{ n} } + \frac{ K B^2\log(2n)(\log(d^2p) + t) }{n},\\
+        %%
+        \Lambda_{Y} &:= \inf_{\bx} \Lambda_{\min} (\Gamma_{Y|\bx}(0)),\\
+        %%
+        \alpha^* &= \Lambda_{Y}\Lambda_{\min}(\Sigma_X) /2,\\
+        %%
+        \tau^* &= {54\delta}.
+    \end{align*}
+    Then, for all $t > 0$ such that $\alpha^* > 54s\delta$, we have that $\hat\Gamma = (\Ir_d \otimes \Wb'\Wb)/N \in\RE(\alpha^*,\tau^*)$ with probability at least $1- 3e^{-t}$.
+\end{prop}
+\begin{proof}
+    First, by Lemma \ref{lemma:re_kronecker}, it suffices to show $\Wb'\Wb/N\in\RE(\alpha,\tau)$. We denote $\Sigma_W = \bbE[\Wb'\Wb/N]$. To achieve this, the steps will be as follows: (\textit{i}) show that $\bv' \Sigma_W \bv > K \| \bv\|_2^2$ for some constant $K>0$, (\textit{ii}) use Lemma \ref{lemma:cov_conc_hetero} to show that $|\bv'(\Wb'\Wb/N - \Sigma_W )\bv | = o_p(1)$, and (\textit{iii}) apply Lemma \ref{lemma:badRE_to_goodRE} to derive the restricted eigenvalue property for $\Wb'\Wb/N$ with probability at least $1 - 3e^{-t}$.
+    
+    First, we note that,
+    \begin{align*}
+        \frac{1}{N} \Wb'\Wb = \frac{1}{n} \sum_{k=1}^n \bX_k\bX_k' \otimes \left( \frac{1}{T-1} (\Yb^k)'\Yb^k  \right)
+    \end{align*}
+    Let $\Vr \in\bbR^{p\times d}$ be a matrix with columns $\Vr = [\bv_1,\bv_2,\ldots ,\bv_d]$. Let $\bv = (\bv_1',\bv_2',\ldots ,\bv_d')'\in\bbR^{pd}$. Then, observe that,
+    \begin{align*}
+        \Wb^k \bv &=  [\bX_k' \otimes \Yb^k] \bv = \sum_{a=0}^{p} x_{ka} \Yb^k \bv_a = \Yb^k \Vr \bX_k
+    \end{align*}
+    Using the same notation for $\Vr\in\bbR^{p\times d}$ and $\bv\in\bbR^{pd}$, we have that 
+    \begin{align*}
+        \bbE\left[ \frac{1}{N} \bv'\Wb' \Wb \bv \right] &= \frac{1}{N} \sum_{k=1}^n \bbE[  \bX_k'\Vr' (\Yb^k)' \Yb^k \Vr \bX_k] \\
+        %%
+        &= \bbE\left\{\bbE\left[  \frac{1}{n}  \sum_{k=1}^n  \bX_k'\Vr' \left(\frac{1}{T-1} (\Yb^k)' \Yb^k \right) \Vr \bX_k\big| \Xb \right]\right\}\\
+        %%
+        &= \bbE\left[  \bX_1'\Vr' \Gamma_{Y|X_1}(0) \Vr \bX_1 \right] \\
+        %%
+        &\geq \Lambda_{Y} \bbE\left[  \bX_1'\Vr' \Vr \bX_1 \right] \geq \Lambda_{Y} \Lambda_{\min}(\Sigma_{X}) \|\bv\|_2^2
+    \end{align*}
+    Now, we focus on providing concentration for $\sup_{\|\bv\|_0 \leq 2s;\, \|\bv\|=1} |\bv'(\Wb'\Wb/N - \Sigma_W )\bv |$. Note that,
+    $$ \frac{1}{N} \Wb'\Wb = \frac{1}{n}\sum_{k=1}^n  (\Xb_k\Xb_k') \otimes \left(\frac{1}{T-1} (\Yb^k)'\Yb^k \right).$$
+    Since the terms $\{(\Xb_k\Xb_k') \otimes [(\Yb^k)'\Yb^k] /(T-1) \}_{k=1,\ldots,n}$ are independent, we may apply Lemma \ref{lemma:cov_conc_hetero}. To this aim, observe that for any $1\leq i,j\leq d$ and $1\leq \ell,m \leq p$, by Lemma \ref{lemma:ts_cov_concentration},
+    \begin{align*}
+        \left|\left[\frac{1}{T-1} (\Xb_k\Xb_k') \otimes(\Yb^k)'\Yb^k \right]_{i\ell, jm} \right|&= \frac{1}{T-1}\left| X_{k\ell}X_{km} (\bY^{k}_{\cdot i})'\bY^{k}_{\cdot j}\right| \\
+        %%
+        &\leq \frac{B^2}{T-1}  \left|(\bY^{k}_{\cdot i})'\bY^{k}_{\cdot j}\right| \\
+        %%
+        &\leq  B^2\Gamma_{Y|X_k}(0)_{ij} + O_p\left( \frac{C_M B^2}{T-1}\right) = O_p(B^2).
+    \end{align*}
+    On the other hand, 
+    \begin{align*}
+        \max_{\substack{ 1\leq i,j\leq d \\ 1\leq \ell,m \leq p}} \frac{1}{n} \sum_{k=1}^n \bbE\left[ \left(\frac{1}{T-1} X_{k\ell}X_{km} (\bY^{k}_{\cdot i})'\bY^{k}_{\cdot j}\right)^2  \right] &= \max_{\substack{ 1\leq i,j\leq d \\ 1\leq \ell,m \leq p}} \bbE\left[ \left(\frac{1}{T-1} X_{1\ell}X_{1m} (\bY^{1}_{\cdot i})'\bY^{1}_{\cdot j}\right)^2  \right]\\ 
+        %%
+        &\leq \max_{\substack{ 1\leq i,j\leq d \\ 1\leq \ell,m \leq p}}  B^2 \bbE\left[ \left(\frac{1}{T-1} (\bY^{1}_{\cdot i})'\bY^{1}_{\cdot j}\right)^2  \right]\\
+        %%
+        &\leq O_p\left( B^2 \right)
+    \end{align*}
+    As a consequence, for appropriately chosen constants $K, \eta > 0 $, by Lemma \ref{lemma:cov_conc_hetero},
+    \begin{equation*}
+        \vertiii{ \frac{1}{T-1}\Wb'\Wb - \Sigma_W }_{\max} \leq \delta := 7\sqrt{\frac{\eta B^2(\log(d^2p) + t)}{ n} } + \frac{  KB^2 \log(2n)(\log(d^2p) + t) }{n}
+    \end{equation*}
+    with probability at least $1 - 3e^{-t}$. From this, it can easily be shown that,
+    \begin{align*}
+        \sup_{\substack{\|\bv\|_0 \leq 2s \,;\, \|\bv\|_2 = 1}} \left|\bv' \left(\frac{\Wb'\Wb}{N} - \Sigma_W \right) \bv\right| \leq 2s\delta.
+    \end{align*}
+    Applying Lemma \ref{lemma:badRE_to_goodRE}, it follows that, for any $\bv\in\bbR^{pd}$
+    \begin{align*}
+        \left|\bv' \left(\frac{\Wb'\Wb}{N} - \Sigma_W \right) \bv\right| \leq 54s\delta  \|\bv\|_2^2 + {54\delta} \|\bv\|_1^2.
+    \end{align*}
+    
+    To conclude, observe that for any $\bv\in\bbR^{pd}$
+    \begin{align*}
+        \left|\bv' (\frac{1}{T-1} \Wb'\Wb)  \bv\right| &\geq  |\bv\Sigma\bv|  - \left|\bv' \left(\frac{\Wb'\Wb}{N} - \Sigma_W \right) \bv\right|\\
+        %%
+        &\geq (\Lambda_{Y}\Lambda_{\min}(\Sigma_X) - 54s\delta )\|\bv\|_2^2 - {54\delta}  \|\bv\|_1^2.  
+    \end{align*}    
+    Thus, as long as $\Lambda_{Y} \Lambda_{\min}(\Sigma_X) /2 > 54s\delta $, it follows that,
+    $\Wb'\Wb/N \in RE(\alpha^*,\tau^*)$ for $\alpha^* = \Lambda_{Y}\Lambda_{\min}(\Sigma_X) /2$ and $\tau = {54\delta}$ and $\delta > 0$ is as defined above.
+\end{proof}
+
+
+
+
+
+\newpage
+\begin{thm*}
+    Consider the MOD-VAR estimator $\hat\Phi\in\bbR^{d\times (dp+d)}$ defined by \eqref{eq:modvar_lasso_mat}. Assume that $\Phi^*$ is $s$-sparse, \textit{i.e.} $\|\Phi^*\|_0 = s$, and we have equal sample size $T$ for all $n$ subjects. Let $N = n(T-1)$. Then, there exist universal constants $K,\eta , c > 0$ such that the following statements hold. Let $t>0$, and 
+    \begin{align*}
+        \delta&:= \delta(t) =  7\sqrt{\frac{\eta B^2(\log(d^2p) + t)}{ n} } + \frac{  K B^2\log(2n)(\log(d^2p) + t) }{n},\\
+        %% 
+        \Lambda_{Y} &:=  \inf_{\bx} \Lambda_{\min}(\Gamma_{Y|\bx}(0)),\\
+        %%
+        \alpha^* &:= \Lambda_{\min}(\Sigma_X) \Lambda_{Y} / 2, \\
+        %%
+        \tau^* &:= 54s\delta ,\\
+        %%
+        C_M &:= \sup_{\bx\in\bbR^p}  \Lambda_{\max}(\Sigma_\varepsilon) \left( 1 + \frac{1 + \mu_{\max}(\cA_x)} {\mu_{\min}(\cA_x)} \right) ,\\
+        %%
+        Q(\bbeta^*, \Sigma_\varepsilon, B) &:= 4B \pi C_M.
+    \end{align*}
+    Whenever the following inequalities are satisfied
+    \begin{align}
+        \alpha^* &> 32s \tau^*  \label{eq:thm1_re_cond} \\
+        %%
+        N &> 16\log(pd^2) \label{eq:thm1_errorbound_cond1}\\
+        %%
+        C_M &< \infty, \label{eq:thm1_errorbound_cond2}\\
+        %%
+        \lambda &> 4Q(\bbeta^*, \Sigma_\varepsilon, B) \sqrt{\frac{2\log(d) + \log(p)}{N}} \label{eq:thm1_lambda_cond}.
+    \end{align}
+    our MOD-VAR estimator satisfies the consistency 
+    \begin{align*}
+        \|\hat\Psi - \Psi^* \|_2  \leq \frac{24\sqrt{s} Q(\bbeta^*, \Sigma_\varepsilon, B)}{\Lambda_{Y}\Lambda_{\min}(\Sigma_X)}  \sqrt{\frac{2\log(d) + \log(p)}{N}};\\
+        %%
+        %%
+        \| \hat\Psi - \Psi^*\|_1 \leq  \frac{144 s Q(\bbeta^*, \Sigma_\varepsilon, B)}{\Lambda_{Y} \Lambda_{\min}(\Sigma_X)}  \sqrt{\frac{2\log(d) + \log(p)}{N}}.
+    \end{align*}
+    with probability at least $1 - 3e^{-t} - 6e^{-3c\log(d^2p)}$.
+\end{thm*}
+\begin{proof}
+    By \eqref{eq:thm1_re_cond}, we have $\alpha^* > 32s \tau^* > 108s\delta$. By Proposition \ref{prop:RE_ours} we have $\hat\Gamma \in\RE(\alpha^*,\tau^*)$ with probability at least $1 - 3e^{-t}$. 
+
+    By \eqref{eq:thm1_errorbound_cond1}, \eqref{eq:thm1_errorbound_cond2}, and applying Proposition \ref{prop:errorbound_whp} we have that,
+    $$  \|\bgamma - \hat\Gamma \bbeta^*\|_\infty  < Q(\bbeta^*, \Sigma_\varepsilon, B)\sqrt{\frac{2\log(d) + \log(p)}{N}} $$
+    with probability at least $1 - 6\exp\{ -3c (2\log(d) + \log(p)) \}$. Therefore, Assumption \ref{as:error_bound} is satisfied.
+
+    Furthermore, note that by \eqref{eq:thm1_lambda_cond}, $$ \lambda \geq 4Q(\bbeta^*, \Sigma_\varepsilon, B) \sqrt{\frac{2\log(d) + \log(p)}{N}}.$$
+
+    Since the restricted eigenvalue condition is satisfied for $\alpha^* > 32 s \tau^*$, and Assumption \ref{as:error_bound} holds, we have that:
+        \begin{align*}
+        \|\hat\bbeta - \bbeta^* \|_2  \leq\frac{3\sqrt{s}\lambda}{\alpha}  =  \frac{24\sqrt{s} Q(\bbeta^*, \Sigma_\varepsilon, B)}{\Lambda_{Y} \Lambda_{\min}(\Sigma_X)}  \sqrt{\frac{2\log(d) + \log(p)}{N}};\\
+        %%
+        %%
+        \| \hat\bbeta - \bbeta^*\|_1 \leq \frac{12s \lambda}{\alpha} =  \frac{144 s Q(\bbeta^*, \Sigma_\varepsilon, B)}{\Lambda_{Y} \Lambda_{\min}(\Sigma_X)}  \sqrt{\frac{2\log(d) + \log(p)}{N}}.
+    \end{align*}
+\end{proof}
+
+
+
+
+
+\section{Additional Simulation Results}\label{supmat_section:add_sims}
+
+As explored in Section \ref{section:simulations}, we present a comparison of performance of our proposed MOD-VAR for cases in which there is heterogeneity in the time series due to moderator effects, as well as a combination of moderator and fully individual effects. These comparisons focus on MSE and forecasting error. In the present section, we provide simulation comparisons of our proposed method in terms of mean true positive rate (TPR), mean false positive rate (FPR) and time performance. Additionally, we share simulation performance results for the scenario where heterogeneity is present, but it is fully individual, with no moderator effects.
+
+In Section \ref{}
+
+\subsection{True and False Positive Rates}\label{supmat_subsec:sims_tpr_fpr}
+
+
+
+
+\subsection{Results for Fully Individual Heterogeneous Time Series}\label{supmat_subsec:sims_fully_individual}
+
+
+
+
+\subsection{Computational Time}\label{supmat_subsec:sims_comp_time}
+
+
+

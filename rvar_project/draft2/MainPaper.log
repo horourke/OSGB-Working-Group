@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.3.7)  3 FEB 2026 14:37
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2026.3.17)  24 JUN 2026 11:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1004,32 +1004,77 @@ File: l3backend-pdftex.def 2024-02-20 L3 backend support: PDF output (pdfTeX)
 \l__pdf_internal_box=\box91
 ) (MainPaper.aux
 
-LaTeX Warning: Label `eq:rvar_opt' multiply defined.
+LaTeX Warning: Label `eq:vareq_idiographic' multiply defined.
 
 
-LaTeX Warning: Label `eq:rvar_opt@cref' multiply defined.
+LaTeX Warning: Label `eq:vareq_idiographic@cref' multiply defined.
+
+
+LaTeX Warning: Label `eq:consistency_l2' multiply defined.
+
+
+LaTeX Warning: Label `eq:consistency_l2@cref' multiply defined.
+
+
+LaTeX Warning: Label `eq:consistency_l1' multiply defined.
+
+
+LaTeX Warning: Label `eq:consistency_l1@cref' multiply defined.
+
+
+Package natbib Warning: Citation `basu2015regularized' multiply defined.
+
+
+Package natbib Warning: Citation `crawford2024penalized' multiply defined.
+
+
+Package natbib Warning: Citation `fisher2022penalized' multiply defined.
+
+
+Package natbib Warning: Citation `gates2012group' multiply defined.
+
+
+Package natbib Warning: Citation `kim2007unified' multiply defined.
+
+
+Package natbib Warning: Citation `kuchibhotla2022moving' multiply defined.
+
+
+Package natbib Warning: Citation `lane2019uncovering' multiply defined.
+
+
+Package natbib Warning: Citation `loh2011high' multiply defined.
+
+
+Package natbib Warning: Citation `sorbom1989model' multiply defined.
+
+
+Package natbib Warning: Citation `stock2002forecasting' multiply defined.
+
+
+Package natbib Warning: Citation `vershynin2018high' multiply defined.
 
 )
 \openout1 = `MainPaper.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 18.
-LaTeX Font Info:    ... okay on input line 18.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 18.
-LaTeX Font Info:    ... okay on input line 18.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 18.
-LaTeX Font Info:    ... okay on input line 18.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 18.
-LaTeX Font Info:    ... okay on input line 18.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 18.
-LaTeX Font Info:    ... okay on input line 18.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 18.
-LaTeX Font Info:    ... okay on input line 18.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 18.
-LaTeX Font Info:    ... okay on input line 18.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 18.
-LaTeX Font Info:    ... okay on input line 18.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 18.
-LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
 
 (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
 ii
@@ -1056,7 +1101,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 fg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-Package hyperref Info: Link coloring OFF on input line 18.
+Package hyperref Info: Link coloring OFF on input line 19.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: rotating package is loaded.
 Package caption Info: End \AtBeginDocument code.
@@ -1067,155 +1112,286 @@ File: translations-basic-dictionary-english.trsl (english translation file `tra
 nslations-basic-dictionary')
 )
 Package translations Info: loading dictionary `translations-basic-dictionary' f
-or `english'. on input line 18.
+or `english'. on input line 19.
 LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 3
-4.
+5.
 
 (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/lm\ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OML+lmm on input line 3
-4.
+5.
 
 (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/lm\omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-34.
+35.
 
 (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/lm\omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-34.
+35.
 
 (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/lm\omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <14.4> on input line 34.
+(Font)              <14.4> on input line 35.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 34.
+(Font)              <10> on input line 35.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 34.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 34.
+(Font)              <7> on input line 35.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 35.
 
 
 (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 34.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 35.
 
 
 (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 3
-4.
+5.
 
 (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 34.
+(Font)              <5> on input line 35.
 
-Underfull \hbox (badness 10000) in paragraph at lines 34--34
+Underfull \hbox (badness 10000) in paragraph at lines 35--35
 \T1/lmr/m/n/10 Corresponding Au-thors: José Á. Sánchez Gómez ([]jos-esa@ucr.edu
 []), Holly O'Rourke
  []
 
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10.95> on input line 40.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <8> on input line 40.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <6> on input line 40.
 [1
 
 {C:/Users/joses/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/jose
 s/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}{C:/Users/joses/Ap
-pData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}] (mainV1.tex
-[2]
+pData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}{C:/Users/joses/AppDa
+ta/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}{C:/Users/joses/AppDa
+ta/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}] (mainV1.tex [2]
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 32.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 32.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 32.
- [3{C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.e
-nc}{C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}{
-C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}{
-C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}]
- [4]
-<figures/2_VisRvarTrueEstPars.png, id=68, 637.1805pt x 394.47375pt>
-File: figures/2_VisRvarTrueEstPars.png Graphic file (type png)
-<use figures/2_VisRvarTrueEstPars.png>
-Package pdftex.def Info: figures/2_VisRvarTrueEstPars.png  used on input line 6
-9.
-(pdftex.def)             Requested size: 462.26999pt x 286.1938pt.
-<figures/1_VisParExample.png, id=69, 637.1805pt x 546.24075pt>
+(Font)              <12> on input line 25.
+
+[3]
+LaTeX Font Info:    Trying to load font information for U+dsrom on input line 4
+2.
+
+(C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/doublestroke\udsrom.fd
+File: Udsrom.fd 1995/08/01 v0.1 Double stroke roman font definitions
+) [4{C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.
+enc}{C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.
+enc}] [5] [6]
+<figures/1_VisParExample.png, id=79, 637.1805pt x 546.24075pt>
 File: figures/1_VisParExample.png Graphic file (type png)
 <use figures/1_VisParExample.png>
-Package pdftex.def Info: figures/1_VisParExample.png  used on input line 75.
+Package pdftex.def Info: figures/1_VisParExample.png  used on input line 95.
 (pdftex.def)             Requested size: 462.26999pt x 396.30196pt.
- [5 <./figures/2_VisRvarTrueEstPars.png>] [6 <./figures/1_VisParExample.png>] [
-7] [8] [9] [10]
-<sims_4/621_ByPnN_d30_sigma2_0.1.pdf, id=147, page=4, 578.16pt x 361.35pt>
-File: sims_4/621_ByPnN_d30_sigma2_0.1.pdf Graphic file (type pdf)
-<use sims_4/621_ByPnN_d30_sigma2_0.1.pdf, page 4>
-Package pdftex.def Info: sims_4/621_ByPnN_d30_sigma2_0.1.pdf , page4 used on in
-put line 229.
-(pdftex.def)             Requested size: 416.04016pt x 260.02293pt.
-<sims_4/621_ByPnN_d20_sigma2_0.1.pdf, id=148, page=4, 578.16pt x 361.35pt>
-File: sims_4/621_ByPnN_d20_sigma2_0.1.pdf Graphic file (type pdf)
-<use sims_4/621_ByPnN_d20_sigma2_0.1.pdf, page 4>
-Package pdftex.def Info: sims_4/621_ByPnN_d20_sigma2_0.1.pdf , page4 used on in
-put line 230.
-(pdftex.def)             Requested size: 416.04016pt x 260.02293pt.
- [11] [12]) (MainPaper.bbl [13]) [14] [15 <./sims_4/621_ByPnN_d30_sigma2_0.1.pd
-f> <./sims_4/621_ByPnN_d20_sigma2_0.1.pdf>]
-(MainPaper.aux)
+
+Overfull \hbox (2.14488pt too wide) in paragraph at lines 100--100
+[]\T1/lmr/bx/n/14.4 Moderator Vec-tor Au-tore-gres-sive Mod-els with In-di-vid-
+ual Re-
+ []
+
+[7] [8 <./figures/1_VisParExample.png>] [9] [10] Excluding 'comment' comment.
+Overfull \hbox (1.7478pt too wide) in paragraph at lines 224--225
+[]\T1/lmr/m/n/12 For each sub-ject $\OML/lmm/m/it/12 k$\T1/lmr/m/n/12 , we de-f
+ine the ar-ti-fi-cial mod-er-a-tor vec-tor $\OML/cmm/b/it/12 X[] \OT1/lmr/m/n/1
+2 = (0\OML/lmm/m/it/12 ; [] \OT1/lmr/m/n/12 0\OML/lmm/m/it/12 ; ; \OT1/lmr/m/n/
+12 1\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 0\OML/lmm/m/it/12 ; [] ; \OT1/lmr/m/n/12
+ 0)[]$\T1/lmr/m/n/12 ,
+ []
+
+[11]
+Overfull \hbox (7.7821pt too wide) in paragraph at lines 267--269
+\T1/lmr/m/n/12 er-a-tor data ma-trix $\OT1/lmr/bx/n/12 X[]$\T1/lmr/m/n/12 , we 
+can es-ti-mate all the pa-ram-e-ters $\OT1/lmr/m/n/12 ^^H[]$\T1/lmr/m/n/12 , $\
+OMS/lmsy/m/n/12 f\OT1/lmr/m/n/12 ^^H[]\OMS/lmsy/m/n/12 g[]$ \T1/lmr/m/n/12 and 
+$\OMS/lmsy/m/n/12 f\OT1/cmr/bx/n/12 ^^A[]\OMS/lmsy/m/n/12 g[]$
+ []
+
+
+Overfull \hbox (37.79567pt too wide) in paragraph at lines 277--278
+\T1/lmr/m/n/12 least-squares term $[][]$ and the penalty term $\OMS/lmsy/m/n/12
+ P\OT1/lmr/m/n/12 (^^H) = \OML/lmm/m/it/12 ^^U[][][] \OT1/lmr/m/n/12 + \OML/lmm
+/m/it/12 ^^U[][][]$
+ []
+
+[12] [13] [14] [15] [16] [17] [18] [19] [20]
+Overfull \hbox (7.44972pt too wide) in paragraph at lines 496--497
+[]\T1/lmr/m/n/12 To gen-er-ate our data, we gen-er-ate a ma-trix of mod-er-a-to
+r vari-ables $\OT1/lmr/bx/n/12 X \OT1/lmr/m/n/12 = [\OML/cmm/b/it/12 X[]\OML/lm
+m/m/it/12 ; \OML/cmm/b/it/12 X[]\OML/lmm/m/it/12 ; [] \OML/cmm/b/it/12 X[]\OT1/
+lmr/m/n/12 ] \OMS/lmsy/m/n/12 2
+ []
+
+[21]
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 5
+14.
+ (C:\Users\joses\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
+File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+[22]
+Overfull \hbox (42.07722pt too wide) in paragraph at lines 532--533
+\OT1/lmr/m/n/12 ^^A[] = 0$ \T1/lmr/m/n/12 for all $\OML/lmm/m/it/12 k \OMS/lmsy
+/m/n/12 2 \OT1/lmr/m/n/12 [\OML/lmm/m/it/12 n\OT1/lmr/m/n/12 ]$\T1/lmr/m/n/12 .
+ For this case, we ex-plore the cases $\OT1/lmr/m/n/12 (\OML/lmm/m/it/12 q[]; q
+[]\OT1/lmr/m/n/12 ) \OMS/lmsy/m/n/12 2 f\OT1/lmr/m/n/12 (0\OML/lmm/m/it/12 :\OT
+1/lmr/m/n/12 075\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 0\OML/lmm/m/it/12 :\OT1/lmr/
+m/n/12 025)\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 (0\OML/lmm/m/it/12 :\OT1/lmr/m/n/
+12 025\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 0\OML/lmm/m/it/12 :\OT1/lmr/m/n/12 075
+)\OMS/lmsy/m/n/12 g$\T1/lmr/m/n/12 .
+ []
+
+[23] (MainPaper.bbl [24]) [25] Excluding 'comment' comment.) (supplementV1.tex
+Excluding 'comment' comment.
+Overfull \hbox (8.54753pt too wide) detected at line 188
+[]
+ []
+
+[26] [27]
+Overfull \hbox (19.44933pt too wide) in paragraph at lines 284--285
+[]\T1/lmr/bx/n/12 Lemma 5 \T1/lmr/m/n/12 (The-o-rem 3.4 of Kuchib-hotla and Cha
+krabortty [][][])\T1/lmr/bx/n/12 . []\T1/lmr/m/it/12 Sup-pose that $\OML/cmm/b/
+it/12 X[]\OML/lmm/m/it/12 ; \OML/cmm/b/it/12 X[]\OML/lmm/m/it/12 ; [] ; \OML/cm
+m/b/it/12 X[] \OMS/lmsy/m/n/12 2
+ []
+
+[28] [29] [30] [31] [32] [33]
+
+LaTeX Warning: Reference `' on page 34 undefined on input line 523.
+
+) (MainPaper.bbl
+pdfTeX warning (ext4): destination with the same identifier (name{cite.basu2015
+regularized}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.3 ...and Michailidis, 2015]{basu2015regularized}
+                                                  
+pdfTeX warning (ext4): destination with the same identifier (name{cite.crawford
+2024penalized}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.8 ...awford et~al., 2024]{crawford2024penalized}
+                                                  
+pdfTeX warning (ext4): destination with the same identifier (name{cite.fisher20
+22penalized}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.14 ...[Fisher et~al., 2022]{fisher2022penalized}
+                                                  
+pdfTeX warning (ext4): destination with the same identifier (name{cite.gates201
+2group}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.20 ...[Gates and Molenaar, 2012]{gates2012group}
+                                                  
+pdfTeX warning (ext4): destination with the same identifier (name{cite.kim2007u
+nified}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.26 \bibitem[Kim et~al., 2007]{kim2007unified}
+                                                [34]
+pdfTeX warning (ext4): destination with the same identifier (name{cite.kuchibho
+tla2022moving}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.32 ...Chakrabortty, 2022]{kuchibhotla2022moving}
+                                                  
+pdfTeX warning (ext4): destination with the same identifier (name{cite.lane2019
+uncovering}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.39 ...tem[Lane et~al., 2019]{lane2019uncovering}
+                                                  
+pdfTeX warning (ext4): destination with the same identifier (name{cite.loh2011h
+igh}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.45 ...tem[Loh and Wainwright, 2011]{loh2011high}
+                                                  
+pdfTeX warning (ext4): destination with the same identifier (name{cite.sorbom19
+89model}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.51 \bibitem[S{\"o}rbom, 1989]{sorbom1989model}
+                                                
+pdfTeX warning (ext4): destination with the same identifier (name{cite.stock200
+2forecasting}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.56 ...ck and Watson, 2002]{stock2002forecasting}
+                                                  
+pdfTeX warning (ext4): destination with the same identifier (name{cite.vershyni
+n2018high}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.63 \bibitem[Vershynin, 2018]{vershynin2018high}
+                                                 )
+
+Package natbib Warning: There were multiply defined citations.
+
+[35] (MainPaper.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
  ***********
 
 
+LaTeX Warning: There were undefined references.
+
+
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 32835 strings out of 474457
- 657723 string characters out of 5742755
+ 33127 strings out of 474457
+ 662469 string characters out of 5742754
  1950190 words of memory out of 5000000
- 54557 multiletter control sequences out of 15000+600000
- 664095 words of font info for 120 fonts, out of 8000000 for 9000
+ 54741 multiletter control sequences out of 15000+600000
+ 660814 words of font info for 129 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 94i,16n,96p,984b,1066s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 94i,15n,96p,1894b,1055s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmbx12.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
-fonts/cm/cmbx8.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/pu
-blic/amsfonts/cm/cmmib10.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/font
-s/type1/public/lm/lmbx10.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/font
-s/type1/public/lm/lmbx12.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/font
-s/type1/public/lm/lmbx7.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts
-/type1/public/lm/lmbx8.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/
-type1/public/lm/lmex10.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/
-type1/public/lm/lmmi10.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/
-type1/public/lm/lmmi12.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/
-type1/public/lm/lmmi5.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/t
-ype1/public/lm/lmmi6.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/ty
-pe1/public/lm/lmmi7.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/typ
-e1/public/lm/lmmi8.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type
-1/public/lm/lmr10.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1
-/public/lm/lmr12.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/
-public/lm/lmr6.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/pu
-blic/lm/lmr7.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/publ
-ic/lm/lmr8.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public
-/lm/lmri12.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public
-/lm/lmsy10.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public
-/lm/lmsy5.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/
-lm/lmsy6.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/l
-m/lmsy7.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm
-/lmsy8.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
-fonts/symbols/msbm10.pfb>
-Output written on MainPaper.pdf (15 pages, 457212 bytes).
+fonts/cm/cmmib10.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/fonts/type1/
+public/amsfonts/cmextra/cmmib8.pfb><C:/Users/joses/AppData/Local/Programs/MiKTe
+X/fonts/type1/public/doublestroke/dsrom12.pfb><C:/Users/joses/AppData/Local/Pro
+grams/MiKTeX/fonts/type1/public/lm/lmbx10.pfb><C:/Users/joses/AppData/Local/Pro
+grams/MiKTeX/fonts/type1/public/lm/lmbx12.pfb><C:/Users/joses/AppData/Local/Pro
+grams/MiKTeX/fonts/type1/public/lm/lmbx8.pfb><C:/Users/joses/AppData/Local/Prog
+rams/MiKTeX/fonts/type1/public/lm/lmex10.pfb><C:/Users/joses/AppData/Local/Prog
+rams/MiKTeX/fonts/type1/public/lm/lmmi10.pfb><C:/Users/joses/AppData/Local/Prog
+rams/MiKTeX/fonts/type1/public/lm/lmmi12.pfb><C:/Users/joses/AppData/Local/Prog
+rams/MiKTeX/fonts/type1/public/lm/lmmi6.pfb><C:/Users/joses/AppData/Local/Progr
+ams/MiKTeX/fonts/type1/public/lm/lmmi8.pfb><C:/Users/joses/AppData/Local/Progra
+ms/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/joses/AppData/Local/Program
+s/MiKTeX/fonts/type1/public/lm/lmr12.pfb><C:/Users/joses/AppData/Local/Programs
+/MiKTeX/fonts/type1/public/lm/lmr6.pfb><C:/Users/joses/AppData/Local/Programs/M
+iKTeX/fonts/type1/public/lm/lmr7.pfb><C:/Users/joses/AppData/Local/Programs/MiK
+TeX/fonts/type1/public/lm/lmr8.pfb><C:/Users/joses/AppData/Local/Programs/MiKTe
+X/fonts/type1/public/lm/lmri12.pfb><C:/Users/joses/AppData/Local/Programs/MiKTe
+X/fonts/type1/public/lm/lmsy10.pfb><C:/Users/joses/AppData/Local/Programs/MiKTe
+X/fonts/type1/public/lm/lmsy6.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX
+/fonts/type1/public/lm/lmsy8.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/
+fonts/type1/public/lm/lmtt12.pfb><C:/Users/joses/AppData/Local/Programs/MiKTeX/
+fonts/type1/public/amsfonts/symbols/msam10.pfb><C:/Users/joses/AppData/Local/Pr
+ograms/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on MainPaper.pdf (35 pages, 572119 bytes).
 PDF statistics:
- 364 PDF objects out of 1000 (max. 8388607)
- 50 named destinations out of 1000 (max. 500000)
- 121 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 629 PDF objects out of 1000 (max. 8388607)
+ 147 named destinations out of 1000 (max. 500000)
+ 258 words of extra memory for PDF output out of 10000 (max. 10000000)
 
