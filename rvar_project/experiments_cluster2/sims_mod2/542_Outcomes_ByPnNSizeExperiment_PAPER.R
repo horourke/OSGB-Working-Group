@@ -99,12 +99,15 @@ method_lookup <- setNames(method_names_clean, method_names)
 
 highlight_methods <- c("MOD-VAR: CV", "Adap. MOD-VAR: CV")
 method_colors <- c(
-  "VAR" = cbPalette[1],
-  "M-VAR: Standard" = cbPalette[2],
-  "M-VAR: Adaptive" = cbPalette[3],
+  "VAR" = cbPalette[2],
+  "M-VAR: Standard" = cbPalette[3],
+  "M-VAR: Adaptive" = cbPalette[4],
   "MOD-VAR: CV" = "#000000",
   "Adap. MOD-VAR: CV" = "#D55E00"
 )
+
+# transparency for all ribbons; change this value to make ribbons darker or lighter
+alpha <- 0.2
 
 for(sigma2_val in c(0.1)) {
   for (d_val in c(10, 20)) {
@@ -155,6 +158,16 @@ for(sigma2_val in c(0.1)) {
       sdSens = sd(sens),
       meanSpec = mean(spec),
       sdSpec = sd(spec)
+      ) %>%
+      ungroup() %>%
+      mutate(
+        p_name = paste0("p == ", p),
+        n_name = paste0("n == ", n),
+        pc_name = ifelse(
+          prob_c == 0.25,
+          "shared == 25*\"%\"",
+          "shared == 75*\"%\""
+        )
       )
 
     print(table(output_merged$method))
@@ -171,13 +184,14 @@ for(sigma2_val in c(0.1)) {
       ".pdf")
     pdf(file_name, width = 8, height = 5)
     p1 <- output_merged %>% ggplot(aes(x = T, y = meanTPR)) +
-      geom_ribbon(aes(ymin = meanTPR - sdTPR, ymax = meanTPR + sdTPR, fill = method), alpha = 0.1) +
+      geom_ribbon(aes(ymin = meanTPR - sdTPR, ymax = meanTPR + sdTPR, fill = method), alpha = alpha) +
       geom_line(data = highlight_data, aes(color = method), linewidth = 1.4, linetype = "solid") +
       geom_line(data = other_data, aes(color = method), linewidth = 0.9, linetype = "dashed") +
       geom_hline(yintercept = c(0, 1), linetype = 2) +
-      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p_name ~ pc_name + n_name, scales = "free_x", labeller = label_parsed) +
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
+      ylab("Mean TPR") +
       theme(legend.position = "bottom")
     print(p1)
     dev.off()
@@ -191,13 +205,14 @@ for(sigma2_val in c(0.1)) {
       ".pdf")
     pdf(file_name, width = 8, height = 5)
     p2 <- output_merged %>% ggplot(aes(x = T, y = meanFPR)) +
-      geom_ribbon(aes(ymin = meanFPR - sdFPR, ymax = meanFPR + sdFPR, fill = method), alpha = 0.1) +
+      geom_ribbon(aes(ymin = meanFPR - sdFPR, ymax = meanFPR + sdFPR, fill = method), alpha = alpha) +
       geom_line(data = highlight_data, aes(color = method), linewidth = 1.4, linetype = "solid") +
       geom_line(data = other_data, aes(color = method), linewidth = 0.9, linetype = "dashed") +
       geom_hline(yintercept = c(0), linetype = 2) +
-      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p_name ~ pc_name + n_name, scales = "free_x", labeller = label_parsed) +
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
+      ylab("Mean FPR") +
       theme(legend.position = "bottom")
     print(p2)
     dev.off()
@@ -211,13 +226,14 @@ for(sigma2_val in c(0.1)) {
       ".pdf")
     pdf(file_name, width = 8, height = 5)
     p3 <- output_merged %>% ggplot(aes(x = T, y = meanL1)) +
-      geom_ribbon(aes(ymin = meanL1 - sdL1, ymax = meanL1 + sdL1, fill = method), alpha = 0.1) +
+      geom_ribbon(aes(ymin = meanL1 - sdL1, ymax = meanL1 + sdL1, fill = method), alpha = alpha) +
       geom_line(data = highlight_data, aes(color = method), linewidth = 1.4, linetype = "solid") +
       geom_line(data = other_data, aes(color = method), linewidth = 0.9, linetype = "dashed") +
       geom_hline(yintercept = c(0), linetype = 2) +
-      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p_name ~ pc_name + n_name, scales = "free_x", labeller = label_parsed) +
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
+      ylab(expression(E[l1])) +
       theme(legend.position = "bottom")
     print(p3)
     dev.off()
@@ -231,13 +247,14 @@ for(sigma2_val in c(0.1)) {
       ".pdf")
     pdf(file_name, width = 8, height = 5)
     p4 <- output_merged %>% ggplot(aes(x = T, y = meanFr)) +
-      geom_ribbon(aes(ymin = meanFr - sdFr, ymax = meanFr + sdFr, fill = method), alpha = 0.1) +
+      geom_ribbon(aes(ymin = meanFr - sdFr, ymax = meanFr + sdFr, fill = method), alpha = alpha) +
       geom_line(data = highlight_data, aes(color = method), linewidth = 1.4, linetype = "solid") +
       geom_line(data = other_data, aes(color = method), linewidth = 0.9, linetype = "dashed") +
       geom_hline(yintercept = c(0), linetype = 2) +
-      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p_name ~ pc_name + n_name, scales = "free_x", labeller = label_parsed) +
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
+      ylab(expression(E[F])) +
       theme(legend.position = "bottom")
     print(p4)
     dev.off()
@@ -255,7 +272,7 @@ for(sigma2_val in c(0.1)) {
       ggplot(aes(x = T, y = logmt)) +
       geom_line(data = highlight_data %>% mutate(logmt = log(meanTime, base = 60)), aes(color = method), linewidth = 1.4, linetype = "solid") +
       geom_line(data = other_data %>% mutate(logmt = log(meanTime, base = 60)), aes(color = method), linewidth = 0.9, linetype = "dashed") +
-      ylab(expression(log[60]("seconds"))) +
+      ylab(expression("Mean computational time ("*log[60](s)*")")) +
       geom_hline(yintercept = c(0, 1, 1.56, 2), linetype = 2, linewidth = 0.25) +
       annotate("text", x = 55, y = 0.15, label = "1 s", size = 2.5) +
       annotate("text", x = 55 * 0.93, y = 1.15, label = "1 m", size = 2.5) +
@@ -276,13 +293,13 @@ for(sigma2_val in c(0.1)) {
       ".pdf")
     pdf(file_name, width = 8, height = 5)
     p6 <- output_merged %>% ggplot(aes(x = T, y = meanfc1)) +
-      geom_ribbon(aes(ymin = meanfc1 - sdfc1, ymax = meanfc1 + sdfc1, fill = method), alpha = 0.1) +
+      geom_ribbon(aes(ymin = meanfc1 - sdfc1, ymax = meanfc1 + sdfc1, fill = method), alpha = alpha) +
       geom_line(data = highlight_data, aes(color = method), linewidth = 1.4, linetype = "solid") +
       geom_line(data = other_data, aes(color = method), linewidth = 0.9, linetype = "dashed") +
-      geom_hline(yintercept = c(sqrt(sigma2_val)), linetype = 2, col = "red") +
-      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p_name ~ pc_name + n_name, scales = "free_x", labeller = label_parsed) +
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
+      ylab("RMSFE") +
       theme(legend.position = "bottom")
     print(p6)
     dev.off()
@@ -296,11 +313,10 @@ for(sigma2_val in c(0.1)) {
       ".pdf")
     pdf(file_name, width = 8, height = 5)
     p7 <- output_merged %>% ggplot(aes(x = T, y = meanfc2)) +
-      geom_ribbon(aes(ymin = meanfc2 - sdfc2, ymax = meanfc2 + sdfc2, fill = method), alpha = 0.1) +
+      geom_ribbon(aes(ymin = meanfc2 - sdfc2, ymax = meanfc2 + sdfc2, fill = method), alpha = alpha) +
       geom_line(data = highlight_data, aes(color = method), linewidth = 1.4, linetype = "solid") +
       geom_line(data = other_data, aes(color = method), linewidth = 0.9, linetype = "dashed") +
-      geom_hline(yintercept = c(sqrt(sigma2_val)), linetype = 2, col = "red") +
-      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p_name ~ pc_name + n_name, scales = "free_x", labeller = label_parsed) +
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
       theme(legend.position = "bottom")
@@ -316,11 +332,10 @@ for(sigma2_val in c(0.1)) {
       ".pdf")
     pdf(file_name, width = 8, height = 5)
     p8 <- output_merged %>% ggplot(aes(x = T, y = meanfc3)) +
-      geom_ribbon(aes(ymin = meanfc3 - sdfc3, ymax = meanfc3 + sdfc3, fill = method), alpha = 0.1) +
+      geom_ribbon(aes(ymin = meanfc3 - sdfc3, ymax = meanfc3 + sdfc3, fill = method), alpha = alpha) +
       geom_line(data = highlight_data, aes(color = method), linewidth = 1.4, linetype = "solid") +
       geom_line(data = other_data, aes(color = method), linewidth = 0.9, linetype = "dashed") +
-      geom_hline(yintercept = c(sqrt(sigma2_val)), linetype = 2, col = "red") +
-      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p_name ~ pc_name + n_name, scales = "free_x", labeller = label_parsed) +
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
       theme(legend.position = "bottom")
@@ -336,12 +351,13 @@ for(sigma2_val in c(0.1)) {
       ".pdf")
     pdf(file_name, width = 8, height = 5)
     p9 <- output_merged %>% ggplot(aes(x = T, y = meanSens)) +
-      geom_ribbon(aes(ymin = meanSens - sdSens, ymax = meanSens + sdSens, fill = method), alpha = 0.1) +
+      geom_ribbon(aes(ymin = meanSens - sdSens, ymax = meanSens + sdSens, fill = method), alpha = alpha) +
       geom_line(data = highlight_data, aes(color = method), linewidth = 1.4, linetype = "solid") +
       geom_line(data = other_data, aes(color = method), linewidth = 0.9, linetype = "dashed") +
-      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p_name ~ pc_name + n_name, scales = "free_x", labeller = label_parsed) +
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
+      ylab("Mean Sensitivity") +
       theme(legend.position = "bottom")
     print(p9)
     dev.off()
@@ -355,13 +371,14 @@ for(sigma2_val in c(0.1)) {
       ".pdf")
     pdf(file_name, width = 8, height = 5)
     p10 <- output_merged %>% ggplot(aes(x = T, y = meanSpec)) +
-      geom_ribbon(aes(ymin = meanSpec - sdSpec, ymax = meanSpec + sdSpec, fill = method), alpha = 0.1) +
+      geom_ribbon(aes(ymin = meanSpec - sdSpec, ymax = meanSpec + sdSpec, fill = method), alpha = alpha) +
       geom_line(data = highlight_data, aes(color = method), linewidth = 1.4, linetype = "solid") +
       geom_line(data = other_data, aes(color = method), linewidth = 0.9, linetype = "dashed") +
       geom_hline(yintercept = c(0), linetype = 2) +
-      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p_name ~ pc_name + n_name, scales = "free_x", labeller = label_parsed) +
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
+      ylab("Mean Specificity") +
       theme(legend.position = "bottom")
     print(p10)
     dev.off()
