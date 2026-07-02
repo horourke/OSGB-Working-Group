@@ -14,8 +14,7 @@ library(lazyeval)
 library(pROC)
 
 input <- commandArgs(trailingOnly = TRUE)
-diag_shift_val <- as.numeric(input[1])
-T0_prop_val    <- as.numeric(input[2])
+version <- as.numeric(input[1])
 
 
 ###################### Parameter table:
@@ -89,15 +88,17 @@ method_names <- c(
     "var_standard",
     "mvar_standard", "mvar_adaptive",
     "modvar_bic", "modvar_cv_roll", "modvar_cv_bsubj",
-    "modvar_ada.bic", "modvar_ada.cv")
+    "modvar_ada.bic", "modvar_ada.cv",
+    "modvar_ada.var")
 method_names_clean <- c(
     "VAR",          
     "M-VAR: Standard", "M-VAR: Adaptive",
     "MOD-VAR: BIC", "MOD-VAR: RWCV", "MOD-VAR: BSCV",
-    "adaMOD-VAR: BIC", "adaMOD-VAR: RWCV")
+    "adaMOD-VAR: BIC", "adaMOD-VAR: RWCV",
+    "adaMOD-VAR: VAR")
 
 for(sigma2_val in c(0.1)) {
-  for (d_val in c(10, 20)) {
+  for (d_val in c(10)) {
   
     ##############################
     ##############################
@@ -151,7 +152,8 @@ for(sigma2_val in c(0.1)) {
 
     file_name <- paste0(
       subfolder_plots_new, 
-      "532_ByPnN",
+      "v", version,
+      "_532_ByPnN",
       "_d", d_val, 
       "_sigma2_", sigma2_val,
       ".pdf")

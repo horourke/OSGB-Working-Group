@@ -105,14 +105,14 @@ run_info <- list(
 
   list(
     main_dir       = "400_modvar/",
-    run_index      = 1,
+    run_index      = 2,
     runtype        = runtype,
     abrev_name     = "RVAR")
   )
 
 ###########################
 ## LOOP OVER ALL 288 SIMULATION PARAMETER COMBINATIONS
-for (id_task in 1:72) {
+for (id_task in 1:36) {
   print(paste("XXXXXXXXXXXXXXXX ID-TASK", id_task))
 
   output <- NULL

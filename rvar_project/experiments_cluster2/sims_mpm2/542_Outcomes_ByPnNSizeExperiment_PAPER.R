@@ -16,6 +16,9 @@ library(pROC)
 input <- commandArgs(trailingOnly = TRUE)
 diag_shift_val <- as.numeric(input[1])
 T0_prop_val    <- as.numeric(input[2])
+cbPalette <- c("#999999", "#E69F00", "#56B4E9", 
+               "#009E73", "#F0E442", "#0072B2", 
+               "#D55E00", "#CC79A7")
 
 
 ###################### Parameter table:
