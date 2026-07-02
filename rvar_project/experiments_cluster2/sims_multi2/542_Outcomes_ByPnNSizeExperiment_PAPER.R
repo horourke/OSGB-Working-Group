@@ -14,10 +14,9 @@ library(lazyeval)
 library(pROC)
 
 input <- commandArgs(trailingOnly = TRUE)
-version <- as.numeric(input[1])
-cbPalette <- c("#999999", "#E69F00", "#56B4E9", 
-               "#009E73", "#F0E442", "#0072B2", 
-               "#D55E00", "#CC79A7")
+diag_shift_val <- as.numeric(input[1])
+T0_prop_val    <- as.numeric(input[2])
+
 
 ###################### Parameter table:
 runtype       <- 2 # FOR EXPERIMENT RUNS
@@ -25,8 +24,8 @@ runtype       <- 2 # FOR EXPERIMENT RUNS
 index_old     <- 1 # run index to use
 sim_par_table <- expand.grid(
   running_days  = 2,
-  range        = 50,
-  horizon      = 3,
+  range         = 50,
+  horizon       = 3,
   entry_min     = 0.3,                            ## entry_min : minimum B0,B1,...,Bp entry magnitude
   entry_max     = 0.9,                            ## entry_max : maximum B0,B1,...,Bp entry magnitude
     
@@ -38,20 +37,19 @@ sim_par_table <- expand.grid(
                                                     ##              data matrix X with non-zero values.
   signed        = c(TRUE),                        ## signed    : are entries signed or all positive?
 
-
-  prob_c        = c(0.25, 0.75),                  ## prob_c     : proportion of common entries.
+  prob_c        = c(0.25, 0.75),                  ## prob_c    : proportion of common entries.
   prob_tot      = 0.1,                            ## prob_tot   : total proportion of non-zero entries.
-  prob_delta    = 0,                              ## prob_delta : total proportion of idiographic entries.
+  prob_phip    = 0,                               ## prob_phip  : total proportion of moderator entries.
 
   nsim          = ifelse(
-                      runtype == 1, 
-                      1, 
-                      ifelse(runtype == 2, 2, 5)),  ## nsim     : no of simulation repetitions.
+                    runtype == 1, 
+                    1, 
+                    ifelse(runtype == 2, 2, 5)), ## nsim     : no of simulation repetitions.
   sigma2        = c(0.1),                         ## sigma2   : variance o VAR error term.
   n             = c(15, 20, 25),                  ## n        : No. of individuals
-  T             = c(30, 60, 90),                  ## T        : timepoints per individual.
+  T             = c(30, 60, 90),                 ## T        : timepoints per individual.
   p             = c(2, 5),                        ## p        : covariate dimension
-  d             = c(10, 20, 30))                  ## d        : Time series dimension
+  d             = c(10, 20, 30))                  ## d        : Time Series dimension
 ## Add specific parameters to table:
 sim_par_table$prob_phi0 <- sim_par_table$prob_tot * sim_par_table$prob_c
 sim_par_table$prob_phip <- sim_par_table$prob_tot * (1 - sim_par_table$prob_c)
@@ -88,21 +86,22 @@ if (!dir.exists(subfolder_plots_new)) {
 ##################################################################
 ##################################################################
 method_names <- c(
-  "var_standard",
-  "mvar_standard", "mvar_adaptive",
-  "modvar_cv_bsubj", "modvar_ada.cv")
+    "var_standard",
+    "mvar_standard", "mvar_adaptive",
+    "modvar_cv_roll", "modvar_ada.cv")
 method_names_clean <- c(
-  "VAR",
-  "M-VAR: Standard", "M-VAR: Adaptive",
-  "MOD-VAR: CV", "Adap. MOD-VAR: CV")
+    "VAR",          
+    "M-VAR: Standard", "M-VAR: Adaptive",
+    "MOD-VAR: RWCV","Adap. MOD-VAR: CV")
 method_lookup <- setNames(method_names_clean, method_names)
 
-highlight_methods <- c("MOD-VAR: CV", "Adap. MOD-VAR: CV")
+highlight_methods <- c(
+    "MOD-VAR: RWCV","Adap. MOD-VAR: CV")
 method_colors <- c(
   "VAR" = cbPalette[2],
   "M-VAR: Standard" = cbPalette[3],
   "M-VAR: Adaptive" = cbPalette[4],
-  "MOD-VAR: CV" = "#000000",
+  "MOD-VAR: RWCV" = "#000000",
   "Adap. MOD-VAR: CV" = "#D55E00"
 )
 
@@ -120,6 +119,7 @@ for(sigma2_val in c(0.1)) {
     results_dir     <- paste0(subfolder_new, "plots_", type, "/")
 
     for (sim_ind in sim_ind_load) {
+      print(sim_ind)
       load(paste0(
         subfolder_new, "data_all/",
         "output", sim_ind, ".RData"))
@@ -133,7 +133,7 @@ for(sigma2_val in c(0.1)) {
     output_merged  <- distinct(bind_rows(mget(ls(pattern = '^output\\d+')))) %>%
       filter(method %in% method_names) %>%
       mutate(method = recode(method, !!!setNames(method_names_clean, method_names))) %>%
-      filter(sigma2 == sigma2_val, signed == TRUE) %>%
+      filter(sigma2 == 0.1, signed == TRUE) %>%
       select(-sigma2) %>%
       group_by(d, p, T, n, prob_c, method) %>%
 
@@ -177,8 +177,7 @@ for(sigma2_val in c(0.1)) {
 
     file_name <- paste0(
       subfolder_plots_new,
-      "v", version,
-      "_542_TPR_ByPnN",
+      "542_TPR_ByPnN",
       "_d", d_val,
       "_sigma2_", sigma2_val,
       ".pdf")
@@ -198,8 +197,7 @@ for(sigma2_val in c(0.1)) {
 
     file_name <- paste0(
       subfolder_plots_new,
-      "v", version,
-      "_542_FPR_ByPnN",
+      "542_FPR_ByPnN",
       "_d", d_val,
       "_sigma2_", sigma2_val,
       ".pdf")
@@ -219,8 +217,7 @@ for(sigma2_val in c(0.1)) {
 
     file_name <- paste0(
       subfolder_plots_new,
-      "v", version,
-      "_542_L1_ByPnN",
+      "542_L1_ByPnN",
       "_d", d_val,
       "_sigma2_", sigma2_val,
       ".pdf")
@@ -240,8 +237,7 @@ for(sigma2_val in c(0.1)) {
 
     file_name <- paste0(
       subfolder_plots_new,
-      "v", version,
-      "_542_Fr_ByPnN",
+      "542_Fr_ByPnN",
       "_d", d_val,
       "_sigma2_", sigma2_val,
       ".pdf")
@@ -261,8 +257,7 @@ for(sigma2_val in c(0.1)) {
 
     file_name <- paste0(
       subfolder_plots_new,
-      "v", version,
-      "_542_Time_ByPnN",
+      "542_Time_ByPnN",
       "_d", d_val,
       "_sigma2_", sigma2_val,
       ".pdf")
@@ -278,7 +273,7 @@ for(sigma2_val in c(0.1)) {
       annotate("text", x = 55 * 0.93, y = 1.15, label = "1 m", size = 2.5) +
       annotate("text", x = 55 * 0.93, y = 1.71, label = "10 m", size = 2.5) +
       annotate("text", x = 55 * 0.93, y = 2.15, label = "1 h", size = 2.5) +
-      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p_name ~ pc_name + n_name, scales = "free_x", labeller = label_parsed) +
       scale_colour_manual(values = method_colors) +
       theme(legend.position = "bottom")
     print(p5)
@@ -286,8 +281,7 @@ for(sigma2_val in c(0.1)) {
 
     file_name <- paste0(
       subfolder_plots_new,
-      "v", version,
-      "_542_fc1_ByPnN",
+      "542_fc1_ByPnN",
       "_d", d_val,
       "_sigma2_", sigma2_val,
       ".pdf")
@@ -306,8 +300,7 @@ for(sigma2_val in c(0.1)) {
 
     file_name <- paste0(
       subfolder_plots_new,
-      "v", version,
-      "_542_fc2_ByPnN",
+      "542_fc2_ByPnN",
       "_d", d_val,
       "_sigma2_", sigma2_val,
       ".pdf")
@@ -325,8 +318,7 @@ for(sigma2_val in c(0.1)) {
 
     file_name <- paste0(
       subfolder_plots_new,
-      "v", version,
-      "_542_fc3_ByPnN",
+      "542_fc3_ByPnN",
       "_d", d_val,
       "_sigma2_", sigma2_val,
       ".pdf")
@@ -344,8 +336,7 @@ for(sigma2_val in c(0.1)) {
 
     file_name <- paste0(
       subfolder_plots_new,
-      "v", version,
-      "_542_Sens_ByPnN",
+      "542_Sens_ByPnN",
       "_d", d_val,
       "_sigma2_", sigma2_val,
       ".pdf")
@@ -364,8 +355,7 @@ for(sigma2_val in c(0.1)) {
 
     file_name <- paste0(
       subfolder_plots_new,
-      "v", version,
-      "_542_Spec_ByPnN",
+      "542_Spec_ByPnN",
       "_d", d_val,
       "_sigma2_", sigma2_val,
       ".pdf")
