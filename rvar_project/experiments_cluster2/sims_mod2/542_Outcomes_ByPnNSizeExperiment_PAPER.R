@@ -278,7 +278,7 @@ for(sigma2_val in c(0.1)) {
       annotate("text", x = 55 * 0.93, y = 1.15, label = "1 m", size = 2.5) +
       annotate("text", x = 55 * 0.93, y = 1.71, label = "10 m", size = 2.5) +
       annotate("text", x = 55 * 0.93, y = 2.15, label = "1 h", size = 2.5) +
-      facet_grid(p ~ prob_c + n, scales = "free_x", labeller = label_parsed) +
+      facet_grid(p_name ~ pc_name + n_name, scales = "free_x", labeller = label_parsed) +
       scale_colour_manual(values = method_colors) +
       theme(legend.position = "bottom")
     print(p5)
