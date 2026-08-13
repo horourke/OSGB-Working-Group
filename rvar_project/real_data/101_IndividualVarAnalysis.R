@@ -1,0 +1,430 @@
+
+library(tseries)
+library(MTS)
+library(ppcor)
+library(TSA)
+library(forecast)
+library(ggplot2)
+
+library(magrittr)
+library(readxl)
+library(tidyverse)
+library(plot.matrix)
+
+## Model fitting packages:
+library(glmnet)
+library(mvtnorm)
+library(multivar)
+library(BigVAR)
+library(expm)
+library(gridExtra)
+
+load("BrainNetworksGeneData/100_Data.RData")
+
+##################################################
+##################################################
+##################################################
+eval_forecast <- function(Y_forecast, B_est_list, range, horizon) {
+  
+  n <- length(Y_forecast)
+  
+  #msfe <- numeric(horizon)
+  msfe <- matrix(0, ncol = n, nrow = horizon)
+  for (h in 1:horizon) {
+    
+    bysubj_msfe <- numeric(n)
+    for (k in 1:n) {
+      Y <- Y_forecast[[k]]
+      B <- B_est_list[[k]] %^% h
+      
+      Z <- Y[h + 1:(range - h),]
+      X <- Y[1:(range - h),]
+      
+      err_mat <- Z - X %*% t(B)
+      
+      bysubj_msfe[k] <- sqrt(mean(err_mat^2))
+      
+    }
+    msfe[h,] <- bysubj_msfe
+    
+  }
+  
+  rownames(msfe) <- paste0("msfe_step", 1:h)
+  
+  return(msfe)
+  
+}
+##################################################
+##################################################
+##################################################
+
+Tsamp <- 50
+dfn_list <- df_list %>% 
+  lapply(function(x) {
+    x %>%
+      dplyr::select(-t,-sub) %>%
+      mutate_if(is.numeric, scale) %>%
+      return()
+  })
+dfn_list[[1]] %>% apply(2,mean)  
+dfn_list[[1]] %>% apply(2,var)  
+
+
+
+models <- list()
+results <- list()
+Y_forecast <- list()
+for(i in 1:length(df_list)) {
+  models[[i]] <- df_list[[i]][1:Tsamp,] %>% 
+    tibble() %>%
+    dplyr::select(-sub,-t) %>% 
+    as.matrix() %>%
+    BigVAR::constructModel( 
+      p = 1,
+      gran = c(50,10),
+      struct = "Basic",
+      cv = "Rolling",
+      verbose = TRUE,
+      ownlambdas = FALSE,
+      model.controls=list(intercept=FALSE),
+      linear = FALSE)
+  results[[i]] <- BigVAR::cv.BigVAR(models[[i]])
+  print(coef(results[[i]]))
+  
+  Y_forecast[[i]] <- df_list[[i]][-(1:Tsamp),] %>% 
+    tibble() %>%
+    dplyr::select(-sub,-t) %>% 
+    as.matrix() 
+
+}
+
+B_est_list <- lapply(results,coef) %>% 
+  lapply(as.matrix)
+B_est_list2 <- rep(ncol(df) - 2, length(df_list)) %>%
+  lapply(function(x) {return(diag(x))})
+
+
+
+par(mar = c(5.1, 4.1, 4.1, 4.1))
+((eval_forecast(Y_forecast, B_est_list, range = 100, horizon = 10) -
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) %>% 
+  plot(breaks = 10)
+
+
+((eval_forecast(Y_forecast, B_est_list, range = 100, horizon = 10) -
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) %>% 
+  apply(1, mean) %>%
+  plot()
+
+
+## Benefits compared to persistent forecasting.
+((eval_forecast(Y_forecast, B_est_list, range = 100, horizon = 10) -
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) %>% 
+  t() %>% as.data.frame() %>%
+  tibble() %>% 
+  pivot_longer(cols = msfe_step1:msfe_step10,
+               names_to = "StepNo",
+               names_prefix = "msfe_step",
+               values_to = "error") %>%
+  mutate(StepNo = factor(StepNo, levels = 1:10, ordered = TRUE)) %>%
+  ggplot(aes(x = StepNo, y = error)) +
+    geom_boxplot() +
+    geom_hline(yintercept = 0)
+  
+## We observe that for the 1st step prediction, the model performs
+## somewhat poorly (~1% worse than persistence forecasting), but
+## as we increase the time horizon, the estimation improves
+## significantly (on average, 20% relative improvement)
+
+
+##################################################
+##################################################
+##################################################
+##################################################
+##################################################
+##################################################
+
+dfn_list <- df_list %>% 
+  lapply(function(x) {
+    x %>%
+      dplyr::filter(t %in% 1:50) %>%
+      dplyr::select(-t,-sub) %>%
+      mutate_if(is.numeric, scale) %>%
+      return()
+  })
+
+dfn_list[[1]] %>% dim()
+dfn_list[[1]] %>% apply(2,mean)  
+dfn_list[[1]] %>% apply(2,var)  
+
+
+modelM50 <- multivar::constructModel(data = dfn_list, lassotype = "standard")
+fitM50 <- multivar::cv.multivar(modelM50)
+fitM50$mats %>% str()
+B_estM50_list <- (fitM50$mats)$total
+str(fitM50)
+
+((eval_forecast(Y_forecast, B_estM50_list, range = 100, horizon = 10) -
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) %>% 
+  plot(breaks = 10)
+
+
+((eval_forecast(Y_forecast, B_estM50_list, range = 100, horizon = 10) -
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) %>% 
+  apply(1, mean) %>%
+  plot()
+
+
+
+## Benefits compared to persistent forecasting.
+rfeM50 <- ((eval_forecast(Y_forecast, B_estM50_list, range = 100, horizon = 10) -
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) 
+p1 <- rfeM50 %>% 
+  t() %>% as.data.frame() %>%
+  tibble() %>% 
+  pivot_longer(cols = msfe_step1:msfe_step10,
+               names_to = "StepNo",
+               names_prefix = "msfe_step",
+               values_to = "error") %>%
+  mutate(StepNo = factor(StepNo, levels = 1:10, ordered = TRUE)) %>%
+  ggplot(aes(x = StepNo, y = error)) +
+  geom_boxplot() +
+  geom_hline(yintercept = 0) +
+  ggtitle("Multi VAR")
+
+## Benefits compared to persistent forecasting.
+rfeVAR <- (eval_forecast(Y_forecast, B_est_list, range = 100, horizon = 10) -
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)
+p2 <- rfeVAR %>% 
+  t() %>% as.data.frame() %>%
+  tibble() %>% 
+  pivot_longer(cols = msfe_step1:msfe_step10,
+               names_to = "StepNo",
+               names_prefix = "msfe_step",
+               values_to = "error") %>%
+  mutate(StepNo = factor(StepNo, levels = 1:10, ordered = TRUE)) %>%
+  ggplot(aes(x = StepNo, y = error)) +
+  geom_boxplot() +
+  geom_hline(yintercept = 0) +
+  ggtitle("VAR")
+
+
+
+grid.arrange(p1, p2, ncol = 2)
+
+
+
+##################################################
+##################################################
+##################################################
+##################################################
+##################################################
+##################################################
+## MOD-VAR with only individual structure:
+Rcpp::sourceCpp("041_modvar/matrix_fista.cpp")
+source("041_modvar/auxfunct.r")
+source("041_modvar/adaweights.r")
+source("041_modvar/bic.modvar.r")
+source("041_modvar/cv.modvar.r")
+source("041_modvar/ada.modvar.r")
+
+
+#lambdas1  <- 10^(seq(3, 0, length.out = 10)) ## Surprisingly good!
+# ratios    <- 10^(seq(2, -2, length.out = 10))
+
+# lambdas1  <- 10^(seq(2, -1, length.out = 10)) # Improved early prediction,
+# ratios    <- 10^(seq(2, -2, length.out = 10)) # worsen later prediction. 
+
+# lambdas1  <- 10^(seq(2, -1, length.out = 10)) # Best so far!
+# ratios    <- 10^(seq(2, 0, length.out = 10)) 
+
+lambdas1  <- 10^(seq(2, -2, length.out = 10)) # Best so far!
+ratios    <- 10^(seq(2, 0, length.out = 10)) 
+
+# lambdas1  <- 10^(seq(3, -3, length.out = 10)) # Not as good as previous
+# ratios    <- 10^(seq(3, 0, length.out = 10)) 
+
+# lambdas1  <- 10^(seq(3, -3, length.out = 50)) # Bad! WTF
+# ratios    <- 10^(seq(3, -3, length.out = 50)) 
+
+
+
+cv.model <- dfn_list %>% 
+  lapply(function(x) {
+    x <- as.matrix(x)
+    colnames(x) = NULL
+    return(x)
+  }) %>%
+  cv.modvar(
+    X = NULL,
+    lambdas1 = lambdas1,
+    ratios = ratios,
+    multi = TRUE,
+    cv.type = "rolling")
+
+
+save.image("BrainNetworksGeneData/101_Data.RData")
+rm(list = ls())
+##################################################
+##################################################
+load("BrainNetworksGeneData/101_Data.RData")
+
+
+par(mfrow = c(1,2),
+    mar = c(5.1, 4.1, 4.1, 4.1))
+plot(log(cv.model$eval.mat, 10), breaks = 30)
+plot(cv.model$eval.mat, breaks = 30)
+
+
+cv.model$eval.mat
+
+
+par(mfrow = c(2,2))
+
+cv.model$bysubject_coeffs[1:4] %>%
+  lapply(plot)
+(fitM50$mats)$total[1:4] %>%
+  lapply(plot)
+B_est_list [1:4] %>%
+  lapply(plot)
+
+cv.model$moderator_coeffs
+cv.model$bysubject_coeffs[[1]]
+cv.model$joint_coeffs
+cv.model$idiographic_coeffs[[1]]
+
+
+cv.model$bysubject_coeffs[[1]] == cv.model$idiographic_coeffs[[1]]
+
+
+B_estMOD50_list <- cv.model$bysubject_coeffs
+
+str(B_estMOD50_list)
+
+((eval_forecast(Y_forecast, B_estMOD50_list, range = 100, horizon = 10) -
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) %>% 
+  plot(breaks = 10)
+
+
+((eval_forecast(Y_forecast, B_estMOD50_list, range = 100, horizon = 10) -
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
+    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) %>% 
+  apply(1, mean) %>%
+  plot()
+
+
+
+
+## Benefits compared to persistent forecasting.
+rfeMOD50 <- ((eval_forecast(Y_forecast, B_estMOD50_list, range = 100, horizon = 10) -
+              eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
+             eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) 
+p1 <- rfeMOD50 %>% 
+  t() %>% as.data.frame() %>%
+  tibble() %>% 
+  pivot_longer(cols = msfe_step1:msfe_step10,
+               names_to = "StepNo",
+               names_prefix = "msfe_step",
+               values_to = "error") %>%
+  mutate(StepNo = factor(StepNo, levels = 1:10, ordered = TRUE)) %>%
+  ggplot(aes(x = StepNo, y = error)) +
+  geom_boxplot() +
+  geom_hline(yintercept = 0) +
+  ylim(-0.5,1) +
+  ggtitle("MOD-VAR")
+
+## Benefits compared to persistent forecasting.
+rfeM50 <- ((eval_forecast(Y_forecast, B_estM50_list, range = 100, horizon = 10) -
+              eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
+             eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) 
+p2 <- rfeM50 %>% 
+  t() %>% as.data.frame() %>%
+  tibble() %>% 
+  pivot_longer(cols = msfe_step1:msfe_step10,
+               names_to = "StepNo",
+               names_prefix = "msfe_step",
+               values_to = "error") %>%
+  mutate(StepNo = factor(StepNo, levels = 1:10, ordered = TRUE)) %>%
+  ggplot(aes(x = StepNo, y = error)) +
+  geom_boxplot() +
+  geom_hline(yintercept = 0) +
+  ylim(-0.5,1) +
+  ggtitle("Multi VAR")
+
+## Benefits compared to persistent forecasting.
+rfeVAR <- (eval_forecast(Y_forecast, B_est_list, range = 100, horizon = 10) -
+             eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
+  eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)
+p3 <- rfeVAR %>% 
+  t() %>% as.data.frame() %>%
+  tibble() %>% 
+  pivot_longer(cols = msfe_step1:msfe_step10,
+               names_to = "StepNo",
+               names_prefix = "msfe_step",
+               values_to = "error") %>%
+  mutate(StepNo = factor(StepNo, levels = 1:10, ordered = TRUE)) %>%
+  ggplot(aes(x = StepNo, y = error)) +
+  geom_boxplot() +
+  geom_hline(yintercept = 0) +
+  ylim(-0.5,1) +
+  ggtitle("VAR")
+
+
+grid.arrange(p1, p2, p3, ncol = 3)
+
+
+
+##################################################
+##################################################
+dMOD50 <- rfeMOD50 %>% 
+  t() %>% as.data.frame() %>%
+  tibble() %>% 
+  pivot_longer(cols = msfe_step1:msfe_step10,
+               names_to = "StepNo",
+               names_prefix = "msfe_step",
+               values_to = "error") %>%
+  mutate(type = "MOD-VAR")
+
+dM50 <- rfeM50 %>% 
+  t() %>% as.data.frame() %>%
+  tibble() %>% 
+  pivot_longer(cols = msfe_step1:msfe_step10,
+               names_to = "StepNo",
+               names_prefix = "msfe_step",
+               values_to = "error") %>%
+  mutate(type = "Multi-VAR")
+
+dV50 <- rfeVAR %>% 
+  t() %>% as.data.frame() %>%
+  tibble() %>% 
+  pivot_longer(cols = msfe_step1:msfe_step10,
+               names_to = "StepNo",
+               names_prefix = "msfe_step",
+               values_to = "error") %>%
+  mutate(type = "VAR")
+
+perf_data <- rbind(dMOD50, dM50, dV50) %>%
+  mutate(StepNo = factor(StepNo, levels = 1:10, ordered = TRUE))
+
+head(perf_data)
+
+ggplot(perf_data, aes(x = factor(StepNo), y = error, fill = type)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  labs(
+    x = "Step Number",
+    y = "Error",
+    fill = "Type"
+  ) +
+  theme_minimal()
+
+
+
+
