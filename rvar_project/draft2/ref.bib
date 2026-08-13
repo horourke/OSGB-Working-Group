@@ -1,4 +1,4 @@
-basu%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 1) General references of high-dimensional time series:
 @article{basu2015regularized,
@@ -23,18 +23,86 @@ basu%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   publisher={Taylor \& Francis}
 }
 
-% uSEM for a single subject.
-@article{kim2007unified,
-  title={Unified structural equation modeling approach for the analysis of multisubject, multivariate functional MRI data},
-  author={Kim, Jieun and Zhu, Wei and Chang, Linda and Bentler, Peter M and Ernst, Thomas},
-  journal={Human brain mapping},
-  volume={28},
-  number={2},
-  pages={85--93},
-  year={2007},
-  publisher={Wiley Online Library}
+
+@article{basu2015network,
+	title={Network granger causality with inherent grouping structure},
+	author={Basu, Sumanta and Shojaie, Ali and Michailidis, George},
+	journal={The Journal of Machine Learning Research},
+	volume={16},
+	number={1},
+	pages={417--453},
+	year={2015},
+	publisher={JMLR. org}
 }
 
+@book{hamilton2020time,
+	title={Time series analysis},
+	author={Hamilton, James D},
+	year={2020},
+	publisher={Princeton university press}
+}
+
+@book{wei2019multivariate,
+	title={Multivariate time series analysis and applications},
+	author={Wei, William WS},
+	year={2019},
+	publisher={John Wiley \& Sons}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Applications:
+@article{papana2017financial,
+	title={Financial networks based on Granger causality: A case study},
+	author={Papana, Angeliki and Kyrtsou, Catherine and Kugiumtzis, Dimitris and Diks, Cees},
+	journal={Physica A: Statistical Mechanics and its Applications},
+	volume={482},
+	pages={65--73},
+	year={2017},
+	publisher={Elsevier}
+}
+% uSEM for a single subject.
+@article{kim2007unified,
+	title={Unified structural equation modeling approach for the analysis of multisubject, multivariate functional MRI data},
+	author={Kim, Jieun and Zhu, Wei and Chang, Linda and Bentler, Peter M and Ernst, Thomas},
+	journal={Human brain mapping},
+	volume={28},
+	number={2},
+	pages={85--93},
+	year={2007},
+	publisher={Wiley Online Library}
+}
+@article{rogers2007assessing,
+	title={Assessing functional connectivity in the human brain by fMRI},
+	author={Rogers, Baxter P and Morgan, Victoria L and Newton, Allen T and Gore, John C},
+	journal={Magnetic resonance imaging},
+	volume={25},
+	number={10},
+	pages={1347--1357},
+	year={2007},
+	publisher={Elsevier}
+}
+@article{deshpande2009multivariate,
+	title={Multivariate Granger causality analysis of fMRI data},
+	author={Deshpande, Gopikrishna and LaConte, Stephan and James, George Andrew and Peltier, Scott and Hu, Xiaoping},
+	journal={Human brain mapping},
+	volume={30},
+	number={4},
+	pages={1361--1373},
+	year={2009},
+	publisher={Wiley Online Library}
+}
+@article{fisher2018lack,
+	title={Lack of group-to-individual generalizability is a threat to human subjects research},
+	author={Fisher, Aaron J and Medaglia, John D and Jeronimus, Bertus F},
+	journal={Proceedings of the National Academy of Sciences},
+	volume={115},
+	number={27},
+	pages={E6106--E6115},
+	year={2018},
+	publisher={National Academy of Sciences}
+}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 1) Common/Individual structure in high-dimensional time series:
@@ -60,6 +128,15 @@ basu%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   pages={54},
   year={2019},
   publisher={American Psychological Association}
+}
+@article{lee2026group,
+	title={Group Iterative Multiple Model Estimation Approaches in Clinical Science},
+	author={Lee, Chaewon and Gates, Kathleen M},
+	journal={Annual Review of Clinical Psychology},
+	volume={22},
+	year={2026},
+	pages={23--48},
+	publisher={Annual Reviews}
 }
 % Modification Indexes
 @article{sorbom1989model,
@@ -91,6 +168,135 @@ basu%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   journal={arXiv preprint arXiv:2409.03085},
   year={2024}
 }
+@article{fisher2024structured,
+	title={Structured estimation of heterogeneous time series},
+	author={Fisher, Zachary F and Kim, Younghoon and Pipiras, Vladas and Crawford, Christopher and Petrie, Daniel J and Hunter, Michael D and Geier, Charles F},
+	journal={Multivariate Behavioral Research},
+	volume={59},
+	number={6},
+	pages={1270--1289},
+	year={2024},
+	publisher={Taylor \& Francis}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 1) Testing for high-dimensional VAR models.
+@article{zhu2022confidence,
+	title={Confidence intervals for parameters in high-dimensional sparse vector autoregression},
+	author={Zhu, Ke and Liu, Hanzhong},
+	journal={Computational Statistics \& Data Analysis},
+	volume={168},
+	pages={107383},
+	year={2022},
+	publisher={Elsevier}
+}
+@article{uematsu2025discovering,
+	title={Discovering the network Granger causality in large vector autoregressive models},
+	author={Uematsu, Yoshimasa and Yamagata, Takashi},
+	journal={Journal of the American Statistical Association},
+	volume={120},
+	number={552},
+	pages={2385--2396},
+	year={2025},
+	publisher={Taylor \& Francis}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 1) debiasing:
+@article{vandeGeer2014debiasing,
+	author = {Sara van de Geer and Peter B{\"u}hlmann and Ya’acov Ritov and Ruben Dezeure},
+	title = {{On asymptotically optimal confidence regions and tests for high-dimensional models}},
+	volume = {42},
+	journal = {The Annals of Statistics},
+	number = {3},
+	publisher = {Institute of Mathematical Statistics},
+	pages = {1166 -- 1202},
+	keywords = {central limit theorem, generalized linear model, Lasso, linear model, multiple testing, Semiparametric efficiency, Sparsity},
+	year = {2014},
+	doi = {10.1214/14-AOS1221},
+	URL = {https://doi.org/10.1214/14-AOS1221}
+}
+@article{zhang2014confidence,
+	title={Confidence intervals for low dimensional parameters in high dimensional linear models},
+	author={Zhang, Cun-Hui and Zhang, Stephanie S},
+	journal={Journal of the Royal Statistical Society Series B: Statistical Methodology},
+	volume={76},
+	number={1},
+	pages={217--242},
+	year={2014},
+	publisher={Oxford University Press}
+}
+@article{javanmard2014confidence,
+	title={Confidence intervals and hypothesis testing for high-dimensional regression},
+	author={Javanmard, Adel and Montanari, Andrea},
+	journal={The Journal of Machine Learning Research},
+	volume={15},
+	number={1},
+	pages={2869--2909},
+	year={2014},
+	publisher={JMLR. org}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Multilevel VAR
+@article{li2022fitting,
+	title={Fitting multilevel vector autoregressive models in Stan, JAGS, and Mplus},
+	author={Li, Yanling and Wood, Julie and Ji, Linying and Chow, Sy-Miin and Oravecz, Zita},
+	journal={Structural equation modeling: a multidisciplinary journal},
+	volume={29},
+	number={3},
+	pages={452--475},
+	year={2022},
+	publisher={Taylor \& Francis}
+}
+@article{song2014analyzing,
+	title={Analyzing multiple multivariate time series data using multilevel dynamic factor models},
+	author={Song, Hairong and Zhang, Zhiyong},
+	journal={Multivariate Behavioral Research},
+	volume={49},
+	number={1},
+	pages={67--77},
+	year={2014},
+	publisher={Taylor \& Francis}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 1) Adaptive lasso
+@article{zou2006adaptive,
+	title={The adaptive lasso and its oracle properties},
+	author={Zou, Hui},
+	journal={Journal of the American statistical association},
+	volume={101},
+	number={476},
+	pages={1418--1429},
+	year={2006},
+	publisher={Taylor \& Francis}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 1) VAR with exogenous variables
+@article{nicholson2017varx,
+	title={VARX-L: Structured regularization for large vector autoregressions with exogenous variables},
+	author={Nicholson, William B and Matteson, David S and Bien, Jacob},
+	journal={International Journal of Forecasting},
+	volume={33},
+	number={3},
+	pages={627--651},
+	year={2017},
+	publisher={Elsevier}
+}
+  @Manual{nicholson2023bigVAR,
+	title = {BigVAR: Dimension Reduction Methods for Multivariate Time Series},
+	author = {Will Nicholson and David Matteson and Jacob Bien and Ines Wilms},
+	year = {2023},
+	note = {R package version 1.1.2},
+	url = {https://CRAN.R-project.org/package=BigVAR},
+}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 1) Historical references of graphical models:
@@ -1107,7 +1313,6 @@ keywords = "miR-3609, PD-L1, Chemo-resistance, Breast cancer",
   pages={1718--1726},
   year={2013}
 }
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Mutual information.
@@ -1417,12 +1622,20 @@ keywords = "miR-3609, PD-L1, Chemo-resistance, Breast cancer",
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Proofs:
 @article{loh2011high,
-  title={High-dimensional regression with noisy and missing data: Provable guarantees with non-convexity},
-  author={Loh, Po-Ling and Wainwright, Martin J},
-  journal={Advances in neural information processing systems},
-  volume={24},
-  year={2011}
+	author = {Po-Ling Loh and Martin J. Wainwright},
+	title = {{High-dimensional regression with noisy and missing data: Provable guarantees with nonconvexity}},
+	volume = {40},
+	journal = {The Annals of Statistics},
+	number = {3},
+	publisher = {Institute of Mathematical Statistics},
+	pages = {1637 -- 1664},
+	keywords = {$M$-estimation, High-dimensional statistics, missing data, nonconvexity, regularization, sparse linear regression},
+	year = {2012},
+	doi = {10.1214/12-AOS1018},
+	URL = {https://doi.org/10.1214/12-AOS1018}
 }
+
+
 
 @article{kuchibhotla2022moving,
   title={Moving beyond sub-Gaussianity in high-dimensional statistics: Applications in covariance estimation and linear regression},
@@ -1441,4 +1654,48 @@ keywords = "miR-3609, PD-L1, Chemo-resistance, Breast cancer",
   volume={47},
   year={2018},
   publisher={Cambridge university press}
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 3) Algorithm
+@article{beck2009fast,
+	title={A fast iterative shrinkage-thresholding algorithm for linear inverse problems},
+	author={Beck, Amir and Teboulle, Marc},
+	journal={SIAM journal on imaging sciences},
+	volume={2},
+	number={1},
+	pages={183--202},
+	year={2009},
+	publisher={SIAM}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+@article{ni2022bayesian,
+	title={Bayesian covariate-dependent Gaussian graphical models with varying structure},
+	author={Ni, Yang and Stingo, Francesco C and Baladandayuthapani, Veerabhadran},
+	journal={Journal of Machine Learning Research},
+	volume={23},
+	number={242},
+	pages={1--29},
+	year={2022}
+}
+@article{zhang2023high,
+	title={High-dimensional Gaussian graphical regression models with covariates},
+	author={Zhang, Jingfei and Li, Yi},
+	journal={Journal of the American Statistical Association},
+	volume={118},
+	number={543},
+	pages={2088--2100},
+	year={2023},
+	publisher={Taylor \& Francis}
+}
+@article{liu2024convex,
+	title={A convex formulation of covariate-adjusted Gaussian graphical models via natural parametrization},
+	author={Liu, Ruobin and Yu, Guo},
+	journal={arXiv e-prints},
+	pages={arXiv--2410},
+	year={2024}
 }

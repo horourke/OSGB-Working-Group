@@ -1,69 +1,209 @@
 \begin{thebibliography}{}
 
-\bibitem[Basu and Michailidis, 2015]{basu2015regularized}
-Basu, S. and Michailidis, G. (2015).
+\bibitem[\protect\citeauthoryear{Basu and Michailidis}{Basu and
+  Michailidis}{2015}]{basu2015regularized}
+Basu, S. and G.~Michailidis (2015).
 \newblock Regularized estimation in sparse high-dimensional time series models.
-\newblock {\em The Annals of Statistics}, 43(4):1535--1567.
+\newblock {\em The Annals of Statistics\/}~{\em 43\/}(4), 1535--1567.
 
-\bibitem[Crawford et~al., 2024]{crawford2024penalized}
-Crawford, C.~M., Park, J.~J., Chow, S.-M., Ernst, A.~F., Pipiras, V., and
-  Fisher, Z.~F. (2024).
-\newblock Penalized subgrouping of heterogeneous time series.
-\newblock {\em arXiv preprint arXiv:2409.03085}.
+\bibitem[\protect\citeauthoryear{Basu, Shojaie, and Michailidis}{Basu
+  et~al.}{2015}]{basu2015network}
+Basu, S., A.~Shojaie, and G.~Michailidis (2015).
+\newblock Network granger causality with inherent grouping structure.
+\newblock {\em The Journal of Machine Learning Research\/}~{\em 16\/}(1),
+  417--453.
 
-\bibitem[Fisher et~al., 2022]{fisher2022penalized}
-Fisher, Z.~F., Kim, Y., Fredrickson, B.~L., and Pipiras, V. (2022).
+\bibitem[\protect\citeauthoryear{Beck and Teboulle}{Beck and
+  Teboulle}{2009}]{beck2009fast}
+Beck, A. and M.~Teboulle (2009).
+\newblock A fast iterative shrinkage-thresholding algorithm for linear inverse
+  problems.
+\newblock {\em SIAM journal on imaging sciences\/}~{\em 2\/}(1), 183--202.
+
+\bibitem[\protect\citeauthoryear{Deshpande, LaConte, James, Peltier, and
+  Hu}{Deshpande et~al.}{2009}]{deshpande2009multivariate}
+Deshpande, G., S.~LaConte, G.~A. James, S.~Peltier, and X.~Hu (2009).
+\newblock Multivariate granger causality analysis of fmri data.
+\newblock {\em Human brain mapping\/}~{\em 30\/}(4), 1361--1373.
+
+\bibitem[\protect\citeauthoryear{Fisher, Medaglia, and Jeronimus}{Fisher
+  et~al.}{2018}]{fisher2018lack}
+Fisher, A.~J., J.~D. Medaglia, and B.~F. Jeronimus (2018).
+\newblock Lack of group-to-individual generalizability is a threat to human
+  subjects research.
+\newblock {\em Proceedings of the National Academy of Sciences\/}~{\em
+  115\/}(27), E6106--E6115.
+
+\bibitem[\protect\citeauthoryear{Fisher, Kim, Fredrickson, and Pipiras}{Fisher
+  et~al.}{2022}]{fisher2022penalized}
+Fisher, Z.~F., Y.~Kim, B.~L. Fredrickson, and V.~Pipiras (2022).
 \newblock Penalized estimation and forecasting of multiple subject intensive
   longitudinal data.
-\newblock {\em psychometrika}, 87(2):403--431.
+\newblock {\em psychometrika\/}~{\em 87\/}(2), 403--431.
 
-\bibitem[Gates and Molenaar, 2012]{gates2012group}
-Gates, K.~M. and Molenaar, P.~C. (2012).
+\bibitem[\protect\citeauthoryear{Fisher, Kim, Pipiras, Crawford, Petrie,
+  Hunter, and Geier}{Fisher et~al.}{2024}]{fisher2024structured}
+Fisher, Z.~F., Y.~Kim, V.~Pipiras, C.~Crawford, D.~J. Petrie, M.~D. Hunter, and
+  C.~F. Geier (2024).
+\newblock Structured estimation of heterogeneous time series.
+\newblock {\em Multivariate Behavioral Research\/}~{\em 59\/}(6), 1270--1289.
+
+\bibitem[\protect\citeauthoryear{Gates and Molenaar}{Gates and
+  Molenaar}{2012}]{gates2012group}
+Gates, K.~M. and P.~C. Molenaar (2012).
 \newblock Group search algorithm recovers effective connectivity maps for
   individuals in homogeneous and heterogeneous samples.
-\newblock {\em NeuroImage}, 63(1):310--319.
+\newblock {\em NeuroImage\/}~{\em 63\/}(1), 310--319.
 
-\bibitem[Kim et~al., 2007]{kim2007unified}
-Kim, J., Zhu, W., Chang, L., Bentler, P.~M., and Ernst, T. (2007).
+\bibitem[\protect\citeauthoryear{Hamilton}{Hamilton}{2020}]{hamilton2020time}
+Hamilton, J.~D. (2020).
+\newblock {\em Time series analysis}.
+\newblock Princeton university press.
+
+\bibitem[\protect\citeauthoryear{Javanmard and Montanari}{Javanmard and
+  Montanari}{2014}]{javanmard2014confidence}
+Javanmard, A. and A.~Montanari (2014).
+\newblock Confidence intervals and hypothesis testing for high-dimensional
+  regression.
+\newblock {\em The Journal of Machine Learning Research\/}~{\em 15\/}(1),
+  2869--2909.
+
+\bibitem[\protect\citeauthoryear{Kim, Zhu, Chang, Bentler, and Ernst}{Kim
+  et~al.}{2007}]{kim2007unified}
+Kim, J., W.~Zhu, L.~Chang, P.~M. Bentler, and T.~Ernst (2007).
 \newblock Unified structural equation modeling approach for the analysis of
   multisubject, multivariate functional mri data.
-\newblock {\em Human brain mapping}, 28(2):85--93.
+\newblock {\em Human brain mapping\/}~{\em 28\/}(2), 85--93.
 
-\bibitem[Kuchibhotla and Chakrabortty, 2022]{kuchibhotla2022moving}
-Kuchibhotla, A.~K. and Chakrabortty, A. (2022).
-\newblock Moving beyond sub-gaussianity in high-dimensional statistics:
-  Applications in covariance estimation and linear regression.
-\newblock {\em Information and Inference: A Journal of the IMA},
-  11(4):1389--1456.
-
-\bibitem[Lane et~al., 2019]{lane2019uncovering}
-Lane, S.~T., Gates, K.~M., Pike, H.~K., Beltz, A.~M., and Wright, A.~G. (2019).
+\bibitem[\protect\citeauthoryear{Lane, Gates, Pike, Beltz, and Wright}{Lane
+  et~al.}{2019}]{lane2019uncovering}
+Lane, S.~T., K.~M. Gates, H.~K. Pike, A.~M. Beltz, and A.~G. Wright (2019).
 \newblock Uncovering general, shared, and unique temporal patterns in
   ambulatory assessment data.
-\newblock {\em Psychological methods}, 24(1):54.
+\newblock {\em Psychological methods\/}~{\em 24\/}(1), 54.
 
-\bibitem[Loh and Wainwright, 2011]{loh2011high}
-Loh, P.-L. and Wainwright, M.~J. (2011).
-\newblock High-dimensional regression with noisy and missing data: Provable
-  guarantees with non-convexity.
-\newblock {\em Advances in neural information processing systems}, 24.
+\bibitem[\protect\citeauthoryear{Lee and Gates}{Lee and
+  Gates}{2026}]{lee2026group}
+Lee, C. and K.~M. Gates (2026).
+\newblock Group iterative multiple model estimation approaches in clinical
+  science.
+\newblock {\em Annual Review of Clinical Psychology\/}~{\em 22}, 23--48.
 
-\bibitem[S{\"o}rbom, 1989]{sorbom1989model}
-S{\"o}rbom, D. (1989).
-\newblock Model modification.
-\newblock {\em Psychometrika}, 54(3):371--384.
+\bibitem[\protect\citeauthoryear{Li, Wood, Ji, Chow, and Oravecz}{Li
+  et~al.}{2022}]{li2022fitting}
+Li, Y., J.~Wood, L.~Ji, S.-M. Chow, and Z.~Oravecz (2022).
+\newblock Fitting multilevel vector autoregressive models in stan, jags, and
+  mplus.
+\newblock {\em Structural equation modeling: a multidisciplinary
+  journal\/}~{\em 29\/}(3), 452--475.
 
-\bibitem[Stock and Watson, 2002]{stock2002forecasting}
-Stock, J.~H. and Watson, M.~W. (2002).
-\newblock Forecasting using principal components from a large number of
-  predictors.
-\newblock {\em Journal of the American statistical association},
-  97(460):1167--1179.
+\bibitem[\protect\citeauthoryear{Liu and Yu}{Liu and Yu}{2024}]{liu2024convex}
+Liu, R. and G.~Yu (2024).
+\newblock A convex formulation of covariate-adjusted gaussian graphical models
+  via natural parametrization.
+\newblock {\em arXiv e-prints\/}, arXiv--2410.
 
-\bibitem[Vershynin, 2018]{vershynin2018high}
-Vershynin, R. (2018).
-\newblock {\em High-dimensional probability: An introduction with applications
-  in data science}, volume~47.
-\newblock Cambridge university press.
+\bibitem[\protect\citeauthoryear{Loh and Wainwright}{Loh and
+  Wainwright}{2012}]{loh2011high}
+Loh, P.-L. and M.~J. Wainwright (2012).
+\newblock {High-dimensional regression with noisy and missing data: Provable
+  guarantees with nonconvexity}.
+\newblock {\em The Annals of Statistics\/}~{\em 40\/}(3), 1637 -- 1664.
+
+\bibitem[\protect\citeauthoryear{Ni, Stingo, and Baladandayuthapani}{Ni
+  et~al.}{2022}]{ni2022bayesian}
+Ni, Y., F.~C. Stingo, and V.~Baladandayuthapani (2022).
+\newblock Bayesian covariate-dependent gaussian graphical models with varying
+  structure.
+\newblock {\em Journal of Machine Learning Research\/}~{\em 23\/}(242), 1--29.
+
+\bibitem[\protect\citeauthoryear{Nicholson, Matteson, Bien, and
+  Wilms}{Nicholson et~al.}{2023}]{nicholson2023bigVAR}
+Nicholson, W., D.~Matteson, J.~Bien, and I.~Wilms (2023).
+\newblock {\em BigVAR: Dimension Reduction Methods for Multivariate Time
+  Series}.
+\newblock R package version 1.1.2.
+
+\bibitem[\protect\citeauthoryear{Nicholson, Matteson, and Bien}{Nicholson
+  et~al.}{2017}]{nicholson2017varx}
+Nicholson, W.~B., D.~S. Matteson, and J.~Bien (2017).
+\newblock Varx-l: Structured regularization for large vector autoregressions
+  with exogenous variables.
+\newblock {\em International Journal of Forecasting\/}~{\em 33\/}(3), 627--651.
+
+\bibitem[\protect\citeauthoryear{Papana, Kyrtsou, Kugiumtzis, and Diks}{Papana
+  et~al.}{2017}]{papana2017financial}
+Papana, A., C.~Kyrtsou, D.~Kugiumtzis, and C.~Diks (2017).
+\newblock Financial networks based on granger causality: A case study.
+\newblock {\em Physica A: Statistical Mechanics and its Applications\/}~{\em
+  482}, 65--73.
+
+\bibitem[\protect\citeauthoryear{Rogers, Morgan, Newton, and Gore}{Rogers
+  et~al.}{2007}]{rogers2007assessing}
+Rogers, B.~P., V.~L. Morgan, A.~T. Newton, and J.~C. Gore (2007).
+\newblock Assessing functional connectivity in the human brain by fmri.
+\newblock {\em Magnetic resonance imaging\/}~{\em 25\/}(10), 1347--1357.
+
+\bibitem[\protect\citeauthoryear{Song and Zhang}{Song and
+  Zhang}{2014}]{song2014analyzing}
+Song, H. and Z.~Zhang (2014).
+\newblock Analyzing multiple multivariate time series data using multilevel
+  dynamic factor models.
+\newblock {\em Multivariate Behavioral Research\/}~{\em 49\/}(1), 67--77.
+
+\bibitem[\protect\citeauthoryear{Uematsu and Yamagata}{Uematsu and
+  Yamagata}{2025}]{uematsu2025discovering}
+Uematsu, Y. and T.~Yamagata (2025).
+\newblock Discovering the network granger causality in large vector
+  autoregressive models.
+\newblock {\em Journal of the American Statistical Association\/}~{\em
+  120\/}(552), 2385--2396.
+
+\bibitem[\protect\citeauthoryear{van~de Geer, B{\"u}hlmann, Ritov, and
+  Dezeure}{van~de Geer et~al.}{2014}]{vandeGeer2014debiasing}
+van~de Geer, S., P.~B{\"u}hlmann, Y.~Ritov, and R.~Dezeure (2014).
+\newblock {On asymptotically optimal confidence regions and tests for
+  high-dimensional models}.
+\newblock {\em The Annals of Statistics\/}~{\em 42\/}(3), 1166 -- 1202.
+
+\bibitem[\protect\citeauthoryear{Wainwright}{Wainwright}{2019}]{wainwright2019high}
+Wainwright, M.~J. (2019).
+\newblock {\em High-dimensional statistics: A non-asymptotic viewpoint},
+  Volume~48.
+\newblock Cambridge University Press.
+
+\bibitem[\protect\citeauthoryear{Wei}{Wei}{2019}]{wei2019multivariate}
+Wei, W.~W. (2019).
+\newblock {\em Multivariate time series analysis and applications}.
+\newblock John Wiley \& Sons.
+
+\bibitem[\protect\citeauthoryear{Zhang and Zhang}{Zhang and
+  Zhang}{2014}]{zhang2014confidence}
+Zhang, C.-H. and S.~S. Zhang (2014).
+\newblock Confidence intervals for low dimensional parameters in high
+  dimensional linear models.
+\newblock {\em Journal of the Royal Statistical Society Series B: Statistical
+  Methodology\/}~{\em 76\/}(1), 217--242.
+
+\bibitem[\protect\citeauthoryear{Zhang and Li}{Zhang and
+  Li}{2023}]{zhang2023high}
+Zhang, J. and Y.~Li (2023).
+\newblock High-dimensional gaussian graphical regression models with
+  covariates.
+\newblock {\em Journal of the American Statistical Association\/}~{\em
+  118\/}(543), 2088--2100.
+
+\bibitem[\protect\citeauthoryear{Zhu and Liu}{Zhu and
+  Liu}{2022}]{zhu2022confidence}
+Zhu, K. and H.~Liu (2022).
+\newblock Confidence intervals for parameters in high-dimensional sparse vector
+  autoregression.
+\newblock {\em Computational Statistics \& Data Analysis\/}~{\em 168}, 107383.
+
+\bibitem[\protect\citeauthoryear{Zou}{Zou}{2006}]{zou2006adaptive}
+Zou, H. (2006).
+\newblock The adaptive lasso and its oracle properties.
+\newblock {\em Journal of the American statistical association\/}~{\em
+  101\/}(476), 1418--1429.
 
 \end{thebibliography}

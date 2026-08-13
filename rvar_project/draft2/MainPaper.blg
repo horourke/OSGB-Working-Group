@@ -1,48 +1,51 @@
-This is BibTeX, Version 0.99d
+This is BibTeX, Version 0.99e
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: MainPaper.aux
 Reallocating 'name_of_file' (item size: 1) to 8 items.
-The style file: apalike.bst
+The style file: Chicago.bst
 Reallocating 'name_of_file' (item size: 1) to 4 items.
 Database file #1: ref.bib
-You've used 11 entries,
-            1935 wiz_defined-function locations,
-            549 strings with 5954 characters,
-and the built_in function-call counts, 4446 in all, are:
-= -- 434
-> -- 191
-< -- 8
-+ -- 64
-- -- 64
-* -- 403
-:= -- 784
-add.period$ -- 33
-call.type$ -- 11
-change.case$ -- 86
-chr.to.int$ -- 11
-cite$ -- 11
-duplicate$ -- 152
-empty$ -- 303
-format.name$ -- 85
-if$ -- 848
+Warning--no number and no volume in liu2024convex
+Warning--empty organization in nicholson2023bigVAR
+You've used 30 entries,
+            2861 wiz_defined-function locations,
+            812 strings with 10579 characters,
+and the built_in function-call counts, 22967 in all, are:
+= -- 1892
+> -- 1871
+< -- 1
++ -- 576
+- -- 634
+* -- 2249
+:= -- 4173
+add.period$ -- 90
+call.type$ -- 30
+change.case$ -- 233
+chr.to.int$ -- 30
+cite$ -- 32
+duplicate$ -- 533
+empty$ -- 1294
+format.name$ -- 738
+if$ -- 4228
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 12
-newline$ -- 58
-num.names$ -- 33
-pop$ -- 64
+missing$ -- 32
+newline$ -- 153
+num.names$ -- 300
+pop$ -- 158
 preamble$ -- 1
-purify$ -- 87
+purify$ -- 417
 quote$ -- 0
-skip$ -- 119
+skip$ -- 577
 stack$ -- 0
-substring$ -- 325
-swap$ -- 12
+substring$ -- 1290
+swap$ -- 174
 text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 64
-warning$ -- 0
-while$ -- 37
+type$ -- 570
+warning$ -- 2
+while$ -- 294
 width$ -- 0
-write$ -- 144
+write$ -- 393
+(There were 2 warnings)
