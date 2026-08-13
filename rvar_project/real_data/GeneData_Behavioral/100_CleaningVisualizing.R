@@ -28,17 +28,18 @@ colnames(df)
 
 dates_list <- df_list %>% 
   lapply(function(x) {as.Date(x$true_date)})
-
+str(dates_list)
 
 no_rep_dates <- lapply(
   dates_list, 
   function(x) {length(x) - length(unique(x))}) %>%
   unlist()
+no_rep_dates
 
-par(mfrow = c(3,3))
+par(mfrow = c(5,4))
 df_list %>% 
   lapply(function(x) {as.Date(x$true_date)}) %>%
-  {.[no_rep_dates > 0]} %>%
+  #{.[no_rep_dates > 0]} %>%
   lapply(plot)
 
 df_list %>%
@@ -47,7 +48,7 @@ df_list %>%
       t <- length(x)
       
     }
-  )
+  ) %>% unlist()
 
 
 
