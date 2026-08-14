@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=2gb
 #SBATCH --time=2-00:00:00
-#SBATCH --output=400_modvar/experiments2/logs/output%a.out
+#SBATCH --output=500_modvar1sd/experiments2/logs/output%a.out
 #SBATCH --array=1-9
 
 pwd; hostname; date
@@ -25,8 +25,8 @@ echo a
 echo a
 
 echo aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-echo 3 Running 400_modvar/203_SimulationScript.R with input $SLURM_ARRAY_TASK_ID 2
-Rscript 400_modvar/203_SimulationScript.R $SLURM_ARRAY_TASK_ID 2
+echo 3 Running 500_modvar1sd/203_SimulationScript.R with input $SLURM_ARRAY_TASK_ID
+Rscript 500_modvar1sd/203_SimulationScript.R $SLURM_ARRAY_TASK_ID
 echo aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 echo a
 echo a

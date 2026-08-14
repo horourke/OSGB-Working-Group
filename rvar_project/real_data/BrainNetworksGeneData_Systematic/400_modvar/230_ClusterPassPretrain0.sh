@@ -25,8 +25,8 @@ echo a
 echo a
 
 echo aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-echo 3 Running 400_modvar/203_SimulationScript.R with input $SLURM_ARRAY_TASK_ID 2
-Rscript 400_modvar/203_SimulationScript.R $SLURM_ARRAY_TASK_ID 2
+echo 3 Running 400_modvar/203_SimulationScript.R with input $SLURM_ARRAY_TASK_ID
+Rscript 400_modvar/203_SimulationScript.R $SLURM_ARRAY_TASK_ID
 echo aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 echo a
 echo a

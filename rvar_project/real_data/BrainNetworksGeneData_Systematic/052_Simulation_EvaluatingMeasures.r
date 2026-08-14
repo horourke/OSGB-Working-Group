@@ -1,7 +1,7 @@
 ##################################################
 ##################################################
 ##################################################
-eval_forecast <- function(B_est_list, Y_forecast, range, horizon) {
+eval_forecast <- function(Y_forecast, B_est_list, range, horizon) {
   
   n <- length(Y_forecast)
   

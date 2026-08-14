@@ -52,7 +52,8 @@ CreateParameters <- function(id_task) {
   }
 
   ## TABLE OF ALL PARAMETER COMBINATIONS.
-  T_vec <- c(20,40,60,80,100,125,150,175,200)
+  #T_vec <- c(20,40,60,80,100,125,150,175,200)
+  T_vec <- 10*(1:10)
   args <- list(
     running_days  = 2,
     range         = 150,

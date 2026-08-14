@@ -28,7 +28,10 @@ FullSimulation <- function(args) {
   #####################################################
   ## Setup output-saving objects
   #####################################################
-  
+
+  ## Loading data:
+  load("110_DataForSims.RData")
+
   ## What methods do you want to run?
   method_names  <- c(
     "modvar_MO", 
@@ -36,28 +39,28 @@ FullSimulation <- function(args) {
     "modvar_MI",
     "ada.modvar_MO", 
     "ada.var_FI", 
-    "ada.modvar_MI",)
+    "ada.modvar_MI")
 
   n_methods     <- length(method_names)
-  args$nsim     <- 1 
+  n_sub         <- length(df_list)
 
   ## Output of simulation:
   ## Dataframe with 
   output <- data.frame(
-    ID      = 1:(args$nsim * n_methods),
-    method  = character(args$nsim * n_methods),
-    sim     = numeric(args$nsim * n_methods),
-    time    = numeric(args$nsim * n_methods),
-    rel_msfe1  = numeric(args$nsim * n_methods),
-    rel_msfe2  = numeric(args$nsim * n_methods),
-    rel_msfe3  = numeric(args$nsim * n_methods),
-    rel_msfe4  = numeric(args$nsim * n_methods),
-    rel_msfe5  = numeric(args$nsim * n_methods),
-    rel_msfe6  = numeric(args$nsim * n_methods),
-    rel_msfe7  = numeric(args$nsim * n_methods),
-    rel_msfe8  = numeric(args$nsim * n_methods),
-    rel_msfe9  = numeric(args$nsim * n_methods),
-    rel_msfe10 = numeric(args$nsim * n_methods))
+    method  = character(n_sub * n_methods),
+    subject = numeric(n_sub * n_methods),
+    T       = rep(args$T, n_sub * n_methods),
+    time    = numeric(n_sub * n_methods),
+    rel_msfe1  = numeric(n_sub * n_methods),
+    rel_msfe2  = numeric(n_sub * n_methods),
+    rel_msfe3  = numeric(n_sub * n_methods),
+    rel_msfe4  = numeric(n_sub * n_methods),
+    rel_msfe5  = numeric(n_sub * n_methods),
+    rel_msfe6  = numeric(n_sub * n_methods),
+    rel_msfe7  = numeric(n_sub * n_methods),
+    rel_msfe8  = numeric(n_sub * n_methods),
+    rel_msfe9  = numeric(n_sub * n_methods),
+    rel_msfe10 = numeric(n_sub * n_methods))
   attach(output)
 
   #################################################
@@ -71,14 +74,12 @@ FullSimulation <- function(args) {
     ############################
     ## Generate data:
     {
-      print(paste("Generating Model and Data (",
-                  round(100 * (sim_ind - 1) / args$nsim, 2),
-                  "%", ")"))
+      print(paste("Generating Model and Data"))
       
 
 
       ## Clean data:
-      load("103_Data.RData")
+      load("110_DataForSims.RData")
 
       dfn_list <- df_list %>% 
         lapply(
@@ -92,16 +93,24 @@ FullSimulation <- function(args) {
 
       ## Separate into forecasting and estimation sets:
       Y_list <- dfn_list %>% 
-        tibble() %>%
-        dplyr::select(-sub,-t) %>% 
-        as.matrix() %>%
-        {(.)[1:args$T]}
+        lapply(function(x) {
+          x %>% 
+          tibble() %>%
+          as.matrix() %>%
+          {(.)[1:args$T,]} %>%
+          return()
+        })
       
       Y_forecast <- dfn_list %>% 
-        tibble() %>%
-        dplyr::select(-sub,-t) %>% 
-        as.matrix() %>%
-        {(.)[-(1:args$T)]}
+        lapply(function(x) {
+          x %>% 
+          tibble() %>%
+          as.matrix() %>%
+          {(.)[-(1:args$T), ]} %>%
+          return()
+        })
+
+        args$n <- length(Y_list)
   
     }
     ####################################################################################
@@ -129,10 +138,17 @@ FullSimulation <- function(args) {
       MO_time <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
           as.numeric()
-      output[count, 2]      <- "modvar_MO"
-      output[count, 3]      <- sim_ind
-      output[count, 4]      <- MO_time
-      output[count, -(1:4)] <- eval_msr(MO.model$bysubject_coeffs, Y_forecast, args$range, args$horizon)
+      output[(count - 1) * n_sub + (1:n_sub), 1]      <- "modvar_MO"
+      output[(count - 1) * n_sub + (1:n_sub), 2]      <- (1:n_sub)
+      output[(count - 1) * n_sub + (1:n_sub), 4]      <- MO_time
+      output[(count - 1) * n_sub + (1:n_sub), -(1:4)] <- t(eval_forecast(Y_forecast, MO.model$bysubject_coeffs, args$range, args$horizon))
+      
+      print(dim(
+        output[(count - 1) * n_sub + (1:n_sub), -(1:4)]
+      ))
+      print(dim(
+        t(eval_forecast(Y_forecast, MO.model$bysubject_coeffs, args$range, args$horizon))
+      ))
       
       memory_in_bytes <- mem_used()
       print(paste0("Memory used MO:", memory_in_bytes / (1024^3), "GB"))
@@ -164,11 +180,18 @@ FullSimulation <- function(args) {
       FI_time <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
           as.numeric()
-      output[count, 2]  <- "modvar_FI"
-      output[count, 3]  <- sim_ind
-      output[count, 4]  <- FI_time
-      output[count, -(1:4)] <- eval_msr(FI.model$bysubject_coeffs, Y_forecast, args$range, args$horizon)
+      output[(count - 1) * n_sub + (1:n_sub), 1]  <- "modvar_FI"
+      output[(count - 1) * n_sub + (1:n_sub), 2]  <- (1:n_sub)
+      output[(count - 1) * n_sub + (1:n_sub), 4]  <- FI_time
+      output[(count - 1) * n_sub + (1:n_sub), -(1:4)] <- t(eval_forecast(Y_forecast, FI.model$bysubject_coeffs, args$range, args$horizon))
       
+      print(dim(
+        output[(count - 1) * n_sub + (1:n_sub), -(1:4)]
+      ))
+      print(dim(
+        t(eval_forecast(Y_forecast, MO.model$bysubject_coeffs, args$range, args$horizon))
+      ))
+
       memory_in_bytes <- mem_used()
       print(paste0("Memory used FI:", memory_in_bytes / (1024^3), "GB"))
 
@@ -199,10 +222,17 @@ FullSimulation <- function(args) {
       MI_time <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
           as.numeric()
-      output[count, 2]  <- "modvar_MI"
-      output[count, 3]  <- sim_ind
-      output[count, 4]  <- MI_time
-      output[count, -(1:4)] <- eval_msr(MI.model$bysubject_coeffs, Y_forecast, args$range, args$horizon)
+      output[(count - 1) * n_sub + (1:n_sub), 1]  <- "modvar_MI"
+      output[(count - 1) * n_sub + (1:n_sub), 2]  <- (1:n_sub)
+      output[(count - 1) * n_sub + (1:n_sub), 4]  <- MI_time
+      output[(count - 1) * n_sub + (1:n_sub), -(1:4)] <- t(eval_forecast(Y_forecast, MI.model$bysubject_coeffs, args$range, args$horizon))
+      
+      print(dim(
+        output[(count - 1) * n_sub + (1:n_sub), -(1:4)]
+      ))
+      print(dim(
+        t(eval_forecast(Y_forecast, MO.model$bysubject_coeffs, args$range, args$horizon))
+      ))
       
       memory_in_bytes <- mem_used()
       print(paste0("Memory used MI:", memory_in_bytes / (1024^3), "GB"))
@@ -234,19 +264,19 @@ FullSimulation <- function(args) {
         lambdas1 = lambdas1, 
         ratios = ratios, 
         weights = W.ada,
-        multi = TRUE,
+        multi = FALSE,
         cv.type = "bysubject", 
         nfolds = 6,
         sparse1sd = FALSE)
       end_time  <- Sys.time()
 
       ## Saving things! bla bla bla
-      output[count, 2]      <- "ada.modvar_MO"
-      output[count, 3]      <- sim_ind
-      output[count, 4]      <- difftime(
+      output[(count - 1) * n_sub + (1:n_sub), 1]      <- "ada.modvar_MO"
+      output[(count - 1) * n_sub + (1:n_sub), 2]      <- (1:n_sub)
+      output[(count - 1) * n_sub + (1:n_sub), 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
           as.numeric() %>% {. + MO_time}
-      output[count, -(1:4)] <- eval_msr(adaMO.model$bysubject_coeffs, Y_forecast, args$range, args$horizon)
+      output[(count - 1) * n_sub + (1:n_sub), -(1:4)] <- t(eval_forecast(Y_forecast, adaMO.model$bysubject_coeffs, args$range, args$horizon))
       
       memory_in_bytes <- mem_used()
       print(paste0("Memory used adaMO:", memory_in_bytes / (1024^3), "GB"))
@@ -285,12 +315,12 @@ FullSimulation <- function(args) {
       end_time  <- Sys.time()
 
       ## Saving things! bla bla bla
-      output[count, 2]      <- "ada.modvar_FI"
-      output[count, 3]      <- sim_ind
-      output[count, 4]      <- difftime(
+      output[(count - 1) * n_sub + (1:n_sub), 1]      <- "ada.modvar_FI"
+      output[(count - 1) * n_sub + (1:n_sub), 2]      <- (1:n_sub)
+      output[(count - 1) * n_sub + (1:n_sub), 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
           as.numeric() %>% {. + FI_time}
-      output[count, -(1:4)] <- eval_msr(adaFI.model$bysubject_coeffs, Y_forecast, args$range, args$horizon)
+      output[(count - 1) * n_sub + (1:n_sub), -(1:4)] <- t(eval_forecast(Y_forecast, adaFI.model$bysubject_coeffs, args$range, args$horizon))
       
       memory_in_bytes <- mem_used()
       print(paste0("Memory used adaFI:", memory_in_bytes / (1024^3), "GB"))
@@ -328,12 +358,12 @@ FullSimulation <- function(args) {
       end_time  <- Sys.time()
 
       ## Saving things! bla bla bla
-      output[count, 2]      <- "ada.modvar_MI"
-      output[count, 3]      <- sim_ind
-      output[count, 4]      <- difftime(
+      output[(count - 1) * n_sub + (1:n_sub), 1]      <- "ada.modvar_MI"
+      output[(count - 1) * n_sub + (1:n_sub), 2]      <- (1:n_sub)
+      output[(count - 1) * n_sub + (1:n_sub), 4]      <- difftime(
           time1 = end_time, time2 = start_time, units = "s") %>%
           as.numeric() %>% {. + MI_time}
-      output[count, -(1:4)] <- eval_msr(adaMI.model$bysubject_coeffs, Y_forecast, args$range, args$horizon)
+      output[(count - 1) * n_sub + (1:n_sub), -(1:4)] <- t(eval_forecast(Y_forecast, adaMI.model$bysubject_coeffs, args$range, args$horizon))
       
       memory_in_bytes <- mem_used()
       print(paste0("Memory used adaMI:", memory_in_bytes / (1024^3), "GB"))
@@ -363,7 +393,7 @@ FullSimulation <- function(args) {
                     round(expected.rt.days, digits = 4),
                     "days."))
         print("---> Stopping process...")
-        sim_ind = args$nsim + 1
+        sim_ind = n_sub + 1
       }
       sim_ind <- sim_ind + 1
     }
@@ -371,7 +401,6 @@ FullSimulation <- function(args) {
 
   #################################################
   ## Return output:
-
   print(output)
 
   return(output)
