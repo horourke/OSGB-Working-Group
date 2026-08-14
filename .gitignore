@@ -237,3 +237,17 @@ rvar_project/experiments_cluster2/sims_multi2/400_modvar/pretrainings1/
 rvar_project/experiments_cluster2/sims_multi2/400_modvar/outputs1/
 rvar_project/experiments_cluster2/sims_multi2/400_modvar/outputs2/
 rvar_project/experiments_cluster2/sims_multi2/500_AggregatedDataExperiments/data_all 
+
+
+
+
+
+rvar_project/real_data/BrainNetworksGeneData_Systematic/req_lib/
+rvar_project/real_data/BrainNetworksGeneData_Systematic/100_var/experiments1/data/
+rvar_project/real_data/BrainNetworksGeneData_Systematic/100_var/experiments1/logs/
+rvar_project/real_data/BrainNetworksGeneData_Systematic/300_mvar/experiments1/data/
+rvar_project/real_data/BrainNetworksGeneData_Systematic/300_mvar/experiments1/logs/
+rvar_project/real_data/BrainNetworksGeneData_Systematic/400_modvar/experiments2/data/
+rvar_project/real_data/BrainNetworksGeneData_Systematic/400_modvar/experiments2/logs/
+rvar_project/real_data/BrainNetworksGeneData_Systematic/500_modvar1sd/experiments2/data/
+rvar_project/real_data/BrainNetworksGeneData_Systematic/500_modvar1sd/experiments2/logs/
