@@ -1,0 +1,859 @@
+
+
+\section{Introduction}
+
+\begin{comment}
+\begin{itemize}
+	\item \jose{Pivot the narrative to think about contextual transfer learning: we are transfering knowledge across the graphs, but we are doing so by also incorporating context into our estimation. This allows for a more nuanced estimation, where we can explain some of the heterogeneity and deviation from the base model by relevant factors.}
+\end{itemize}
+\end{comment}
+
+
+%% Intro to time series analysis and recent works. 
+The modeling and forecasting of intensive multivariate time series data has been a long-standing area of research in statistics, optimization and machine learning \citep{hamilton2020time}, with applications in economics, finance, neuroscience and psychology \citep{papana2017financial,kim2007unified,rogers2007assessing,deshpande2009multivariate,lane2019uncovering}, among other areas. In particular, researchers are often interested in constructing a \textit{Granger-causal network} (GCN) to describe the dependence that variables in the time series have over time. In a GCN, nodes correspond to variables in the time series, and a directed link between two nodes represents an effect of the origin variable in the present to future values of the target variable. When the time dependence is linear, the GCN can be fully recovered by estimating coefficients of a sparse vector auto-regressive model (VAR). This has led to the development of a wide variety of methods aimed at accurately estimating GCNs in time series data \citep{basu2015regularized,basu2015network,nicholson2017varx}. For a review, see \citet{wei2019multivariate}.
+
+%% Introduction of the problem: multi subject time series with 
+One major statistical challenge is that of estimating GCNs over multiple subjects. For example, in fMRI studies, researchers are often interested in determining the patterns of connectivity among different regions of the brain \citep{kim2007unified,rogers2007assessing,deshpande2009multivariate}. By processing functional magnetic resonance imaging (fMRI) data, researchers can measure the activity of brain regions over time. In this context, a GCN may describe the connectivity of electrical signals across different brain regions. In multi-subject studies, we expect the connectivity patterns to have shared components, while also showing some heterogeneity across different subjects. In this setting, fitting a single VAR model may lead to bias and inaccurate forecasting. On the other hand, training separate VAR models for each subject may miss the chance to exploit the common structure to obtain improved forecasting accuracy \citep{fisher2018lack}.  
+
+%% Summary of things that have been done in the consistent estimation of time series. 
+Several works have explored the problem of fitting and testing models for multi-subject high dimensional GCNs. The Multi-VAR method \citep{fisher2022penalized,fisher2024structured} applies penalized estimation to recover both joint and individual components of the GCNs across multiple subjects. The group iterative multiple model estimation procedure (GIMME) decomposes shared and individual components of both a GCN and structural equation model across subjects \citep{gates2012group,lane2019uncovering,lee2026group}. Recent works have explored the task of testing the significance of sparse GCN estimators. For example, \citet{zhu2022confidence,uematsu2025discovering} develop multiple testing procedure based on the debiased lasso \citep{vandeGeer2014debiasing,zhang2014confidence,javanmard2014confidence} to determine if there are significant differences in the GCN across multiple subjects. 
+
+%% Research gap: cannot explain the source of this heterogeneity.
+Despite the progress of prior works, a key question remains unanswered: \textit{can we explain the heterogeneity observed across subjects?} For example, in the aforementioned example of fMRI data, researchers may be interested not only in detecting heterogeneity in the GCNs across individuals, but to determine whether external moderator like age, gender, and existing health conditions or treatments may explain it. While existing methods measure GCN heterogeneity, they are ill-equipped to determine if the variation in the GCNs can be explained by such external moderator data. 
+
+
+% Multi-level: limitations
+While models that link the GCN of time series with moderator variables have been explored via multi-level modeling \citep{song2014analyzing,li2022fitting}, such methods have limited applicability since they are unable to handle a large number of variables $d$ or moderator variables $p$ unless the number of subjects or time-measurements per subjects are prohibitively large. Alternatively, the VARX model incorporates the effect of external moderators to the VAR forecasting model \citep{nicholson2017varx,nicholson2023bigVAR}. Despite its advantages, the external moderators are only considered as potentially affecting the mean behavior of the time series. From this, the VARX does not consider the potential effect that moderators have on the GCN. Thus, there is a pressing need for methods that can estimate the influence that moderator variables have on the GNC across multiple subjects, and can provide reliable estimates, even in cases where the number of parameters may be significantly larger than the number of observations. 
+
+
+
+%% What do we do here? We introduce MOD-VAR, which estimates structure that is common, moderator dependent, and fully individual structure. We provide convergence guarantees and extensive simulations that confirm superior performance. 
+In the present work, we propose the moderator vector autoregressive model (MOD-VAR) for the simultaneous estimation of GCN over multi-subject longitudinal data. Our method measures the effect that external moderators may have on the GCNs across datasets. We achieve this by decomposing each GCN into (\textit{i}) connections shared across all datasets, (\textit{ii}) connections in the network dependent on external moderators, and (\textit{iii}) connections that are fully individual, and cannot be explained by the given moderator variables. Our method is highly general, encompassing the VAR and Multi-VAR framework \citep{fisher2022penalized,fisher2024structured}. While similar moderator models have been explored in the context of Gaussian graphical models \citep{ni2022bayesian,zhang2023high,liu2024convex}, to our best knowledge this is the first method to exploit the presence of shared, moderated and individual auto-regressive structure for enhancing the forecasting and interpretability of multi-subject high-dimensional GCNs.
+
+%% Our contributions are two fold: we introduce method.
+Our theoretical findings confirm that our proposed MOD-VAR can achieve consistent estimation of all parameters, as long as  our total sample size $N$ satisfies $N \gg \log(pd^2)$. Furthermore, we conduct extensive simulation experiments that further confirm the improved performance of our proposed MOD-VAR when compared to other methods designed for the estimation of common and individual components of GCNs for multiple subject time series data. We obtain improved performance in scenarios in which the heterogeneity is fully explained by the moderators, partially explined by the moderators, and even when heterogeneity is unrelated to the moderators. To showcase the usefulness of our method in real data applications, we analyze a dataset of breain activation across multiple regions via fMRI measurements, and quantify the effect that external moderators like age, gender and size of the locus coeruleus (LC) region has on brain connectivity across subjects.
+
+
+% Our paper's order. 
+The rest of the paper is organized as follows. In section \ref{section:mod-var} we introduce our model of moderator time series model, and introduce our MOD-VAR estimator. In section \ref{section:method} we provide details on the implementation of our proposed method. In Section \ref{section:simulations} we provide numerical comparisons of our proposed MOD-VAR with methods found in the literature. In Section \ref{section:realData} we exemplify the use of our MOD-VAR method in the analysis of daily mood and behavior psychological data. Closing remarks and discussions are found in Section \ref{section:discussion}.
+
+
+\subsection*{Notational Conventions} 
+
+We establish the following notational conventions. For any $n$, let $[n] = \{1,2,\ldots ,n\}$. For any $k\leq \ell$, we denote $[k : \ell] = \{k,k+1,\ldots, \ell-1, \ell\}$. For any $\Ar \in\bbR^{p\times q}$, we denote the transpose of $\Ar$ as $\Ar'$. For $\bx= (x_1,x_2,\ldots ,x_d)'\in\bbR^{d}$, we denote by $\|\bx\|_1, \|\bx\|_2, \|\bx\|_{\infty}$ the $\ell_1$-norm, euclidean norm and entrywise maximum norm respectively, given by $\|\bx\|_1 = \sum_{i=1}^d |x_i|$, $\|\bx\|_2 = \sqrt{\bx'\bx}$, and $\|\bx\|_\infty = \max_{i\in[d]} |x_i|$. For any $\Sigma= (\sigma_{ij})_{i,j=1}^d\in\bbR^{d\times d}$, we denote the trace as $\btr(\Sigma) = \sum_{i\in[d]} \sigma_{ii}$. For $\Ar \in\bbR^{p\times q}$, we denote by $\vertiii{\Ar}_2$, and $\vertiii{\Ar}_F$  the $\ell_2$ operator,  and Frobenius norms, respectively, given by $\vertiii{\Ar}_2 := \sup_{\bx\in\bbR^{q}\setminus\{\bzero\}} \|\Ar \bx\|_2 / \|\bx\|_2$, and $\vertiii{\Ar}_F = \sqrt{\btr(\Ar'\Ar)}$. Additionally, we denote by $\|\Ar\|_{1}$ the vectorized $\ell_1$-norm of the matrix $\Ar$, given by $\|\Ar\|_1 = \sum_{i,j}|A_{ij}|$. For any $k$, we denote $\indv{k}\in\bbR^{k}$ the vector with all one entries. For any set $A$, we denote by $\ind{A}$ the indicator function of $A$. For any $x\in\bbR$, we denote $\bsign(x) = \ind{x> 0} - \ind{x<0}$. For any symmetric matrix $\Sigma\in\bbR^{d\times d}$, we denote the minimum and maximum eigenvalues of $\Sigma$ as $\Lambda_{\min}(\Sigma),\Lambda_{\max}(\Sigma)\in\bbR$, respectively.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Moderator Vector Autoregressive Model}\label{section:mod-var}
+
+
+
+
+\subsection{Vector Autoregressive Models}
+
+Consider a study with $n$ subjects. For each subject $k\in[n]$, we have access to the measurements of $d$ different variables of interest over $T_k$ equally spaced time points, which we denote by $\Yb_{k} = \{ \bY_{t}^{(k)} \}_{t = 1}^{T_k}\subset \bbR^{d}$. We model the lagged temporal relationships that exist between the different variables, by a VAR(1) model, expressed as
+\begin{equation*}
+	\bY_{t}^{(k)} =  \Phi^{(k)*} \bY_{t-1}^{(k)} + \bvarepsilon_{t}^{(k)}, \hspace{5mm} \text{for all } 2\leq t\leq T_k,
+\end{equation*}
+where $\Phi^{(k)*}$ is a $d\times d$ matrix that represents the true lag-1 multivariate relationships for the subject $k$. In particular, for $1\leq i,j\leq d$, the entry $\Phi^{(k)*}_{ij}$ represents the effect that the variable $j$ at time $(t-1)$ affects the variable $i$ at time $t$. Notice that we define a distinct coefficient matrix $\Phi^{(k)*}$ for each subject $k\in[n]$. Given the matrix $\Phi^{(k)*}$, we define the GCN associated with subject $k$, as the network with set of nodes $N = \{1,2,...,d\}$, and a link $i\to j$ is present in the GCN if and only if $\Phi^{(k)*}_{ji}\neq 0$. Thus, the structure of the GCN depends on the sparsity pattern of the matrix $\Phi^{(k)*}$. 
+
+For each subject $k=1,2,\ldots, n$, in addition to the time series data $\Yb_k$, we have a set of $p$ potential moderator variables $\bX_k = (X_{k1}, X_{k2}, \ldots, X_{kp})'\in\bbR^{p}$. Notice that the moderators in $\bX_k$ are not time-varying, and thus can be thought as stable features of each subject. For example, in a neuroimaging study analyzing brain connectivity, these moderators may include clinical or demographic variables such as gender or age. We may also consider controlled experimental variables of interest such as treatment status of individual, or magnitude of the dose provided to a patient. Our goal in this work is to determine if such moderator variables explain the heterogeneity in the GCNs across subjects, and exploit this potential effects to improve the estimation of the GCNs. 
+
+
+%When encountering a study with multiple subjects, there are several potential approaches to consider. A simple approach consists of simply assuming that all subjects have the same lagged temporal relationships, \textit{i.e.,} $\Phi^{*} := \Phi^{(1)*} = \Phi^{(2)*} =\ldots = \Phi^{(n)*} $.  Under this assumption, the estimation of $\Phi$ can be performed by pooling the data from all subjects and performing standard VAR estimation \jose{(cite)}. This approach exclusively focuses on the estimation of shared components on a GCN, and ignores the potential presence of individual-level heterogeneity. Alternatively, one may perform the estimation of each $\{\Phi^{(1)*}, \Phi^{(2)*}, \ldots , \Phi^{(n)*}\}$ separately, by fitting a different VAR model to each model. While this approach allows for the study of individual-level GCN structure, it does not exploit the potential common structure that is likely to be shared across most subjects. 
+
+%More recently, Multi-VAR \citet{fisher2022penalized} explores the estimation of multiple VAR models, allowing for the presence of both common and idividual components. To this end, they assume that the subject-level coefficients of the VAR(1) model satisfy the decomposition,
+%\begin{equation*}
+%	\Phi^{(k)*} = \Phi^{(0)*} + \bDelta^{(k)*},\hspace{5mm} \text{for all }k=1,\ldots, n.
+%\end{equation*}
+%where $\Phi^{(0)*}$ is a $d\times d$ matrix representing the coefficients common across all subjects, and $\bDelta^{(k)*}$ represents relationships exclusive to subject $k$.  While the multi-VAR model accounts for inter-subject structural variability, it only focuses on quantifying differences in the GCN, without studying the potential explanatory sources of said heterogeneity. Thus, there is an important question that remains unanswered: \textit{Can part of the inter-subject heterogeneity be explained by external moderator variables?} This question is at the core of our proposed methodology. 
+
+
+\subsection{Moderator Vector Autoregressive Models}
+
+
+We first introduce the scenario in which all cross-subject heterogeneity can be explained by the moderators in $\bX_k$. In this case, we can represent the moderator-dependent relationships as $\Phi^{(k)*} = \Phi^{*}(\bX_k)$, where, for any vector of $p$ moderators $\bx = (x_1, x_2, \ldots , x_p)'$,
+\begin{equation}\label{eq:mod_noIdiographic}
+    \Phi^{*}(\bx) := \Phi^{(0)*} + x_1 \Phi^{(M1)*} + x_2 \Phi^{(M1)*} + \ldots + x_p \Phi^{(Mp)*} ,
+\end{equation}
+where $\Phi^{(0)*},\Phi^{(M1)*}, \Phi^{(M2)*}, \ldots, \Phi^{(Mp)*}\in\bbR^{d\times d}$. The matrix $\Phi^{(0)*}\in\bbR^{d\times d}$ represents the shared connectivity in the GCN across subjects. For each moderator variable $1\leq \ell\leq p$, the matrix $\Phi^{(M\ell)*}$ represents the effect that the $\ell$-th moderator has on the time series dynamic. More specifically, for $i,j\in[d]$ and $\ell\in[p]$ the entry $\Phi^{(M\ell)*}_{ij}$ represents the effect that the moderator variable $\ell$ has on the lagged relationship of $j$ on the variable $i$. If for a subject $i$ we have $x_{i\ell}= 0$, then $x_{i\ell} \Phi^{(M\ell)*} = \bzero$ and thus, the moderator $\ell$ does not have any effect on the time dynamics for subject $i$. In addition, the large values of $x_{i\ell}$ are associated with stronger effects of the moderator $\ell$ on the dynamic of subject $i$. Under the model \eqref{eq:mod_noIdiographic}, we define the moderator vector auto-regressive (MOD-VAR) model via the equation
+\begin{equation}\label{eq:vareq_idiographic}
+    \bY_{t}^{(k)} =  \Phi^*(\bX_k) \bY_{t-1}^{(k)} + \bvarepsilon_{t}^{(k)}, \hspace{5mm} \text{for all } 1\leq k\leq n \text{ and }2\leq t\leq T_k.
+\end{equation}
+We illustrate our MOD-VAR model from \eqref{eq:vareq_idiographic} with the following example.
+
+\begin{comment}
+\begin{figure}
+	\centering
+	\includegraphics[width = 0.8\linewidth]{figures/figs_modvar/KeyInsights1}
+	\caption{Illustration of the decomposition \eqref{eq:mod_noIdiographic} for $p = 2$. The GCN network of subject $k$ is the aggregation of the shared GCN connections across all subjects in the study, as well as connections whose magnitudes are contingent on the value of the moderators $X_1$ and $X_2$. }\label{fig:modvar_example}
+\end{figure}
+\end{comment}
+
+
+\begin{ex}[Binary moderators]\label{ex:modvar_p2}
+    We consider a VAR(1) model with $n$ subjects. For each subject, we measure a single moderator variable (\textit{i.e.,} $p = 1$) $X_1,X_2,\ldots,X_n \in\bbR$ with $\{X_k\}_k\stackrel{i.i.d.}{\sim} Bernoulli(p)$. In this case, our propose model can be written as,
+	\begin{align*}
+		\bY^{(k)}_t &=  [\Phi^{(0)*} + X_{k1} \Phi^{(M1)*} ] \cdot \bY_{t-1}^{(k)} + \be^{(k)}_{t}
+	\end{align*}
+	Notice that the GCN of a subject $k\in[n]$ incorporates the matrix $\Phi^{(0)*}\in\bbR^{d\times d}$ shared across all subjects. Furthermore, there is an individual structure that depends on the value of $X_k$. All subjects with $X_k=1$ will have GCN $\Phi^{(k)*} = \Phi^{(0)*} + \Phi^{(M1)*}$, while subjects with $X_k = 0$ have GCN  $\Phi^{(k)*} = \Phi^{(0)*}$.  Thus, the matrix $\Phi^{(M1)*}$ represents the structural differences in the GCN across the the grouping given by the moderators $X_1,X_2,\ldots,X_n$.
+
+	Now, consider modeling two binary moderator variables $\bX_k = (\bX_{k1}, \bX_{k2})^\mt\in\{0,1\}^2$, we have now a total of four potential GCNs: (i) $\Phi^{(k)*} = \Phi^{(0)*}$ if $\bX_k = (0,0)^\mt$, (ii) $\Phi {(k)*} = \Phi^{(0)*}+ \Phi^{ {(M1)*}}$ if $\bX_k=(1,0)^\mt$, (iii) $\Phi {(k)*} = \Phi^{(0)*}+ \Phi^{ {(M2)*}}$ if $\bX_k=(0,1)^\mt$, and (iv) $\Phi {(k)*} = \Phi^{(0)*}+ \Phi^{ {(M1)*}} + \Phi^{ {(M2)*}}$ if $\bX_k=(1,1)^\mt$. We illustrate the GCNs of two subjects with different moderator values in Figure \ref{fig:rvarCoeffsExample}.
+\end{ex}
+ 
+\begin{figure}
+		\centering
+		\includegraphics[width = 0.8\linewidth]{figures/figs_modvar/KeyInsight3}
+		\caption{Illustration of the MOD-VAR framework with $p=2$ binary moderator variables, as discussed in Example \ref{ex:modvar_p2}. Top-panels: visualization of the decomposition of the GCN of subject 1. Since $\bX_1 = (1,0)^\mt$, only the first moderator has an effect on the GCN for this subject. Bottom panels: visualization of the GCN for subject 2. Since $\bX_2 = (0,1)^\mt$, only the second moderator affects the GCN structure.}\label{fig:rvarCoeffsExample}
+	\end{figure}
+
+
+\subsection{MOD-VAR with Fully Individual Connections}\label{subsec:modvar_fullyIndividual}
+
+
+While external moderators may account for some of the GCN heterogeneity across subjects, often some heterogeneity may remain unexplained. Thus, in addition to a shared component $\Phi^{(0)*}$, and moderator effects $\Phi^{(M1)*},\ldots,\Phi^{(Mp)*}$, we consider $\bDelta^{(I1)*},\bDelta^{(I2)*},\ldots, \bDelta^{(In)*}\in\bbR^{d\times d}$ matrices corresponding to fully individual GCN connections. For each subject $k$, the coefficient matrix $\Phi^{(k)*}$ can be decomposed as
+\begin{equation}\label{eq:mod_idiographic}
+    \Phi^{(k)*} = \Phi^{*}(\bX_k) + \bDelta^{(Ik)*} = \Phi^{(0)*} + \left(\sum_{\ell=1}^p X_{k\ell} \Phi^{(M\ell)*}\right) + \bDelta^{(Ik)*} .
+\end{equation}
+Notice that $\bDelta^{(Ik)*}\in\bbR^{p\times p}$ only appears on the GCN of subject $k$. Thus, it represents the individual connections for subject $k$ not explained by moderator data. We illustrate the role of the additional fully individual structure in the GCNs across subjects in Figure \ref{fig:JointIndividual1}.
+
+
+
+
+To simplify using the notation introduced in \eqref{eq:mod_noIdiographic}, we write,
+\begin{equation}\label{eq:vareq_idiographic}
+    \bY_{t}^{(k)} =  (\Phi^{*}(\bX_k) + \bDelta^{(Ik)*})\bY_{t-1}^{(k)} + \bvarepsilon_{t}^{(k)}, \hspace{5mm}  \text{for all } 1\leq k\leq n \text{ and }2\leq t\leq T_k.
+\end{equation}
+We illustrate the model introduced in \eqref{eq:vareq_idiographic} in Figure \ref{fig:JointIndividual1}.
+
+\begin{figure}
+	\centering
+	\includegraphics[width = 0.8\linewidth]{figures/figs_modvar/JointIndividual1}
+	\caption{Illustration of the MOD-VAR framework with $p=2$ binary moderators and fully individual terms $\{\Delta^{(Ik)}\}_{k\in[n]}$. This models scenarios where fully individual connections may be present across GCNs, in addition to shared and moderator GCN connections.}\label{fig:JointIndividual1}
+\end{figure}
+
+Our goal is to estimate the common component $\Phi^{(0)*}$, GCN moderator effects $\{\Phi^{(M\ell)*}\}_{\ell = 1}^p$, and fully individual GCN connections $\{\bDelta^{(Ik)*}\}_{k=1}^n$. %Based on this, we introduce our proposed MOD-VAR estimation method.
+
+
+
+
+
+
+
+
+\section{Methodology}\label{section:method}
+
+We introduce our method for simultaneously estimating the shared GCN connections across all subjects $\Phi^{(0)*}$, as well as the moderated effects $\{\Phi^{(M\ell)*}\}_{\ell = 1}^p$ and fully individual connections $\{\bDelta^{(Ik)*}\}_{k=1}^n$. We achieve this via an $\ell_1$-penalized time series estimation approach, which takes into account the estimation of all components. We first introduce the method when no individual remainders are present, \textit{i.e.,} $\bDelta^{(I1)*} = \bDelta^{(I1)*} = \ldots = \bDelta^{(In)*} = \bzero $. 
+
+\subsection{Mod-VAR With Only Moderator Components}\label{subsec:modvar_moderator}
+
+Consider the case in which all inter-subject variability can be explained by our moderator variables, as described in \eqref{eq:mod_noIdiographic}. Then, our GCN follows the structure \eqref{eq:vareq_idiographic}. Consider $\Phi = [\Phi^{(0)} , \Phi^{(M1)} , \Phi^{(M2)} ,\ldots , \Phi^{(Mp)}]\in\bbR^{d\times (d+dp)}$, and, for any vector of $p$ moderators $\bx$, we define $\Phi(\bx)$ as the $d\times d$ matrix given by
+\begin{equation}\label{eq:mod_est_noIdiographic}
+    \Phi(\bx) := \Phi^{(0)}  + x_1 \Phi^{(M1)} + x_2 \Phi^{(M2)} + \ldots + x_p \Phi^{(Mp)}. 
+\end{equation}
+
+Our goal is to estimate $\hat\Phi$. Since this requires the estimation of a total of $q = (p + 1) d^2$ parameters, the estimation can be challenging, specially in cases where the number of study subjects $n$ or number of time points per subject $\{T_k\}_{k=1}^n$ are limited. In such scenarios, one may estimate $\Phi^{*}$ under the assumption of sparsity, \textit{i.e.}, only a small number of parameters in $\Phi^{*} $ are non-zero, with the vast majority of the entries in $\Phi^*$ being zero. As seen in the literature, the estimation of such sparse VAR structures can be achieved through the use of $\ell_1$-penalties \cite{basu2015regularized,fisher2022penalized}. Here, we adapt such sparse-estimation techniques for detecting moderator effects in the VAR models of interest.
+
+To derive a sparse estimation of $\Phi^*$, we introduce the MOD-VAR optimization problem
+\begin{equation}\label{eq:modvar_opt_raw}
+    \hat\Phi = \argmin_{[\Phi^{(0)}, \Phi^{(M1)},\ldots , \Phi^{(Mp)}] } \frac{1}{2N}\sum_{k = 1}^n \sum_{t = 2}^{T_{k}} \| \bY^{(k)}_{t} - \Phi(\bX_k) \bY^{(k)}_{t-1}  \|_2^2 + \lambda_1\vertiii{\Phi^{(0)}}_1 + \lambda_2\sum_{\ell = 1}^p\vertiii{\Phi^{(M\ell)}}_1 .
+\end{equation}
+where $N = T_1 + T_2 + \ldots + T_n - n$, and $\lambda_1,\lambda_2>0$ are tuning parameters. Observe that the optimization \eqref{eq:modvar_opt_raw} aims to minimize the mean square forecasting error (MSFE) across all subjects. Furthermore, it incorporates a non-uniform penalty, that induces different levels of sparsity for the shared component $\Phi^{(0)}$ and the moderator effects $\{\Phi^{(M\ell)}\}_{k}$.  
+
+We can simplify the expression of \eqref{eq:modvar_opt_raw} to a reduced matrix form. For this, consider $ \Zb^{(k)} = [\bY^{(k)}_T, \bY^{(k)}_{T-1},\ldots,\bY^{(k)}_{2}]'$,  $\Yb^{(k)} =  [\bY^{(k)}_{T-1}, \bY^{(k)}_{T-2}, \ldots ,\bY^{(k)}_{1}]'$, and $\Eb^{(k)} = [\bvarepsilon^{(k)}_{T} , \bvarepsilon^{(k)}_{T-1} \ldots , \bvarepsilon^{(k)}_{2}]'$.
+\begin{comment}
+\begin{equation*}
+    \Zb^{(k)} = \begin{pmatrix}
+        (\bY^{(k)}_T)'\\ (\bY^{(k)}_{T-1})'\\ \vdots \\(\bY^{(k)}_{2})'\\ 
+    \end{pmatrix}, \hspace{7mm}
+    \Yb^{(k)} =  \begin{pmatrix}
+        (\bY^{(k)}_{T-1})'\\ (\bY^{(k)}_{T-2})'\\ \vdots \\(\bY^{(k)}_{1})'\\ 
+    \end{pmatrix}, \hspace{7mm}
+    \Eb^{(k)} =  \begin{pmatrix}
+        (\bvarepsilon^{(k)}_{T})'\\ (\bvarepsilon^{(k)}_{T-1})'\\ \vdots \\(\bvarepsilon^{(k)}_{2})'\\ 
+    \end{pmatrix}.
+\end{equation*}
+\end{comment}
+Here the matrices $\Zb^{(k)}, \Yb^{(k)}$ and $\Eb^{(k)}$ aggregate the contemporaneous, lagged and error terms for subject $k$, respectively. Furthermore, we introduce
+\begin{equation*}
+    \Wb^{(k)} := \left[\Yb^{(k)} , X_{k1}\Yb^{(k)} , \dots , X_{kp}\Yb^{(k)} \right] = \bX_k' \otimes \Yb^{(k)} \in \bbR^{(T_k-1) \times (pd + d)}.
+\end{equation*}
+One can show that $ (\Yb^{(k)})' \cdot\Phi^*(\bX_k)  =   (\Wb^{(k)})\cdot  (\Phi^*)' $. We gather data from all subjects through the matrices $\Zb := [{\Zb^{(1)}}' , {\Zb^{(2)}}' , \ldots , {\Zb^{(n)}}']'$, $\Wb :=  [{\Wb^{(1)}}', {\Wb^{(2)}}', \ldots , {\Wb^{(n)}}']'$, and $\Eb := [{\Eb^{(1)}}' , {\Eb^{(2)}}' , \ldots , {\Eb^{(n)}}']'$
+\begin{comment}
+\begin{equation}\label{eq:ZWEmat_construction}
+    \Zb = \begin{pmatrix}
+        \Zb^{(1)}\\ \Zb^{(2)} \\ \vdots \\ \Zb^{(n)}
+    \end{pmatrix}, \hspace{7mm}
+    \Wb =  \begin{pmatrix}
+        \Wb^{(1)} \\ \Wb^{(2)} \\ \vdots \\ \Wb^{(n)}  
+    \end{pmatrix}, \hspace{7mm}
+    \Eb =  \begin{pmatrix}
+        \Eb^{(1)} \\ \Eb^{(2)} \\ \vdots \\ \Eb^{(n)} 
+    \end{pmatrix}.
+\end{equation}
+\end{comment}
+We can summarize all relationships in \eqref{eq:mod_noIdiographic} with the simplified matrix notation $\Zb = \Wb \cdot(\Phi^*)' + \Eb $. The optimization problem  \eqref{eq:modvar_opt_raw} is equivalent to solving
+\begin{equation}\label{eq:modvar_opt_mat}
+    \bhat\Phi  := \argmin_{\Phi = [\Phi^{(0)}, \Phi^{(M1)},\ldots , \Phi^{(Mp)}] } \frac{1}{2N}\vertiii{ \Zb - \Wb \Phi' }_F^2 + \lambda_1 \vertiii{\Phi^{(0)}}_1 + \lambda_2 \vertiii{[\Phi^{(M1)},\ldots , \Phi^{(Mp)}]}_1 .
+\end{equation}
+Thus, the estimation of $\hat\Phi$ can be reduced to a multiple regression optimization problem, with a non-uniform $\ell_1$ penalty. We describe the optimization algorithm in Section \ref{section:computation}.
+
+%The formulation \eqref{eq:modvar_opt_mat} is based on the construction of the subject-specific blocks $\Wb^{(k)} = [\Yb^{(k)}, X_{k1}\Yb^{(k)}, \ldots , X_{k1}\Yb^{(k)}]$, and the design matrix $\Wb = [(\Wb^{(1)})' ,(\Wb^{(2)})' ,\ldots , (\Wb^{(n)})']'$. As we demonstrate in the following sections, the construction of $\Wb$ and $\Wb^{(k)}$ can be adapted to account for estimation of fully individual components in $\{\Phi^{(k)}\}_{k=1}^n$.
+
+
+\begin{comment}
+Then, if we define 
+\begin{equation*}
+    \hat\Gamma = \Ir_{d}\otimes \Wb =\begin{pmatrix}
+        \Wb & \bzero & \ldots & \bzero \\
+        \bzero & \Wb & \ldots & \bzero \\
+        \vdots & \vdots & \ddots & \vdots \\
+        \bzero & \bzero & \ldots & \Wb
+    \end{pmatrix}; \hspace{5mm}
+    \bbeta = \bvec(\Phi') = \bvec\begin{pmatrix}
+        \Phi_{1 \cdot}' \\\Phi_{2 \cdot}' \\ \vdots \\ \Phi_{d \cdot}' 
+    \end{pmatrix}; \hspace{5mm} y = \bvec(\Zb);
+\end{equation*}
+Then, we can write our optimization \eqref{eq:modvar_opt_mat} as a single LASSO optimization problem of the form,
+\begin{equation}\label{eq:modvar_opt_vectorized}
+    \hat\bbeta = \argmin_{\bbeta} \frac{1}{2N} \| y - \hat\Gamma \bbeta \|_2^2 + \sum_{i = 1} \lambda_{i}|\bbeta_i|,
+\end{equation}
+where $\lambda_i = \lambda_1$ if the entry $\beta_i$ corresponds to a shared component in $\Phi^{0}$ and $\lambda_i = \lambda_2$ if it corresponds to a moderator effect. Notice that \eqref{eq:modvar_opt_vectorized} can be given directly to a solver of the LASSO optimization problem, such as the implementation found in the \texttt{glmnet} package in R. Our implementation leverages this fact to solve \eqref{eq:modvar_opt_vectorized} through the \texttt{glmnet} package. Once $\hat\bbeta$ is obtained, we can rearrange from vector to matrix form, to recover the matrix $\hat\Phi = [\hat\Phi^{(0)}, \hat\Phi^{(M1)}, \ldots \hat\Phi^{(Mp)}]$. Observe that this model performs the sparse estimation of a total of $(p+1)d^2$ parameters.
+
+Observe that the objects $y$, $\hat\Gamma$ can be constructed based on the time series data $\{\Yb_k \,:\, k=1,\ldots , n\}$ and the matrix of moderator data,
+\begin{equation*}
+    \Xb_M = \begin{pmatrix}
+        \bX_1' \\
+        \bX_2'\\
+        \vdots \\
+        \bX_p' 
+    \end{pmatrix} = 
+    \begin{pmatrix}
+        X_{11} & X_{12} & X_{13} & \ldots & X_{1p} \\
+        X_{21} & X_{22} & X_{23} & \ldots & X_{2p} \\
+        \vdots & \vdots & \vdots & \ddots & \vdots \\
+        X_{n1} & X_{n2} & X_{n3} & \ldots & X_{np} 
+    \end{pmatrix}.
+\end{equation*}
+
+As we observe, variations on the design of the matrix of moderator data $\Xb$ can help estimate fully idiographic and moderator/idiographic mixed models. 
+\end{comment}
+
+
+\subsection{Mod-VAR With Fully Idiographic Components}\label{subsec:modvar_idiographic}
+
+In many real data scenarios, moderator data may not be available, or the heterogeneity across subject may not be fully explained by the available moderator data. In such cases, we may aim to estimate additional fully individual connections in the GCN of each subject.  We construct a set of artificial moderators to adapt optimization problem described in Section \ref{subsec:modvar_moderator} for estimating common and fully individual components of the GCNs.
+
+We consider the case in which we do not have moderator data available, and simply aim to estimate the shared and individual structure across multiple GCNs. This scenario is equivalent to the problem studied by the multi-VAR method \citep{fisher2022penalized}. For each subject $k$, we define the artificial moderator vector $\bX_k^{(I)} = (0,\ldots 0,,1,0,\ldots , 0)'$, a column vector of size $n\times 1$, with zero in all entries except the $k$-th entry. Since $\bX_k^{(I)}$ has $n$ artificial moderators, the associated parameters of MOD-VAR model can be expressed in the form of a $d\times (nd+d)$ matrix $\Phi = [\Phi^{(0)},\Phi^{(M1)},\Phi^{(M2)}, \ldots , \Phi^{(Mn)}]$. Observe that, since $\bX^{(I)}_k$ is indicator of the $k$-th entry and  \eqref{eq:mod_est_noIdiographic}, $\Phi(\bX_k^{(I)}) = \Phi^{(0)} + \Phi^{(Mk)}$,  for all $k\in[n]$. Since the moderator effect $\Phi^{(Mk)}$ appears only in the coefficients of subject $k$, $\Phi^{(Mk)}$ corresponds to a fully individual connections in the GCN for subject $k$. From this, we change our notation for the estimating parameter to $\Phi = [\Phi^{(0)},\bDelta^{(I1)},\bDelta^{(I2)}, \ldots , \bDelta^{(In)}]$, where $\bDelta^{(Ik)}$ represents the fully individual GCN connections to subject $k$. In summary, the estimation of $\Phi = [\Phi^{(0)},\bDelta^{(I1)},\bDelta^{(I2)}, \ldots , \bDelta^{(In)}]$ can be achieved by solving our proposed  MOD-VAR optimization problem \eqref{eq:modvar_opt_mat} with the artificial moderator design matrix $\Xb_{(I)} := [\bX^{(I)}_1, \bX^{(I)}_2, \ldots, \bX^{(I)}_1]' = I_n\in\bbR^{n\times n}$.
+
+We may also be interested in scenarios where the GCNs incorporates shared, moderator-based and fully individual connections across subjects, as described in Section \ref{subsec:modvar_fullyIndividual}. For this, consider, for $n$ subjects, the $n\times p$ moderator data matrix $\Xb_{(M)} = [\bX_1, \bX_2,\ldots,\bX_n]'\in \bbR^{n\times p}$, and the artificial moderator matrix $\Xb_{(I)}\in\bbR^{n\times n}$. We construct the expanded matrix $\Xb_{(M,I)} := [  \Xb_{(M)} , \Xb_{(I)} ]$. By incorporating both data-driven and artificial moderators to our matrix $\Xb_{(M,I)}$, we can estimate all the parameters $\Phi^{(0)}$, $\{\Phi^{(M\ell)}\}_{\ell = 1}^p$ and $\{\bDelta^{(Ik)}\}_{k=1}^n$ simultaneously by solving our proposed optimization problem \eqref{eq:modvar_opt_mat}.
+
+\begin{comment}
+	
+\begin{equation*}
+    \Xb_{(M,I)} = \begin{pmatrix}  \Xb_{(M)} & \Xb_{(I)} \end{pmatrix} = 
+    %\begin{pmatrix}
+    %    \bX_1' & (\bX_1^e)' \\
+    %    \bX_2' & (\bX_2^e)' \\
+    %    \bX_3' & (\bX_3^e)' \\
+    %    \vdots & \vdots \\
+    %    \bX_p' & (\bX_n^e)'
+    %\end{pmatrix} = 
+    \begin{pmatrix}
+        X_{11} & X_{12} & X_{13} & \ldots & X_{1p} & 1 & 0 & 0 & \ldots & 0\\
+        X_{21} & X_{22} & X_{23} & \ldots & X_{2p} & 0 & 1 & 0 & \ldots & 0\\
+        X_{31} & X_{32} & X_{33} & \ldots & X_{3p} & 0 & 0 & 1 & \ldots & 0\\
+        \vdots & \vdots & \vdots & \ddots & \vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\
+        X_{n1} & X_{n2} & X_{n3} & \ldots & X_{np} & 0 & 0 & 1 & \ldots & 1
+    \end{pmatrix}.
+\end{equation*}    
+By incorporating both data-driven and artificial moderators to our matrix $\Xb_{(M,I)}$, we can estimate all the parameters $\Phi^{(0)}$, $\{\Phi^{(M\ell)}\}_{\ell = 1}^p$ and $\{\bDelta^{(Ik)}\}_{k=1}^n$ simultaneously by solving our proposed optimization problem \eqref{eq:modvar_opt_mat}. In this case, MOD-VAR estimates a total of $(n+p+1) d^2$ parameters.
+\end{comment}
+
+
+\section{Computational Algorithm and Estimation}\label{section:computation}
+
+We now discuss the procedure for optimizing \eqref{eq:modvar_opt_mat}, as well as for selecting the optimal tuning parameters $\lambda_1$ and $\lambda_2$ for fitting the MOD-VAR method. 
+
+\subsection{Column-wise FISTA}
+
+The estimation of MOD-VAR requires solving the optimization problem \eqref{eq:modvar_opt_mat}. Since both terms $\vertiii{\Zb - \Wb \Phi'}_F^2 / 2N$ and $\cP(\Phi) = \lambda_1 \vertiii{\Phi^{(0)}}_1 + \lambda_2 \vertiii{[\Phi^{(M1)},\ldots , \Phi^{(Mp)}]}_1$ are decomposable by the rows of the matrix $\Phi$, we can solve for $\Phi$ by solving for each row separately. Thus, for each $\ell \in[d]$ we aim to solve the optimization problem
+\begin{equation}\label{eq:modvar_lasso_columnwise}
+	\hat\phi_\ell = \argmin_{\phi\in\bbR^{d+dp}} \left\{\frac{1}{2N} \| \Zb_{\cdot \ell}  - \Wb \phi\|_2^2 + \lambda_1 \|\phi_{[1:d]}\|_1 + \lambda_2 \|\phi_{[(d+1):(d+ dp)]}\|_1 \right\}.
+\end{equation}
+Once we obtain $\hat\phi_1,\hat\phi_2,\ldots, \hat\phi_d\in\bbR^{d}$, we construct $\hat\Phi = [\hat\phi_1,\hat\phi_2,\ldots, \hat\phi_d]'\in\bbR^{d\times (d+dp)}$. Then, the estimated common portion of the GCN is defined as $\hat\Phi^{(0)} = \hat\Phi_{\cdot, [1:d]}$, and, for any $k\in[p]$ the estimated effect of the $k$-th moderator on the GCN defined as $\hat\Phi^{(M k)} = \hat\Phi_{\cdot, [(d+ d(k-1)):(d+dk)]}$. A summary of this procedure is provided in Algorithm \ref{alg:MODVAR}. As discussed in Section \ref{subsec:modvar_idiographic}, fully individual components can be incorporated into the model via artificial moderator variables. Therefore, the procedure described in Algorithm \ref{alg:MODVAR} can be applied for estimating shared, moderated and fully individual connections across GCNs, by simple modifications of the moderator design matrix $\Xb$. 
+
+\begin{singlespace}
+	\begin{algorithm}
+		\SetAlgoLined
+		\KwIn{Time series $\{\bY^{(k)}_{t}: k\in[n], \, t\in[T_k]\}\subset\bbR^{d}$, moderators $\Xb\in\bbR^{n\times p}$, tuning parameters $\lambda_1,\lambda_2> 0$.} 
+		\For{$k \in [n]$}{
+			Define $\Zb^{(k)} = [\bY_2^{(k)}, \bY_3^{(k)},\ldots, \bY_{T_k}^{(k)}]'\in\bbR^{(T_k-1)\times d}$.\\
+			Define $\Yb^{(k)} = [\bY_1^{(k)}, \bY_2^{(k)},\ldots, \bY_{T_k-1}^{(k)}]'\in\bbR^{(T_k-1)\times d}$.\\
+			Set $\bX_k^{*} := (1,\Xb_{k\cdot}')'\in\bbR^{p+1}$. \\
+			Define $\Wb^{(k)} = \bX_k^{*} \otimes \Yb^{(k)} = [\Yb^{(k)}, X_{k1} \Yb^{(k)}, \ldots ,  X_{kp} \Yb^{(k)}]\in\bbR^{(T_k-1)\times (d+dp)}$.
+		}
+		Define $\Zb = [\Zb^{(1)'}, \Zb^{(2)'}, \ldots, \Zb^{(n)'}]'\in\bbR^{N\times d}$.\\
+		Define $\Wb = [\Wb^{(1)'}, \Wb^{(2)'}, \ldots, \Wb^{(n)'}]'\in\bbR^{N\times (d+dp)}$.\\
+		\For{$\ell \in [d]$}{
+			Solve $\hat\bphi_\ell = \argmin_{\bphi\in\bbR^{d(p+1)}} \| \Zb_{\cdot \ell} - \Wb \bphi \|_2^2 / 2N + \lambda_1\|\bphi_{1:d}\|_1 + \lambda_2\|\bphi_{(d+1):(d+pd)}\|_1$.\\
+		}
+		Define $\hat\Phi:=\hat\Phi(\lambda_1,\lambda_2) = [\hat\bphi_1,\hat\bphi_2,\ldots, \hat\bphi_d]'\in\bbR^{d\times (d+pd)}$. \\
+		Set $\hat\Phi^{(0)} := \hat\Phi^{(0)}(\lambda_1,\lambda_2) = \hat\Phi_{\cdot, [1:d]} $.\\
+		For $s \in[p]$, define $\hat\Phi^{(M s)} := \hat\Phi^{(M s)}(\lambda_1,\lambda_2) = \hat\Phi_{\cdot, [(d+ d(s-1)):(d+ds)]} $.\\
+		\KwOut{Common effects $\hat\Phi^{(0)}$, and moderated effects $\{\hat\Phi^{(M s)}\}_{s = 1}^p$}
+		\caption{MOD-VAR.}\label{alg:MODVAR}
+	\end{algorithm}
+\end{singlespace}%
+
+In order to solve the optimization problem \eqref{eq:modvar_lasso_columnwise} for each $\ell\in[d]$, we apply the fast iterative shrinkage-threshold algorithm (FISTA) algorithm  \citep{beck2009fast}. For each $\ell\in[d]$, we define $\cL^{(\ell)}(\phi) =   - \bphi'\Wb'\Wb \bphi / 2N - \Zb_{\cdot \ell}'\Wb \bphi / N$, and the penalty term  $\cP(\bphi) = \lambda_1\|\bphi_{1:d}\|_1 + \lambda_2\|\bphi_{(d+1):(d+pd)}\|_1 $. It can be shown that optimizing \eqref{eq:modvar_lasso_columnwise} is equivalent to solving the optimization problem $\argmin_{\bphi}\cL^{(\ell)}(\bphi) + \cP(\bphi)$.  Furthermore, FISTA requires calculating a Lipschitz constant $L>0$  for the gradient $\nabla\cL^{(\ell)}(\bphi) = ({\Wb'\Wb}/N) \phi - \Wb'\Zb_{\cdot \ell}/N$. The inputs of our implementation of the FISTA algorithm applied to each $\ell \in[d]$ are derived from the matrices $\Mb:= {\Wb'\Wb}/N$, $\bb_\ell := \Wb'\Zb_{\cdot \ell}$, the tuning parameters $\lambda_1,\lambda_2 > 0$, the Lipschitz constant $L  := \vertiii{\Wb'\Wb}_2/2N$, and a maximum iteration number $I$, and a tolerance level $\varepsilon > 0$. In addition, we may improve efficiency of our estimation by utilizing a warm start $\bx_0\in\bbR^{d+dp}$. 
+
+Our FISTA implementation consists of the following steps. We start by setting $s_1 = 1$, and initializing $\bx_0$ if a warm start is not provided. Then, we set $\by_1 = \bx_0$, and define the vector of penalization weights as $\bw = (\lambda_1 \indv{d}', \lambda_2 \indv{dp}')' \in \bbR^{d+dp}$. Then, for any $i=1,2,\ldots, I$, the updates for $\bx_i$, $s_i$ and $\by_{i+1}$ are given by the equations
+\begin{align*}
+	\bx_{i} &:= ST_{\bw/L}( \by_i - \nabla \cL^{(\ell)}(\by_i) / L),\\
+	%%
+	s_{i + 1} &:= (1+\sqrt{1 + 4 s_{i}^{2}})/2,\\
+	%%
+	\by_{i + 1} &:= \bx_i + ((s_i + 1)/s_{i+1}) (\bx_i - \bx_{i - 1}),
+\end{align*}
+where, for any $\bw,\ba\in\bbR^{m}$, we define $ST_{\bw}(\ba)\in\bbR^{m}$ as the weighted entrywise soft thresholding function given by the entrywise value $[ST_{\bw}(\ba)]_i = sign(a_i) \cdot \max\{ 0, |a_i| - |w_i| \}.$ The full procedure is summarized in Algorithm \ref{alg:fista_MODVAR}. 
+
+
+
+
+\begin{singlespace}
+	\begin{algorithm}
+		\SetAlgoLined
+		\KwIn{$\Mb:= \Wb'\Wb/N\in\bbR^{(d+dp)\times (d+dp)}$, $\bb_\ell := \Wb' \Zb_{\cdot \ell}/N \in\bbR^{d+dp}$, hyperparameters $\lambda_1,\lambda_2 > 0$, Lipschitz constant $L := \vertiii{\Mb}_{2}$, maximum iterations $I> 0$, tolerance $\varepsilon>0$, warm start $\bx_0\in\bbR^{d+dp}$ . } 
+		Initialize $s_1 = 1$, $\by_1= \bx_0 $, and $\bx_1 =  ST_{\bw/L}( \by_1 - \nabla \cL^{(\ell)}(\by_1) / L)$.\\
+		Set $\bw = (\lambda_1 \indv{d}', \lambda_1 \indv{dp}')' \in \bbR^{d+dp}$ and $i = 1$.\\
+		\While{$i\leq I$ and $\|\bx_{i} - \bx_{i-1}\|_2 > \varepsilon$}{
+			Calculate $\nabla \cL^{(\ell)}(\by_i) = \Mb \by_i - \bb_\ell $.\\
+			Set $\bx_{i} := ST_{\bw/L}( \by_i - \nabla \cL^{(\ell)}(\by_i) / L)$.\\
+			Set $s_{i + 1} = (1+\sqrt{1 + 4 s_{i}^{2}})/2$.\\
+			Set $\by_{i + 1} = \bx_i + ((s_i + 1)/s_{i+1}) (\bx_i - \bx_{i - 1}) $.\\
+			Set $i \leftarrow i+1$.\\
+		}
+		Set $\hat\bphi_\ell := \hat\bphi_\ell(\lambda_1,\lambda_2) = \bx_{i-1}$.\\
+		\caption{FISTA for $\ell$-step of MOD-VAR estimation.}\label{alg:fista_MODVAR}
+	\end{algorithm}
+\end{singlespace}%
+
+
+%The fitting of our proposed MOD-VAR method requires the selection of the hyperparameteres $\lambda_1,\lambda_2> 0$. In the following section, we provide three methods for the optimal selection of tuning parameters. 
+
+
+\subsection{Tuning Parameter Selection}
+
+To select the optimal MOD-VAR fit, we must select the optimal $\lambda_1,\lambda_2>0$ over a range of potential values. We describe three strategies for the selection of $\lambda_1,\lambda_2>0$: by-subject cross validation, rolling window and cross validation, and an adaptive version of our proposed moderator vector auto-regressive model (adaMOD-VAR). 
+
+
+\subsubsection{By Subject Cross-Validation}
+
+We introduce the by-subject cross-validation (BSCV) procedure for fitting our proposed MOD-VAR method. Our $J$-fold BSCV procedure is as follows. First, we divide our set of subjects $[n]$ into $J$ approximately equally sized partitions $\cC_1,\cC_2,\ldots ,\cC_J$. Then, for each $j\in[J]$, and choice of tuning parameters $\lambda_1 > 0$, $\lambda_2 > 0$, we fit $\hat\Phi_{(BSCV,j)}(\lambda_1,\lambda_2)$ as the solution to \eqref{eq:modvar_opt_raw} based exclusively on the data of the subjects $[n]\setminus\cC_j$. This provides us with the common GCN structure $\hat\Phi_{(BSCV,j)}^{(0)}(\lambda_1,\lambda_2)\in\bbR^{d\times d}$ and for each $s\in[p]$, the effect of the $s$-moderator onto the GCN $\{\hat\Phi_{(BSCV,j)}^{(M\ell)}(\lambda_1,\lambda_2)\}_{\ell=1}^p\subset\bbR^{d\times d}$. Then, for each subject $k\in\cC_j$, we define the cross-validation predicted GCN based on the moderator vector $\bX_k$,
+\begin{equation*}
+	\hat\Phi_{(BSCV,j)}^{(\lambda_1,\lambda_2)}(\bX_k) = \hat\Phi_{(BSCV,j)}^{(0)}(\lambda_1,\lambda_2) + \sum_{s = 1}^p X_{ks} \hat\Phi_{(BSCV,j)}^{(Ms)}(\lambda_1,\lambda_2)\in\bbR^{d\times d}.
+\end{equation*}
+Here, $\hat\Phi_{(BSCV,j)}^{(\lambda_1,\lambda_2)}(\bX_k)$ provides an estimation of the GCN corresponding to subject $k\in\cC_j$, with no use of the data of subject $k$, instead relying only on the for the subject set $[n]\setminus\cC_j$. Finally, we define the by-subject cross-validation mean-squared forecasting error as
+\begin{align*}
+	BSCV.MSFE(\lambda_1,\lambda_2) &= \frac{1}{J}\sum_{j\in[J]} \sum_{k\in\cC_j} \frac{1}{T_k-1}\vertiii{ \Zb^{(k)}- \Yb^{(k)} \hat\Phi_{(BSCV,j)}^{(\lambda_1,\lambda_2)}(\bX_k) }_F^2.\\
+	%%
+	&= \frac{1}{J}\sum_{j\in[J]} \sum_{k\in\cC_j} \frac{1}{T_k-1} \sum_{t=2}^{T_{k}} \| \bY^{(k)}_t - \hat\Phi_{(BSCV,j)}^{(\lambda_1,\lambda_2)}(\bX_k)\bY^{(k)}_{t-1}  \|_2^2
+\end{align*}
+We select the pair $\lambda_1,\lambda_2> 0$ that minimize the $BSCV.MSFE(\lambda_1,\lambda_2)$.
+
+This approach enjoys major computational advantages compared to other procedures like rolling-window cross-validation, since it only requires the fit of $J$ runs of our MOD-VAR fitting procedure. We emphasize that by-subject cross validation can be used exclusively when no fully individual connections are expected across models. %If non-zero individual structure $\{\bDelta^{(Ik)*}\}_{k=1}^n$ is present, data from subjects in $[n]\setminus\cC_j$ cannot be used to fully estimate the GCN of subjects $k\in\cC_j$. For cases in which some fully individual GCN structure may be present, we introduce the rolling window cross-validation procedure.
+
+
+\subsubsection{Rolling Window Cross-Validation}
+
+Rolling window cross-validation is an alternative procedure for the selection of an optimal MOD-VAR model, based on the method proposed in \citep{nicholson2017varx}. First, we select $T =  \min_{k\in[n]}\{ T_k-1 \}$, and we set $J = \lfloor  T / 3 \rfloor$. Then, for any $j \in [J]$, we select the observations $\cup_{k\in[n]}\{Y^{(k)}_{t}\,:\, t\in [T_k - j - 2]\}$ as the training set. With this, we obtain the by-subject GCN estimators $\hat\Phi^{(k;\lambda_1,\lambda_2)}_{(RWCV,j)}\in\bbR^{d\times d}$ for each potential choice of $\lambda_1,\lambda_2> 0$. Finally, we measure the rolling window cross validation mean squared forecasting error, given by,
+\begin{equation*}
+	RWCV.MSFE(\lambda_1, \lambda_2) = \frac{1}{J}\sum_{j\in[J]} \frac{1}{n} \sum_{k\in[n]}\| \Yb^{(k)}_{T_k - j - 1} -  \hat\Phi^{(k;\lambda_1,\lambda_2)}_{(RWCV,j)} \cdot \Yb^{(k)}_{T_k - j} \|_2^2.
+\end{equation*}
+We select the values  $\lambda_1^*, \lambda_2^*>0$ with the lowest RWCV.MSFE value. 
+
+
+
+\begin{comment}
+
+	\subsubsection{BIC}
+	
+	In addition to cross-validation, we alternatively propose the fitting of our model by selecting the tuning parameter that minimizes the Bayesian information criteria (BIC). Given $\lambda_1,\lambda_2 > 0$, we estimate $\hat\Phi(\lambda_1,\lambda_2)$ with the full data without splitting. Then, we evaluate the fit with the measurement,\jose{double check:}
+	\begin{equation}\label{eq:bic}
+		\BIC(\lambda_1,\lambda_2) =  \vertiii{ \Zb - \Wb \bhat\Phi(\lambda_1,\lambda_2) }_{F}^2 + \vertiii{\bhat\Phi(\lambda_1,\lambda_2)}_0 \log(T-N)  . 
+	\end{equation}
+	
+	Through numerical results, we have verified that BIC is a measure that leads to more sparse estimates of the matrix $\Phi$ when compared to the estimate obtained through cross-validation.
+		
+\end{comment}
+
+\subsubsection{Adaptative MOD-VAR}
+
+
+To improve upon the performance of our original estimator, we propose a refinement of our MOD-VAR estimator through an adaptive approach \citep{zou2006adaptive}. For this, we consider  $\bhat{\Phi}= [\hat{\Phi}^{(0)}, \hat{\Phi}^{(M1)}, \ldots ,\hat{\Phi}^{(Mp)}, \hat{\bDelta}^{(I1)},\ldots , \hat{\bDelta}^{(In)}]\in\bbR^{d\times (d+dp+dn)}$ be an initial estimator of our proposed MOD-VAR. Then, given a constant $\gamma > 0$ we define the adaptive weight for the shared and moderated coefficients $[\hat{\Phi}^{(0)}, \hat{\Phi}^{(M1)}, \ldots ,\hat{\Phi}^{(Mp)}]$ as,
+\begin{equation*}
+	\omega_{ada}(\hat\Phi)_{ij}  = 
+		|\hat\Phi_{ij}|^{-\gamma}, \hspace{8mm}\forall\, 1\leq i\leq d,\, 1\leq j \leq p+1.
+\end{equation*}
+For the fully individual connectivity portion $[\hat{\bDelta}^{(I1)},\ldots , \hat{\bDelta}^{(In)}]$, we select our adaptive penalty similar to the proposal of \citet{fisher2024structured}. First, based on $\hat{\Phi}$, we calculate the by-subject GCNs, $\hat{\Phi}^{(1)},\hat{\Phi}^{(2)},\ldots, \hat{\Phi}^{(n)}\in\bbR^{d\times d}$. Then, we calculate the entrywise median GCN $\tilde{\Phi}\in\bbR^{d\times d}$, where $\tilde{\Phi}_{ij}$ is the median of $\hat{\Phi}^{(1)}_{ij},\hat{\Phi}^{(2)}_{ij},\ldots, \hat{\Phi}^{(n)}_{ij}$. Finally, we define the penalty adaptive weight for $\bDelta^{(Ik)}_{ij}$ as,
+\begin{equation*}
+	\omega_{ada}(\hat\Phi)_{i,d(p+k)+j}  = 
+	|\Delta^{(Ik)}_{ij} - \tilde{\Phi}_{ij}|^{-\gamma}, \hspace{8mm}\forall\, 1\leq i,j\leq d,\, 1\leq k \leq n.
+\end{equation*}
+
+
+From this, we define the adaptively-weighted $\ell_1$ penalty for $\Phi$ as,
+\begin{equation}
+	P_{ada}(\Phi)  = \sum_{\ell = 1}^{p}\sum_{i, j=1}^{d} \omega_{ada}(\hat\Phi)_{ij}\cdot |\Phi_{ij}|.
+\end{equation}
+Then, our adaptive MOD-VAR estimator is given as a solution to the optimization problem
+\begin{equation*}\label{eq:rvar_opt}
+	\bhat\Phi_{ada}(\lambda) = \argmin_{\Phi \in \bbR^{d \times (d+dp))}} \frac{1}{2N}\vertiii{ \Zb - \Wb \Phi }_{F}^2 + \lambda P_{ada}(\Phi), \hspace{10mm} \textit{for } \lambda > 0 . 
+\end{equation*}
+
+
+
+As observed in our numerical simulations, the adaptive procedure has significant improvements in terms of both forecasting, consistency, and edge-recovery performance. 
+
+
+\section{Theoretical Properties}\label{section:theory}
+
+
+We explore the theoretical properties of our proposed MOD-VAR, and provide high-dimensional consistency guarantees of estimation. In particular, we are interested in the estimation error $\vertiii{\hat\Phi - \Phi^*}_F$ and $\ell_1$-error $\|\hat\Phi - \Phi^*\|_{1}$. To explore this, consider the MOD-VAR matrix of true parameters $\Phi^*$ is $s$-sparse: $\|\Phi^*\|_0 \leq s$. To simplify our exposition, we assume that all time series have the same number of time observations, \textit{i.e.}, $T := T_1 = T_2 = \ldots = T_n$. Then, we denote $N$ the total number of observations available as $N = n(T-1)$. 
+
+%\subsection{Consistency Under Random Moderator Designs}\label{subsec:theory_random}
+
+%First, we derive theoretical results for the consistency of our proposed MOD-VAR in the case in which our moderators are independent and identically distributed variables. This represents the scenario in which all cross-population heterogeneity is explained by the moderator variables. We provide an analysis of convergence when fully individual structure is present in Section \ref{subsec:theory_idiographic}. 
+
+To establish our guarantees, consider the following set of assumptions. 
+
+\begin{assumption}[Bounded moderators]\label{as:boundedModEffect}
+    Assume the moderator vectors $\bX,\bX_1,\bX_2,\ldots , \bX_n$ are independent, identically distributed and entrywise bounded random vectors \textit{i. e.,} $|X_{i}| \leq 1$, with mean zero, and covariance matrix $\Sigma_X = \bbE[\bX\bX']$. Furthermore, assume that for some constant $0< \eta < 1$, we have that $\sup_{\|x\|_\infty \leq 1} \vertiii{\Phi^*(\bx)}_2 < \eta < 1 $
+\end{assumption}
+
+\begin{assumption}[Curvature condition]\label{as:boundedEigenvalue}
+     Let $\Lambda_{Y} := \inf_{\|\bx\|_\infty \leq 1} \Lambda_{\min}( Cov(Y_t^k | X_k) )$, and $\alpha = \Lambda_{Y} \cdot \Lambda_{\min}(\Sigma_X) / 2$. There exists a universal constant $C > 0$ such that, for some $t > 0$, 
+     \begin{equation*}
+         \alpha > C s^2 \left(\sqrt{\frac{\log(d^2p) + t}{n}}  + \frac{\log(2n)(\log(pd^2) + t)}{n}\right).
+     \end{equation*}
+\end{assumption}
+
+Our Assumption \ref{as:boundedModEffect} requires that the moderator variables satisfy the entrywise bound $|X_i|\leq 1$. This is not restrictive, since in applications, covariates often correspond to categorical or bounded score variables. For example, in the analysis of emotional/behavioral data from intensive longitudinal studies, moderators of interest are often gender, socio-economic status, or ethnicity age, which can be coded and normalized as discrete, centered and bounded variables. The condition $\sup_{\|x\|_\infty \leq 1} \vertiii{\Phi^*(\bx)}_2 < \eta < 1 $ serves to ensure that all the sampled time series are stable \citep{basu2015regularized}.
+
+The convergence of our MOD-VAR estimator relies on ensuring sufficient curvature of the matrix $\Wb'\Wb/N\in\bbR^{(d+dp)\times (d+dp)}$. Since the design matrix $\Wb$ is composed of the blocks  $\bX_k^*\otimes \Yb^{(k)}$, where $\bX_k^* = (1,\bX_k')'\in\bbR^{p+1}$, the minimum eigenvalue of $\bbE[\Wb'\Wb/N]$ can be controlled by imposing minimum eigenvalue conditions of $\Sigma_X$ and the conditional covariances of $Cov(\bY_t^{(k)}| \bX_k)$. Similar minimum eigenvalue controls are commonly used in the literature of high-dimensional regression literature \citep{loh2011high,basu2015regularized,wainwright2019high}. 
+
+Under Assumptions \ref{as:boundedModEffect} and $\ref{as:boundedEigenvalue}$, we derive high-dimensional guarantees of convergence.
+
+\begin{thm}\label{thm:modvar_normconsistency}
+    Consider multiple subject data $\{(\Yb_k, \bX_k)\}_{k=1}^n$ that follows the MOD-VAR model \eqref{eq:vareq_idiographic}. Furthermore, suppose Assumption \ref{as:boundedModEffect} holds, Assumption \ref{as:boundedEigenvalue} is satisfied for a given $t> 0$, and $n > 16\log(2n)\log(pd^2)$. Let $C_M := \Lambda_{\max}(\Sigma_\varepsilon)(2 + 4\eta / (1 - \eta)^2 ).$
+    Then, assuming that $\lambda:= \lambda_1 = \lambda_2$ satisfies the inequality $\lambda > 16 \pi C_M  \sqrt{{\log(pd^2)}/{N}}$, we have that, with probability at least $1 - 3e^{-t} - (6/(pd^2))^2$,
+    \begin{align}
+        \|\hat\Phi - \Phi^* \|_2  \leq \frac{12\sqrt{s} \pi C_M}{\alpha}  \sqrt{\frac{\log(pd^2)}{N}};  \label{eq:consistency_l2}\\
+        %%
+        %%
+        \| \hat\Phi - \Phi^*\|_1 \leq  \frac{72 s \pi C_M}{\alpha}  \sqrt{\frac{\log(pd^2)}{N}}.\label{eq:consistency_l1}
+    \end{align}
+\end{thm}
+
+Our Theorem \ref{thm:modvar_normconsistency} provides guarantees on the convergence of our proposed MOD-VAR, even in high dimensional scenarios. First, notice that our bound on $\|\hat\Phi - \Phi^*\|_2$ can be translated into a bound on the individual GCN estimation,
+\begin{align*}
+	\max_{k=1,...,n} \|\hat\Phi(\bX_k) - \Phi^*(\bX_k) \|_1 &\leq  \|\hat\Phi^{(0)} - \hat\Phi^{(0)*}\|_1 + \max_{k=1,...,n} \sum_{i=1}^p |X_{ki}| \|\hat\Phi^{(Mi)} - \hat\Phi^{(Mi)*}\|_1\\
+	%%
+	&\leq \| \hat \Phi - \Phi^*\|_1
+\end{align*}
+As a consequence of this, as long as $\log(pd^2)= O(N)$, we may ensure the $\ell_1$-norm consistency of our proposed MOD-VAR estimator. The rate $O(\sqrt{(\log(p) +2\log(d))/N})$ described in \eqref{eq:consistency_l1} depends on the total sample size $N = \sum_{i=1}^n(T_i - 1)$. As long as $\log(p)$ is moderate (for example, if $p = O(d)$), the rate obtained in Theorem \ref{thm:modvar_normconsistency} represents a significant improvement to the rate of $O(\sqrt{2\log(d)}/T)$ attained by the individual VAR estimation without moderators. This demonstrates the significant improvement of performing joint estimation when moderator effects are present in our time series model. Furthermore, notice that since the convergence depends on $N$ and not on $T$, consistent estimation is possible, even in cases where the number of available observations per subject $T$ is limited, as long as $n$ the number of subjects $n$ is large. This is possible thanks to the knowledge transfer across GCN's facilitated by the moderator data. The main requirement on the number of subjects $n$ is $\log(pd^2) = o(n / \log(n))$, found in Assumption \ref{as:boundedEigenvalue}. This ensures that there is sufficient heterogeneity in the moderator data, and consistent estimation of $\Sigma_{X}$, which in turn facilitates the estimation of the GCN moderator effects.
+
+%\jose{The constant $C_M$ on bound \eqref{eq:consistency_l2} and \eqref{eq:consistency_l1} scales as the magnitude of the error in the time series data via $\Lambda_{\max}(\Sigma_{\varepsilon})$, and the constant $2 + 4\eta / (1 - \eta)^2$, which corresponds to a uniform bound on the maximum eigenvalue of the spectral density of $Y$. Similar bounds on the spectral density can be found in \citet{basu2015regularized}.}
+
+
+%Our Theorem \ref{thm:modvar_normconsistency} ensures that, if the matrix $\Phi = [\Phi^{(0)},\Phi^{(M1)}, \Phi^{(M2)},\ldots, \Phi^{(Mp)}]\in\bbR^{d\times(d+dp)}$ is sparse, we can ensure convergence rate of $O_p(\sqrt{\log(pd^2)}/N)$. There are two main improvements of our result when compared to prior theoretical results found in the literature. First, we note that our derived rate of convergence $O_p(\sqrt{\log(pd^2)}/N)$ depends on the total sample size $N = n(T-1)$. Thus, the rate of estimation of the shared GCN component $\Phi^{(0)}$ shows significant improvements when compared to the rate of convergence obtained when performing individual estimation. Furthermore, our guarantee does not impose conditions on the number of available time points beyond requiring $T> 1$. This indicates that, in scenarios where the cross-population heterogeneity is fully explained by the underlying moderator variables, our proposed MOD-VAR method successfully transfers knowledge across the time series and does not require the sample of each subject to be long. It has been derived that, when fitting each VAR model separately, there is a convergence rate of $O_p(\sqrt{\log(d^2)}/(T-1))$ for each time series, which imposes strong assumptions on the number of available time points per subject. Therefore, our proposed 
+
+
+\begin{comment}
+\subsection{Consistency Under General Moderator Designs}\label{subsec:theory_idiographic}
+
+\jose{Including this might be too much... I want to get this out. Maybe it is better to simply submit and see what happens during the review process.}
+
+Now, we provide consistency guarantees of our proposed MOD-VAR when our moderator design matrix $\Xb$ incorporates a mixture of random and fixed components. A particular application of this scenario is described in Sections \ref{subsec:modvar_idiographic} and \ref{subsec:modvar_mixed}, where the cross-population heterogeneity is not fully explained by moderators. As previously discussed, in this case our moderator design matrix $\Xb$ must incorporate a portion of non-random columns. This also incorporates the scenario in which some of the moderator variables are controlled in the data-generating experiment, which is common in applications.
+
+To provide guarantees of convergence in this mixed scenario, we consider the following additional assumption.
+
+\begin{assumption}[Sufficient sample size]\label{as:sufficientSample}
+	Assume that the total number of observations $N$ satisfies $N > 16\log(pd^2)$. Furthermore, the number of subjects $n$ satisfies that $n > 16\log(2n)\log(pd^2)$.\jose{This will be removed, but you have to first write down the version of this assumption for moderated + idiographic heterogeneity.}
+\end{assumption}
+
+In this case, we derive the following convergence guarantee.
+
+
+\begin{thm}\label{thm:modvar_normconsistency2}\jose{Modify this result to incorporate the presence of non-random components. Also, derive what happens if the portion of non-random components in the moderator matrix is $\Ir_n$.}
+	Consider multiple subject data $\{(\Yb_k, \bX_k)\}_{k=1}^n$ that follows the MOD-VAR model \eqref{eq:vareq_idiographic}. Furthermore, suppose Assumption \ref{as:boundedModEffect} holds, Assumption \ref{as:boundedEigenvalue} is satisfied for a given $t> 0$, and $n > 16\log(2n)\log(pd^2)$. Let $$C_M := \Lambda_{\max}(\Sigma_\varepsilon)(2 + 4\eta / (1 - \eta)^2 ).$$
+	Then, assuming that $\lambda:= \lambda_1 = \lambda_2$ satisfies the inequality $\lambda > 16 \pi C_M  \sqrt{{\log(pd^2)}/{N}}$, we have that, with probability at least $1 - 3e^{-t} - (6/(pd^2))^2$,
+	\begin{align}
+		\|\hat\Phi - \Phi^* \|_2  \leq \frac{12\sqrt{s} \pi C_M}{\alpha}  \sqrt{\frac{\log(pd^2)}{N}};  \label{eq:consistency2_l2}\\
+		%%
+		%%
+		\| \hat\Phi - \Phi^*\|_1 \leq  \frac{72 s \pi C_M}{\alpha}  \sqrt{\frac{\log(pd^2)}{N}}.\label{eq:consistency2_l1}
+	\end{align}
+\end{thm}
+
+\end{comment}
+
+\section{Numerical Simulations}\label{section:simulations}  
+
+To assess the performance of our proposed MOD-VAR, and compare it to methods in the literature, we perform a set of numerical simulation experiments. 
+
+\subsection{Data Generating Method}
+
+
+To generate our data, we select a dimension $d\in \{10,20\}$, number of available moderator variables $p \in \{2,5\}$, number of available time series $n\in\{15,20,25\}$, and number of available observations per time series $T \in\{30,60,90\}$.
+
+To generate our data, we generate a matrix of moderator variables $\Xb = [\bX_1, \bX_2,\ldots \bX_{n}]\in\bbR^{n \times p}$, as well as matrices of shared GCN connections $\Phi^{(0)*}\in\bbR^{d\times d}$, the GCN moderator effects $\{\Phi^{(Ms)*}\}_{s=1}^p\subset\bbR^{d\times d}$, and the matrices of fully individual connections $\{\Delta^{(Ik)*}\}_{k=1}^n \subset \bbR^{d\times d}$. Once these matrices are generated, for each $k\in[n]$, we define the GCN for the $k$-th time series based on the moderators $\bX_k = (X_{k1},\ldots X_{kp})'$ as,
+\begin{align*}
+	\Phi^{(k)*} = \Phi^{(0)*} + \sum_{s=1}^p X_{ks} \Phi^{(Ms)*} + \Delta^{(Ik)*}\in\bbR^{d\times d}.
+\end{align*}
+Then, for each $k\in[n]$, we generate the time series data $\{\bY^{(k)}_t\}_{t=1}^{T+400}$, by first setting $\bY^{(k)}_0 = \bzero$, and 
+$ \bY^{(k)}_{t} = \Phi^{(k)*} \bY^{(k)}_{t-1} + \bvarepsilon_t , $
+where $\{\bvarepsilon_{t}\}_{t=1}^{T+403}\sim N_d(\bzero, (0.1)\cdot \Ir_d)$. Then, we discard the first 400 time points of each time series. The additional 3 time points will be used to evaluate out-of-sample forecasting performance. 
+
+The simulation of our data requires a procedure for generating the matrix of moderator variables $\Xb = [\bX_1, \bX_2,\ldots \bX_{n}]\in\bbR^{n \times p}$, and the GNC matrices $\Phi^{(0)*}$, $\{\Phi^{(Ms)*}\}_{s=1}^p$ and $\{\Delta^{(Ik)}\}_{k=1}^n$. To generate $\Xb= [\bX_1, \bX_2,\ldots \bX_{n}]'\in\bbR^{n\times p}$. we set $\bX_{k} = (X_{k1},\ldots ,X_{kp}) \stackrel{i.i.d.}{\sim} (0.25)\cdot\delta_0 + (0.75) \cdot Unif([-1,-0.5]\cup [0.5, 1])$. To generate the GNC matrices, we introduce $q_{0}, q_{m}, q_{\Delta}\in[0,1]$ the probabilities of shared, moderated and fully individual connection probabilities. With these parameters in place, we generate our data as follows. First, we generate the shared network  $\Phi^{(0)*}\in\bbR^{d\times d}$, moderated networks  $\{\Phi^{(Ms)*}\}_{s=1}^p \subset\bbR^{d\times d}$, and fully individual network connections $\{\Delta^{(Ik)*}\}_{k=1}^n \subset \bbR^{d\times d}$ as follows:
+\begin{align*}
+	\{\Phi^{(0)*}_{ij}\}_{i,j=1}^d \stackrel{i.i.d.}{\sim} (1-q_{0}) \delta_0 + q_{0} Unif([-0.9,-0.5]\cup [0.5,0.9]);\\
+	\{\Phi^{(Ms)*}_{ij}\}_{i,j=1}^d \stackrel{i.i.d.}{\sim} (1-q_{m}) \delta_0 + q_{m} Unif([-0.9,-0.5]\cup [0.5,0.9]);\\
+	\{\Delta^{(Ik)*}_{ij}\}_{i,j=1}^d \stackrel{i.i.d.}{\sim} (1-q_{\Delta}) \delta_0 + q_{\Delta} Unif([-0.9,-0.5]\cup [0.5,0.9]).
+\end{align*}
+Thus, the parameters $q_0$, $q_m$ and $q_\Delta$ control the level of sparsity of the matrices $\Phi^{(0)*}$, $\{\Phi^{(Ms)*}\}_{s=1}^p$ and $\{\Delta^{(Ik)*}\}_{k=1}^n$. In particular, notice that if $q_{m} = 0$, it follows that $\Phi^{(Ms)*} = 0$ for all $s\in[p]$. Thus, $q_{m} = 0$ corresponds to a data generating scenario in which the moderator variables do not have any effect on the connectivity pattern across the GCNs. Furthermore, $q_{\Delta} = 0$ implies $\Delta^{(Ik)} = \bzero$ for all $k\in[n]$, which corresponds to an absence of fully individual structure in our time series. In our simulations, we explore different choices of $q_{0}$, $q_m$ and $q_\Delta$ to explore the impact that moderator effects, fully individual effects and the absence of each have on the GNC estimation accuracy.
+
+\subsection{Methods and Performance Metrics}
+
+We compare our proposed MOD-VAR to methods in the literature of multiple time series modeling. First, we consider the vector auto-regressive (VAR) model \citep{basu2015regularized} applied separately to each time series. This method is implemented via the \texttt{bigVAR} R package \citep{nicholson2023bigVAR}. We also compare to the original and adaptive multi-VAR methods \citep{fisher2022penalized}, implemented via the \texttt{multivar} package. Finally, we compare our MOD-VAR method, fitted with rolling-window cross-validation, BIC and adaptive procedures. 
+
+%To evaluate the performance, we consider the following metrics: mean true positive rate of connection, mean false positive rate, mean $\ell_1$ and Frobenius GNC estimation errors, and mean squared forecasting errors, given by
+
+To evaluate the performance, we consider the mean $\ell_1$ and Frobenius GNC estimation errors, and root mean squared forecasting errors, given by
+\begin{align*}
+%	\TPR(\bhat\Phi, \Phi^*) &= \frac{1}{n} \sum_{k=1}^n \frac{|\{(i,j)\in[d]^2 \,:\, \bhat\Phi^{(k)}_{ij}\neq 0 ,\, \Phi^{(k)*}_{ij}\neq 0\}|}{ |\{(i,j)\in[d]^2 \,:\, \Phi^{(k)*}_{ij}\neq 0\}| },\\
+	%%
+%	\FPR(\bhat\Phi, \Phi^*) &= \frac{1}{n} \sum_{k=1}^n \frac{|\{(i,j)\in[d]^2 \,:\, \bhat\Phi^{(k)}_{ij}\neq 0 ,\, \Phi^{(k)*}_{ij} = 0\}|}{ |\{(i,j)\in[d]^2 \,:\, \Phi^{(k)*}_{ij} = 0\}| },\\
+	%%
+	E_{\ell_1}(\bhat\Phi, \Phi^*) &= \frac{1}{n} \sum_{k=1}^n \|\bhat\Phi^{(k)} - \Phi^{(k)*}\|_1,\\
+	%%
+	E_{F}(\bhat\Phi, \Phi^*) &= \frac{1}{n} \sum_{k=1}^n \vertiii{\bhat\Phi^{(k)} - \Phi^{(k)*}}_F,\\
+	%%
+	MSFE(\bhat\Phi, \Phi^*) &= \frac{1}{n} \left(\sum_{k=1}^{n} \frac{1}{3} \sum_{h=1}^3 \| \Yb^{(k)}_{T+h-1} - \bhat\Phi^{(k)}\Yb^{(k)}_{T+h}\|_{2}^2\right)^{1/2},
+\end{align*}
+respectively. In our supplementary materials, we incorporate results on mean true positive rate of connection, mean false positive rate, and computational time. 
+
+\subsection{Results: Only Moderator-Driven Heterogeneity}
+
+First, we explore the scenario in which all the heterogeneity across the time series models can be accounted by the $p$ moderator variables. This corresponds to the case $q_{\Delta} = 0$, \textit{i.e.,} $\Delta^{(Ik)} = 0$ for all $k\in[n]$. For this case, we explore the cases $(q_{0},q_{m})\in\{(0.075,0.025), (0.025,0.075)\}$. We provide visualizations for the $E_{\ell_1}$, $E_{F}$ and $MSFE$ for $d = 10$ in this section. We provide visualizations for the $\TPR$, $\FPR$ in our Supplementary Materials.
+
+
+\begin{figure}
+	\centering
+	\includegraphics[width = 0.7\linewidth]{../experiments_cluster2/sims_mod2/500_AggregatedDataExperiments/paper_plots_all/v1_542_L1_ByPnN_d10_sigma2_0.1.pdf}
+	\caption{Visualization of the mean $\ell_1$ GNC estimation error for our proposed MOD-VAR, as well as methods in the literature when the only source of GCN heterogeneity are explained by moderator variables. Our proposed MOD-VAR and adaptive MOD-VAR attain the best performance, for all choices of number of subjects $n$, moderatros $p$ and percentage of shared structure in the GCN. }\label{fig:mod2_L1}
+	%\includegraphics[width = 0.7\linewidth]{../experiments_cluster2/sims_mod2/500_AggregatedDataExperiments/paper_plots_all/v1_542_fc1_ByPnN_d10_sigma2_0.1}
+\end{figure}
+
+As we observe in Figure \ref{fig:mod2_L1}, both the MOD-VAR and adaptive MOD-VAR attain the best performance in terms of $\ell_1$-norm error. Notice that, depending on the degree of commonality among the GCNs, the second best estimation may be attained by the individual VAR estimation or the Multi-VAR method. In the scenario with the least cross-subject heterogeneity in which $75\%$ of the GCN is shared, and $p=2$, we have that the Multi-VAR method is the next best performing method. On the other hand, in scenarios with high heterogeneity where only $25\%$ of entries are shared and $p=5$, we have that the VAR method is the second best performing method. Our proposed MOD-VAR attains a significantly better performance, since it can model joint structure, and uses moderator data to drastically reduce the parameter complexity of estimating the heterogeneous structure. 
+
+\subsection{Results: Moderator and Fully Individual Heterogeneity}
+
+To further explore the performance of our estimation procedure, accounting for the potential presence of both moderator effectse, as well as fully individual connections in the GNC of some individuals, we perform an additional simulation scenario. For this, we set $(q_{0},q_{m})\in\{(0.075,0.025), (0.025,0.075)\}$ and $q_{\Delta} = 0.03$. We provide visualizations for the $E_{\ell_1}$, $E_{F}$ and $MSFE$ for $d = 10$ in this section. We provide visualizations for the $\TPR$, $\FPR$ in our Supplementary Materials.
+
+
+\begin{figure}
+	\centering
+	\includegraphics[width = 0.7\linewidth]{../experiments_cluster2/sims_mpm2/500_AggregatedDataExperiments/paper_plots_all/542_L1_ByPnN_d10_sigma2_0.1.pdf}
+	%\includegraphics[width = 0.7\linewidth]{../experiments_cluster2/sims_mod2/500_AggregatedDataExperiments/paper_plots_all/v1_542_fc1_ByPnN_d10_sigma2_0.1}
+	\caption{Visualization of the mean $\ell_1$ GNC estimation error for our proposed MOD-VAR, as well as methods in the literature when heterogeneity in the GCNs is a combination of moderator effects and fully individual connections. Our proposed adaptive MOD-VAR attain the best performance, for all choices of number of subjects $n$, moderatros $p$ and percentage of shared structure in the GCN. }\label{fig:mpm2_L1}
+\end{figure}
+
+	
+
+\section{Analysis of Intensive fMRI Data}\label{section:realData}
+
+
+
+
+
+\section{Discussion}\label{section:discussion}
+
+In this work, we introduce the moderator vector auto-regressive model (MOD-VAR), for estimating the GCN associated to a set of heterogeneous multivariate time series data. Our proposed MOD-VAR can identify common structure across heterogeneous GNCs, and identify whether individual structure present in the model may be explained by external moderator variables. Our method outperforms methods in the literature in terms of both GNC recovery and forecasting error, as showcased by our extensive numerical experiments. Furthermore, our theoretical developments show that MOD-VAR attains fast rates of convergence, even in high-dimensional scenarios, as long as  $n = \Omega(\log((n+p+1) d^2))$. 
+
+This work opens a variety of new avenues of research. In particular, we consider important to further explore applications of our proposed MOD-VAR to other multi subject studies in psychology and neuroscience, similar to the works of \citep{kim2007unified,rogers2007assessing,deshpande2009multivariate}. Furthermore, our proposed method opens a variety of new avenues of methodological research. For example, it would be of interest to test the statistical significance of the effect of moderators on GCN networks. Further extensions beyond the sparsity assumption are also of interest.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace{-3mm}
+\subsection*{Acknowledgments}
+\vspace{-3mm}
+
+This work was supported by the UCR Latino and Latin-American Research Center writing group. Holly O'Rourke and Gene Brewer were supported by the Army Research Institute for Behavioral and Social Sciences grant W911NF-18-S-0005. José Á. Sánchez Gómez and Holly O'Rourke were supported by the UCR Research Seed Funding and Grant Program.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace{-3mm}
+\subsection*{Supplementary Materials}
+\vspace{-3mm}
+
+We provide proofs, additional discussions and simulations in the Supplementary Materials.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace{-3mm}
+%\setstretch{1}
+\bibliographystyle{Chicago}
+\bibliography{ref}
+
+
+
+\newpage
+
+\begin{comment}
+
+\section{Old Intro}\label{section:oldintro}
+
+
+    
+\begin{itemize}
+	\item The difference between multilevel-VAR, multi-VAR, and MOD-VAR lies in the specification of the idiographic structure of the time series equation. (See photo we took on 2/12.) Multilevel-VAR assumes that the "leftover" effect  within is random, Multi-VAR assumes it is systematic, and MOD-VAR assumes it is systematic. ML-VAR includes a component in the idiographic structure that relates covariates to the time series (which MOD-VAR does as well), but multi-VAR does not. Because MOD-VAR includes covariates AND treats that "leftover" effect as systematic (i.e., important individual lagged structure), this distinguishes it from each of the other methods. 
+    
+    \item There is a growing availability of longitudinal data, which allows for an increase in the breath and depth of research regarding how specific psychometric measurements influence behavior, well-being and daily progress.
+	
+	\item Often, this data takes the form of a set of time series, each associated with an individual patient. When modeling, we must take into account both the temporal dependency of the data (prior psychological states are likely to influence future states), and the dependencies among the psychometric measurements.
+	
+	\item Many methods have been proposed for the estimation of such dependencies such as sparse vector auto-regression models \citep{basu2015regularized}, dynamic factor analysis \citep{stock2002forecasting}, and the unified structural equation model (USEM) \citep{kim2007unified}.
+	
+	\item In psychometric research, it is vital to recognize the effect that individual characteristics of each subject can have in the overall fit of the model and interpretation. From this, a variety of works have focused on the estimation of a common (or nomothetic) structure across all individuals, as well as individual (or idiographic) structure that is exclusive to each subject. The GIMME method \citep{gates2012group} performs the estimation of the network of psychometric relationships via the estimation of multiple USEM model, with a variable selection procedure that estimates model overlaps. More recently, the MultiVAR method \citep{fisher2022penalized} estimates the individual and common structure through a penalized optimization approach. Further extensions to consider the potential structure of subgroups has been considered for both approaches \citep{lane2019uncovering,crawford2024penalized}.
+	
+	
+	\item Often, in psychometric or MRI studies, our subject-specific time series data is accompanied by additional clinical data. The incorporation of this additional information may provide further insight into behavior, but its use has been largely ignored.
+	
+	
+	\item One important omission from these approaches is to explain \textit{why} each individual has a particular idiographic structure. While the common network has a straightforward interpretation, the individual structures are not necessarily easy to interpret or process. Therefore, the output of GIMME or MultiVAR can only measure the existence of this idiographic structure, without explaining in any way the origin or motivation of potential underlying patterns.
+	
+	\item In the current writeup, we propose a method for estimating the nomothetic and idiographic structure of multi-subject time series, where the time dependence of each individual depends on a set of underlying covariates. This way, the idiographic effects are not simply unexplained individual structure, but are instead linked to the patients' individual characteristics. This allows for an actual interpretation of the idiographic structure. 
+	
+	\item \textbf{Main advantages}: while other methods allow for modeling nomothetic and idiographic structure, the motivation for why such variations occur remains largely unknown. The explanation is simply: there is variation across individuals. This method connects the individual variation to underlying features, allowing us to determine the nature of the nomothetic structure, and to provide potential explanations for the origin of the idiographic structure. This can then be used as useful knowledge for further research or downstream statistical analysis.
+
+    
+\end{itemize}
+
+
+\section{Description of the Model}
+
+
+
+\begin{itemize}
+	\item Consider we have a study with $N$ subjects. For each subject $1\leq k\leq N$, we have access to two data modes: (\textit{i}) a $p$-dimensional vector of covariates $\bX_k\in\bbR^{p}$, and (\textit{ii}) a $d$-dimensional time series of length $T_k$, given as $\Yb_k = \{\bY_t^{(k)}\in\bbR^{d} \,:\, 1\leq t\leq T_k\}$.
+	
+	\item In the usual GIMME or MultiVAR frameworks \citep{gates2012group,fisher2022penalized}, the aim is to model the time series with a common+individual decomposition, usually of the form:
+	\begin{align*}
+		\bY^{(k)}_t &= \sum_{\ell=1}^{q} (\Psi_\ell^{c} + \Psi_\ell^{(k)}) \bY_{t-\ell}^{(k)} + \be^{(k)}_{t}.\hspace{40mm} \text{(MultiVAR)};\\
+		\bY^{(k)}_t &= (\Ar^{c} + \Ar^{(k)}) \bY^{(k)}_t + \sum_{\ell=1}^{q} (\Phi_\ell^{c} + \Phi_\ell^{(k)}) \bY_{t-\ell}^{(k)} + \varepsilon^{(k)}_{t}.\hspace{10mm} \text{(GIMME)}.
+	\end{align*}
+	
+	\item While these approaches are useful at extracting common and individual structure, they miss the opportunity to exploit the potentially useful additional information contained in $\{\bY_k\}_{k=1}^N$. 
+	
+	\item To exploit it, we assume that the time series model coefficients depend on the values of $Y$. We consider the following models: 
+	\begin{align}
+		\bY^{(k)}_t &= \sum_{\ell=1}^{q} \Psi_\ell(\bX_k) \bY_{t-\ell}^{(k)} + \be^{(k)}_{t}.\hspace{40mm} \text{(MultiVAR)}; \label{eq:rvar}\\
+		\bY^{(k)}_t &= \Ar(\bX_k) \bY^{(k)}_t + \sum_{\ell=1}^{q} \Phi_\ell(\bX_k) \bY_{t-\ell}^{(k)} + \varepsilon^{(k)}_{t}.\hspace{17mm} \text{(GIMME)}.
+	\end{align}
+	Notice that, instead of being fixed, the set of coefficients $\Psi_\ell(\bX_k), \Ar(\bX_k), \Phi_\ell(\bX_k)$ now depend on the individual covariate data. From this, the individual structure of each cannot be arbitrary, but it now depends on the specific features $\bX_k$.
+	
+	\item As a first approach, lets assume that these parameters have an \textit{additive} relationship to the underlying covariates. For a vector $\bx=(x_1,x_2,\ldots ,x_p)^\mt\in\bbR^p$
+	\begin{align*}
+		\Psi_\ell(\bx) &= \Psi_{\ell 0} + x_1 \Psi_{\ell 1} + x_2 \Psi_{\ell 2} + \ldots + x_p \Psi_{\ell p} ;\\
+		\Ar(\bx) &= \Ar_0 + x_1 \Ar_1 + x_2 \Ar_2 + \ldots + x_p \Ar_p ;\\
+		\Phi_\ell(\bx) &= \Phi_{\ell0} + x_1 \Phi_{\ell1} + x_2 \Phi_{\ell2} + \ldots + x_p \Phi_{\ell p}. \\
+	\end{align*}
+	Here, the matrices $\{\Psi_{\ell 0}\}_{\ell=1}^q, \Ar_0, \{\Phi_{\ell 0}\}_{\ell = 1}^q$ represent the structure that is common (nomothetic) among all subjects. The remaining parameters are affected by $\bx$, so they are dependent on the individual characteristics of each subject.
+
+	\item \textbf{Example:} We consider a VAR(1) model, where there is a single lagged relationship, \textit{i.e.} $q = 1$, and two subject-level covariates $p = 2$. In that case, given that $\bX_k = (X_{k1},X_{k2})^\mt$ our equations simplify to:
+	\begin{align*}
+		\bY^{(k)}_t &= \Psi(\bX_k) \bY_{t-1}^{(k)} + \be^{(k)}_{t}\\
+		&= [\Psi_{0} + X_{k1} \Psi_{1} + X_{k2} \Psi_{2}] \cdot \bY_{t-1}^{(k)} + \be^{(k)}_{t}
+	\end{align*}
+	Notice that each subject $k$ will have their own VAR structure. This structure will incorporate a common structure shared across all subjects $\Psi_0\in\bbR^{d\times d}$. It also has individual structure. Now, instead of having this individual structure vary arbitrarily, it has the form $Y_{k1} \Psi_{1} + Y_{k2} \Psi_{2}$. Therefore, it depends on known information $Y_k = (Y_{k1}, Y_{k2})^{'}$ about each subject.
+	
+	\item In Figure \ref{fig:rvarCoeffsExample}, we provide an example of how common and individual effects in a VAR time series model can relate to underlying subject-level covariates.	Here, the dimension of our time series is $ d = 5 $, the number of subject-level covariates is $ p = 2 $, and the lag in the model is $ q = 1 $. We generate data for $N = 50$ subjects, all with a total of $T = 100$ time points.
+
+
+	\begin{figure}
+		\centering
+		\includegraphics[width = \linewidth]{figures/2_VisRvarTrueEstPars}
+		\caption{Illustration of the true and estimated Regression VAR parameters. For very large sample sizes, the traditional OLS method is successful. It would now be interesting to explore how regularization or model selection can help in higher dimension.}\label{fig:rvar_TrueEstimatedPars}
+	\end{figure}
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width = \linewidth]{figures/1_VisParExample}
+		\caption{Illustration of the Regression VAR framework with 2 covariate-dependent effects. Top-panels: visualization of the joint effects that are common across all subjects. We also visualize the effects that are individual to variables $X_1$ and $X_2$. Center-left panel: Visualization of the covariate information for $N = 50$ subjects. We highlight the covariate information of the first 5 subjects. Remaining panels: Visualization of the effects for the first 5 subjects. We observe that, as subject 1 has nearly zero for both $X_1$ and $X_2$, the effects are mostly just the joint effects. Subject 3 has a high $X_2$ covariate, but low $X_1$ covariate, and therefore its effects are a mixture of the joint and $X_2$ effects. Subject 2 has large covariates for both $X_1$ and $X_2$, so its time series effects are a mixture of all.}\label{fig:rvarCoeffsExample}
+	\end{figure}
+	
+	
+	\item For this same example, we performed a traditional LS fitting, to see if we could successfully recover the common/individual structure of the time series. As we see in Figure \ref{fig:rvar_TrueEstimatedPars}, our estimation for very large sample sizes is successful.
+	
+
+	
+	
+\end{itemize}
+
+\newpage
+
+\section{Fitting the RVAR Model with LASSO Penalty}\label{section:rvar}
+
+
+In this section, we describe the fitting of the RVAR model of the form \eqref{eq:rvar}, with 1-lag relationships, \textit{i.e.} $q = 1$. Assuming that, for each individual $k=1,...,N$, we can capture the VAR relationships in matrix form as:
+{\footnotesize
+\begin{equation*}
+	\underbrace{\begin{bmatrix} 
+		(\bY_{T_k}^k)^{'} \\ (\bY_{T_k-1}^k)^{'} \\ \vdots \\ (\bY_{2}^k)^{'}
+	\end{bmatrix}}_{\Zb^{k}} = 
+	\underbrace{\begin{bmatrix} 
+		(\bY_{T_k-1}^{k})^{'}  & X_{k1} (\bY_{T_k-1}^{k})^{'} &  X_{k2} (\bY_{T_k-1}^{k})^{'} & \ldots & X_{kp} (\bY_{T_k-1}^{k})^{'} \\
+		(\bY_{T_k-2}^{k})^{'}  & X_{k1} (\bY_{T_k-2}^{k})^{'} &  X_{k2} (\bY_{T_k-2}^{k})^{'} & \ldots & X_{kp} (\bY_{T_k-2}^{k})^{'} \\
+		 \vdots      &     \vdots      & \ddots & \vdots 		  \\
+		(\bY_{1}^{k})^{'}  & X_{k1} (\bY_{1}^{k})^{'} &  X_{k2} (\bY_{1}^{k})^{'} & \ldots & X_{kp} (\bY_{1}^{k})^{'} \\
+	\end{bmatrix}}_{\Wb^k} 
+	\underbrace{\begin{bmatrix}
+		\Psi_{0}^{'} \\ \Psi_{1}^{'} \\ \vdots \\ \Psi_{p}^{'}
+	\end{bmatrix}}_{\Psi} +  
+	\underbrace{\begin{bmatrix} 
+		(\varepsilon_T^{k})^{'} \\ (\varepsilon_{T-1}^{k})^{'} \\ \vdots \\ (\varepsilon_{T-q+1}^{k})^{'}
+	\end{bmatrix}}_{\Eb^{k}}.
+\end{equation*}
+}%
+This can be simplified to matrix form as
+\begin{equation}\label{eq:rvar_kmat}
+	\Zb^{k} = \Wb^{k} \bPsi + \Eb^{k}
+\end{equation}
+The equation \eqref{eq:rvar_kmat} represents the VAR relationships for individual $k$. Then, we can model the behavior for all individuals via the equation
+\begin{equation}\label{eq:multiresponse_regression}
+	%\underbrace{\begin{bmatrix}  \Zb^1 \\ \Zb^2 \\ \vdots \\  \Zb^k \\ \vdots \\ \Zb^N \end{bmatrix}}_{\Zb} = 
+	\underbrace{\begin{bmatrix}  \Zb^1 \\ \Zb^2  \\ \vdots \\ \Zb^N \end{bmatrix}}_{\Zb} = 
+	%\underbrace{\begin{bmatrix}  \Wb^1 \\ \Wb^2 \\ \vdots \\  \Wb^k \\ \vdots \\ \Wb^N \end{bmatrix}}_{\Wb}  
+	\underbrace{\begin{bmatrix}  \Wb^1 \\ \Wb^2  \\ \vdots \\ \Wb^N \end{bmatrix}}_{\Wb}  
+	\bPsi + 
+	%\underbrace{\begin{bmatrix}  \Eb^1 \\ \Eb^2 \\ \vdots \\  \Eb^k \\ \vdots \\ \Eb^N \end{bmatrix}}_{\Eb} 
+	\underbrace{\begin{bmatrix}  \Eb^1 \\ \Eb^2 \\ \vdots \\ \Eb^N \end{bmatrix}}_{\Eb} ,
+\end{equation}
+Thus, we can summarize the VAR equation model for all individuals simultaneously with the reduced matrix equation:
+\begin{equation}\label{eq:rvar_mat}
+	\Zb = \Wb \bPsi + \bE,
+\end{equation}
+where $\Zb \in \bbR^{(T - N)\times d}$, $T = \sum_{k} T_k$, $\Wb\in \bbR^{(T - N)\times (d(p + 1))}$ and $\Eb \in \bbR^{(T - N)\times d}$. 
+
+To solve for the parameter $\bPsi\in\bbR^{d (p+1) \times d}$, we propose the following optimization problem,
+\begin{equation}\label{eq:rvar_matreg_lasso}
+	\bhat\bPsi := \bhat\bPsi(\lambda_1,\lambda_2) = \argmin_{\bPsi\in \bbR^{d (p+1) \times d}} \vertiii{ \Zb - \Wb \bPsi }_{F}^2 + \lambda_1 \vertiii{\Psi_{0}}_1 +  \lambda_2 \vertiii{[\Psi_1 \, \Psi_2 \, \ldots \, \Psi_p]}_1,
+\end{equation}
+where the hyperparameter $\lambda_1$ serves to penalize the common structure of all VAR models, and $\lambda_2$ penalizes the $X$ covariate dependent portion of the model. We can interpret \eqref{eq:rvar_matreg_lasso} as a matrix regression problem. Notice that the optimization problem \eqref{eq:rvar_matreg_lasso} is equivalent to solving the separate column-wise optimization problems
+\begin{equation}\label{eq:rvar_opt}
+	\bhat\bPsi^{\ell}(\lambda_1,\lambda_2) = \argmin_{\bPsi^{(\ell)} \in \bbR^{d (p+1)}} \vertiii{ \Zb_{\cdot \ell} - \Wb \bPsi^{(\ell)} }_{F}^2 + \lambda_1 \|{[\bPsi^{(\ell)}]_{1:d}}\|_1 +  \lambda_2 \|{[\bPsi^{(\ell)}]_{(d+1):(dp)}}\|_1.
+\end{equation}
+When solving the individual optimization problems \eqref{eq:rvar_opt}, we can set the estimated parameter $\bhat\bPsi(\lambda_1,\lambda_2) := \left[\bhat\bPsi^{1}\, \bhat\bPsi^{2}\,\ldots \, \bhat\bPsi^{d}\right](\lambda_1,\lambda_2)\in\bbR^{d(p+1)\times d}$. Figure \ref{fig:rvar_TrueEstimatedPars} in the previous section was derived with $\lambda_1 = \lambda_2 = 0$.
+
+The current implementation only allows for a single lagged relationship, \textit{i.e.} $q = 1$. We aim to create a more general implementation with lag $q> 1$ in the future. Alternatively, we can further vectorize the representation \eqref{eq:rvar_mat} into a single-response linear regression of the form 
+\begin{align*}
+	\bvec(\bZ) =  ( I_d \otimes  \Wb )  \cdot \bvec(\Psi) + \bvec(\Eb)
+\end{align*}
+where $\bvec(\Ab) = [A_{\cdot 1}^\mt , A_{\cdot 2}^\mt ,  \ldots A_{\cdot n}^\mt]^\mt\in\bbR^{ab}$ and $\Ab \otimes \Bb = [A_{ij}\cdot \Bb]_{i,j}\in\bbR^{ac \times bd}$ for any $\Ab\in\bbR^{a\times b}$ and $\Bb \in \bbR^{c\times d}$. Thus, solving \eqref{eq:rvar_opt} is equivalent to solving a weighted-penalty version of the LASSO \jose{add LASSO/glmnet ref}.
+
+\subsection{Adaptive CD-VAR}\label{subsec:adaptiveCDVAR}
+
+To improve upon the performance of our original estimator, we propose a refinement of our CD-VAR estimator through an adaptive approach. For this, let $\bhat{\bPsi}$ be an initial estimator of the CD-VAR model. Then, given a constant $\gamma > 0$ we define the adaptively-weighted $\ell_1$ penalty as:
+\begin{equation}
+	P_{ada}(\bPsi)  = \sum_{\ell = 1}^{p}\sum_{i, j=1}^{d}  |\Psi^{(\ell)}_{ij}|^{-\gamma}\cdot |\bPsi^{(w)}_{ij}|
+\end{equation}
+Then, for $\lambda >0$, our adaptive CD-VAR estimator is given as a solution to the optimization problem
+\begin{equation*}\label{eq:rvar_opt}
+	\bhat\bPsi_{ada}(\lambda_a) = \argmin_{\bPsi \in \bbR^{d \times (d(p+1))}} \vertiii{ \Zb - \Wb \bPsi }_{F}^2 + \lambda_a P_{ad}(\bPsi).
+\end{equation*}
+
+In following sections, we explore how the adaptive approach can help improve the edge-recovery performance. 
+
+
+\subsection{Tuning Parameter Selection}
+
+One of the main concerns when fitting a penalized model is to determine the best procedure for selecting tuning parameters. In particular, due to the dependence present in time series data, direct sample splitting is not feasible, leading to sophisticated procedures of data splitting to obtain a reasonable cross-validation procedure. For example \jose{add references, and what they do.}
+
+\subsubsection{Cross-Validation}
+
+Contrary to other methods like GIMME and Multi-VAR, one can generate ``predictive model coefficients'': with a model $\hat\bPsi\in\bbR^{d\times (p(d+1))}$ trained on the data of $N$ individuals $\{(\bX_k, \Yb^{(k)})\}_{k=1}^N$, we may provide an estimate of the coefficients of an out-of-sample individual $\{(\bX_{N+1}, \Yb^{(N+1)})$ via $\hat\Phi_{N+1} = \hat\Psi_{0} + \sum_{i=1}^p X_{ki} \hat\Psi_{i}$.
+
+In our particular modeling, due to the independence across individuals, it is possible for us to perform cross validation as follows. Given a number of subjects $N$ and number of folds $K< N$, we divide the set of individuals $\{1,2,\ldots, N\} $into $K$ groups $\cG_1,\ldots, \cG_K$. Then, for each $k\in[K]$, the $k$-th fold consist of the union of all the data corresponding to the individuals in $\cG_k$. 
+
+While simple, this approach for cross-validation cannot be used in usual VAR models, or even the Multi-VAR and GIMME methods. The main reason is that our model assumes a structural relationship between the exogenous covariates and the individual time series model. Therefore, the training on a set of individuals $\cG\subset [N]$ can be used to infer the time series coefficients for a new individual $i\in [N] \setminus \cG$. In contrast, methods like GIMME, Multi-VAR and their extensions must train individual coefficients for each individual separately. Therefore, fitting the time series models for a subset of individuals $\cG\subset [N]$ cannot be exploited to determine the coefficients of a new individual $i\in [N] \setminus \cG$, or at least not directly.
+
+On our case, since we assume that there is an underlying additive structure that connects all the individual time series models, it is possible to train both the invidiual and common structure simultaneously. 
+
+
+\subsubsection{BIC}
+
+In addition to cross-validation, we alternatively propose the fitting of our model by selecting the tuning parameter that minimizes the Bayesian information criteria (BIC). Given $\lambda_1,\lambda_2 > 0$, we define,
+\begin{equation}\label{eq:bic}
+	\BIC(\lambda_1,\lambda_2) =  \vertiii{ \Zb - \Wb \bhat\bPsi(\lambda_1,\lambda_2) }_{F}^2 + \vertiii{\bhat\bPsi(\lambda_1,\lambda_2)}_0 \log(T-N)  . 
+\end{equation}
+
+Through numerical results, we have verified that BIC is a measure that leads to more sparse estimates of the matrix $\bPsi$ when compared to the estimate obtained through cross-validation.
+
+\section{Fitting RUSEM}
+
+
+The implementation of the RVAR model described in Section \ref{section:rvar} is simply a generalization of the optimization problem considered in the \citet{fisher2022penalized}. Notice that the RVAR focuses the estimation on the lagged effects $\bPsi$. For the GIMME model, we are also interested in recovering contemporaneous effects. The GIMME model cannot easily be extended to the regression setting. Therefore, we need to explore a different procedure for recovering the USEM structure in the regression setting. This will require thought and research...
+
+I explored the original GIMME reference \citet{gates2012group}, which points towards the modification index described in \citet{sorbom1989model}. I am still trying to understand how the GIMME adapts the estimation of USEM described in \citet{sorbom1989model} to scenarios with time dependence. This will be the next task.
+
+
+
+
+\section{Simulation Study for R-VAR}
+
+To explore the performance of our proposed RVAR model, and to compare to other methods found in the literature, we perform a numerical simulation study.
+
+\subsection{Simulation Setup}
+
+
+
+We consider multivariate time series over $d = 10, 20, 30$ variables of interest. We consider scenarios with $N = 10, 20$ subjects, measured over $T = 30, 50, 100$ time points. For each subject $k\in\{1,2,\ldots , N\}$, we simulate a vector of $p = 2,5$ time-invariant covariates according to the mixture distribution $\bX_{k} = (X_{k1},X_{k2},\ldots , X_{kp})\stackrel{i.i.d.}{\sim} 0.25\cdot \delta_{0} + 0.75\cdot\Unif([-1,-0.5]\cup [0.5,1])$. Then, we simulate a lag-1 time series dataset for the subject $k \in \{1,2,\ldots , N\}$ according to the covariate-dependent VAR model \eqref{eq:rvar} with parameter $\bPsi(\bX_i)$, where 
+\begin{equation*}
+	\bPsi(\bx) = \Psi_0 + x_1 \Psi_1 + x_2 \Psi_2 + \ldots + x_p \Psi_p.
+\end{equation*}
+Finally, the common effect matrix $\Psi_0\in\bbR^{d\times d}$ and the matrix of covariate-dependent effects $\Psi_1,\ldots,\Psi_p \in\bbR^{d\times d}$ are generated as follows. First, we select the proportion of common non-zero entries $\eta_{c}$, a proportion of covariate-dependent non-zero entries $\eta_{i}$. We generate $\Psi_0$ by selecting at random $d^2 \eta_{c}$ entries to follow the distribution $\Unif([-0.9,-0.3]\cup[0.3,0.9])$. To generate $\Psi_k$,  we select $d^2 \eta_{i}$ to follow $\Unif([-0.9,-0.3]\cup[0.3,0.9])$. In our simulations, we consider $(\eta_c, \eta_i) = \{ (0.075,0.025), (0.025,0.075)\}$. Finally, we generate time series for the $k$-th subject $\{\bY^{(k)}_1,\bY^{(k)}_2,\ldots,\bY^{(k)}_{T+400}\}$ via the model \eqref{eq:rvar}, with $\be^{(k)}_1, \be^{(k)}_2, \ldots, \be^{(k)}_T\stackrel{i.i.d.}{\sim} N_{d}(\bzero, (0.1) \Ir_{d})$, and discard the first 400 time steps. 
+
+We compare our proposed sparse CD-VAR method with methods of multi-subject vector auto-regressive models found in the literature. In particular, we consider the estimation of the time series via the individual VAR model \citep{basu2015regularized}, as well as the Multi-VAR method in their original and adaptive versions \citep{fisher2022penalized}. For the selection of the tuning parameters of the CD-VAR method, we consider training based on cross-validation, as well as based on our proposed BIC measure. Furthermore, we fit our method with both a direct and two-step adaptive approach, as described in Section \ref{subsec:adaptiveCDVAR}. 
+
+We compare the methods in terms of several measurements of performance. First, we consider the mean root aggregated error (MRAE), and mean absolute aggregated error (MAAE), given by,
+\begin{align*}
+	MRAE &= \frac{1}{N}\sum_{k=1}^N  \sum_{\ell = 1}^p  \vertiii{\hat\Psi^{k}_{\ell} - \Psi^{k}_{\ell}}_F;\\
+	%%
+	MAAE &= \frac{1}{N}\sum_{k=1}^N  \sum_{\ell = 1}^p  \left\|\hat\Psi^{k}_{\ell} - \Psi^{k}_{\ell}\right\|_1;\\
+\end{align*}
+
+
+
+\subsection{Simulation Results}
+
+
+The results of the MRAE for $d = 30$ are presented in Figure \ref{fig:30mrae}. The best performance for all scenarios is obtained by the adaptive CV-SCDVAR model, closely followed by the original CV-SCDVAR model and the adaptive BIC-SCDVAR model. This findings are consistent across choices of number of explanatory covariates $p=2,5$, number of subjects $N = 10, 20$, common entries $p_c = 0.025, 0.075$ and number of available time points $T$.  
+
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\textwidth, page=4]{sims_4/621_ByPnN_d30_sigma2_0.1.pdf}
+	\includegraphics[width=0.9\textwidth, page=4]{sims_4/621_ByPnN_d20_sigma2_0.1.pdf}
+	\caption{This is the caption for the inserted PDF page.}
+	\label{fig:30mrae}
+\end{figure}
+
+\newpage
+
+\end{comment}
