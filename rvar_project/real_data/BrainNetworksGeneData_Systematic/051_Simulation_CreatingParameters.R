@@ -56,7 +56,7 @@ CreateParameters <- function(id_task) {
   T_vec <- 10*(1:10)
   args <- list(
     running_days  = 2,
-    range         = 150,
+    range         = 50,
     horizon       = 10,
     T             = T_vec[id_task])                 ## T        : No. of time points
 
