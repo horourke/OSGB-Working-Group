@@ -16,7 +16,7 @@ library(gridExtra)
 
 
 ###################### Creating folders:
-subfolder_new        <- paste0("600_AggregatedDataReal/")
+subfolder_new        <- paste0("600_AggregatedDataReal_v3/")
 subfolder_data_new   <- paste0(subfolder_new, "data_all/")
 subfolder_plots_new  <- paste0(subfolder_new, "plots_all/")
 
@@ -38,17 +38,13 @@ if (!dir.exists(subfolder_plots_new)) {
 method_names <- c(
   "var_standard",     
   "mvar_adaptive",    "mvar_standard",    
-  "modvar_MO",        #"modvar_FI",        "modvar_MI",
-  "ada.modvar_MO")    #"ada.modvar_FI",    "ada.modvar_MI",
-  #"modvar1sd_MO",     #"modvar1sd_FI",     "modvar1sd_MI",    
-  #"ada.modvar1sd_MO", "ada.modvar1sd_FI", "ada.modvar1sd_MI")
+  "modvar_MO",
+  "ada.modvar_MO")
 method_names_clean <- c(
   "VAR",          
   "MultiVAR: Standard", "MultiVAR: Adaptive",
-  "MOD-VAR: Standard", #"MOD-VAR: FI", "MOD-VAR: MO + FI",
-  "MOD-VAR: Adaptive")#, "ada.MOD-VAR: FI", "ada.MOD-VAR: MO + FI",
-  #"MOD-VAR1sd: MO", "MOD-VAR1sd: FI", "MOD-VAR1sd: MO + FI",
-  #"ada.MOD-VAR1sd: MO", "ada.MOD-VAR1sd: FI", "ada.MOD-VAR1sd: MO + FI")
+  "MOD-VAR: Standard",
+  "MOD-VAR: Adaptive") 
 
 results_dir     <- paste0(subfolder_new, "plots_all/")
 
@@ -201,13 +197,7 @@ plot_data <- output_merged %>%
       )
     )
   )
-#ggplot(plot_data, aes(x = T, y = meanfc, color = method, fill = method)) + 
-#  geom_ribbon(aes(ymin = meanfc - sdfc, ymax = meanfc + sdfc), alpha = 0.15, color = NA) +
-#  geom_line(linewidth = 0.8) +  
-#  facet_wrap(~ horizon, nrow = 1) +
-#  labs(x = "Time", y = "Forecasting Error", color = "Method", fill = "Method") +
-#  theme_bw() +
-#  theme(legend.position = "bottom")
+  
 cbPalette <- c(
   "#E69F00", "#56B4E9", "#009E73",
   "#F0E442", "#0072B2", "#D55E00", "#CC79A7"

@@ -15,7 +15,7 @@ library(lazyeval)
 
 
 ###################### Creating folders:
-subfolder_new        <- paste0("600_AggregatedDataReal/")
+subfolder_new        <- paste0("600_AggregatedDataReal_v3/")
 subfolder_data_new   <- paste0(subfolder_new, "data_all/")
 subfolder_plots_new  <- paste0(subfolder_new, "plots_all/")
 
@@ -55,7 +55,7 @@ run_info <- list(
 
   list(
     main_dir       = "400_modvar/",
-    run_index      = 2,
+    run_index      = 3,
     abrev_name     = "MOD-VAR"),
 
   list(

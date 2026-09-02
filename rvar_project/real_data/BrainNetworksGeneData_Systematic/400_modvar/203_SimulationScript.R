@@ -26,7 +26,7 @@ source("../042_modvar/ada.modvar.r")
 source("051_Simulation_CreatingParameters.R")
 source("052_Simulation_EvaluatingMeasures.r")
 
-index  <- 2
+index  <- 3
 main_folder <- "400_modvar/"
 
 #################################################

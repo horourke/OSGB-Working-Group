@@ -121,8 +121,8 @@ FullSimulation <- function(args) {
       ## 
       print(paste0("Step ", sim_ind,".1: MOD-VAR MOD ONLY"))
       start_time                  <- Sys.time()
-      lambdas1  <- 10^(seq(2, -2, length.out = 30))
-      ratios    <- 10^(seq(2, 0, length.out = 30))
+      lambdas1  <- 10^(seq(0, -5, length.out = 30))
+      ratios    <- 10^(seq(2, -2, length.out = 30))
       MO.model <- cv.modvar(
         Ylist = Y_list, 
         X = lcdf_norm, 
@@ -162,8 +162,8 @@ FullSimulation <- function(args) {
     {
       print(paste0("Step ", sim_ind,".2: CV.MOD-VAR rolling window"))
       start_time                  <- Sys.time()
-      lambdas1  <- 10^(seq(2, -2, length.out = 30))
-      ratios    <- 10^(seq(2, 0, length.out = 30))
+      lambdas1  <- 10^(seq(0, -5, length.out = 30))
+      ratios    <- 10^(seq(2, -2, length.out = 30))
 
       FI.model <- cv.modvar(
         Ylist = Y_list, 
@@ -204,8 +204,8 @@ FullSimulation <- function(args) {
     {
       print(paste0("Step ", sim_ind,".2: CV.MOD-VAR rolling window"))
       start_time                  <- Sys.time()
-      lambdas1  <- 10^(seq(2, -2, length.out = 30))
-      ratios    <- 10^(seq(2, 0, length.out = 30))
+      lambdas1  <- 10^(seq(0, -5, length.out = 30))
+      ratios    <- 10^(seq(2, -2, length.out = 30))
 
       MI.model <- cv.modvar(
         Ylist = Y_list, 
@@ -247,8 +247,8 @@ FullSimulation <- function(args) {
       ## 
       print(paste0("Step ", sim_ind,".1: adaBIC.MOD-VAR"))
       start_time                  <- Sys.time()
-      lambdas1  <- 10^(seq(2, -2, length.out = 30))
-      ratios    <- 10^(seq(2, 0, length.out = 30))
+      lambdas1  <- 10^(seq(0, -5, length.out = 30))
+      ratios    <- 10^(seq(2, -2, length.out = 30))
 
 
       W.ada <- adaweights(
@@ -292,8 +292,8 @@ FullSimulation <- function(args) {
       ## 
       print(paste0("Step ", sim_ind,".1: adaBIC.MOD-VAR"))
       start_time                  <- Sys.time()
-      lambdas1  <- 10^(seq(2, -2, length.out = 30))
-      ratios    <- 10^(seq(2, 0, length.out = 30))
+      lambdas1  <- 10^(seq(0, -5, length.out = 30))
+      ratios    <- 10^(seq(2, -2, length.out = 30))
 
 
       W.ada <- adaweights(
@@ -335,8 +335,8 @@ FullSimulation <- function(args) {
       ## 
       print(paste0("Step ", sim_ind,".1: adaBIC.MOD-VAR"))
       start_time                  <- Sys.time()
-      lambdas1  <- 10^(seq(2, -2, length.out = 30))
-      ratios    <- 10^(seq(2, 0, length.out = 30))
+      lambdas1  <- 10^(seq(0, -5, length.out = 30))
+      ratios    <- 10^(seq(2, -2, length.out = 30))
 
 
       W.ada <- adaweights(
