@@ -58,111 +58,7 @@ eval_forecast <- function(Y_forecast, B_est_list, range, horizon) {
 ##################################################
 ##################################################
 
-Tsamp <- 100
-dfn_list <- df_list %>% 
-  lapply(function(x) {
-    x %>%
-      dplyr::select(-t,-sub) %>%
-      mutate_if(is.numeric, scale) %>%
-      return()
-  })
-dfn_list[[1]] %>% apply(2,mean)  
-dfn_list[[1]] %>% apply(2,var)  
-
-
-
-models <- list()
-results <- list()
-Y_forecast <- list()
-for(i in 1:length(df_list)) {
-  models[[i]] <- df_list[[i]][1:Tsamp,] %>% 
-    tibble() %>%
-    dplyr::select(-sub,-t) %>% 
-    as.matrix() %>%
-    BigVAR::constructModel( 
-      p = 1,
-      gran = c(50,10),
-      struct = "Basic",
-      cv = "Rolling",
-      verbose = TRUE,
-      ownlambdas = FALSE,
-      model.controls=list(intercept=FALSE),
-      linear = FALSE)
-  results[[i]] <- BigVAR::cv.BigVAR(models[[i]])
-  print(coef(results[[i]]))
-  
-  Y_forecast[[i]] <- df_list[[i]][-(1:Tsamp),] %>% 
-    tibble() %>%
-    dplyr::select(-sub,-t) %>% 
-    as.matrix() 
-
-}
-
-results[[1]]@Loss
-
-str(results[[1]])
-apply(results[[1]]@InSampMSFE, 2, mean)
-apply(results[[1]]@OOSMSFE, 2, mean)
-results[[1]]
-results[[1]]@LambdaGrid
-results[[1]]@InSampMSFE
-
-B_est_list <- lapply(results,coef) %>% 
-  lapply(as.matrix) 
-eval_forecast(Y_forecast, B_est_list, range = 100, horizon = 10) %>%
-  apply(1, mean)
-##RW Out of Sample Loss
-## [1] 0.294
-
-
-B_est_list2 <- rep(ncol(df) - 2, length(df_list)) %>%
-  lapply(function(x) {return(diag(x))})
-results %>% lapply(function(x) {})
-
-
-
-par(mar = c(5.1, 4.1, 4.1, 4.1))
-((eval_forecast(Y_forecast, B_est_list, range = 100, horizon = 10) -
-    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
-    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) %>% 
-  plot(breaks = 10)
-
-
-((eval_forecast(Y_forecast, B_est_list, range = 100, horizon = 10) -
-    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
-    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) %>% 
-  apply(1, mean) %>%
-  plot()
-
-
-## Benefits compared to persistent forecasting.
-((eval_forecast(Y_forecast, B_est_list, range = 100, horizon = 10) -
-    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
-    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) %>% 
-  t() %>% as.data.frame() %>%
-  tibble() %>% 
-  pivot_longer(cols = msfe_step1:msfe_step10,
-               names_to = "StepNo",
-               names_prefix = "msfe_step",
-               values_to = "error") %>%
-  mutate(StepNo = factor(StepNo, levels = 1:10, ordered = TRUE)) %>%
-  ggplot(aes(x = StepNo, y = error)) +
-    geom_boxplot() +
-    geom_hline(yintercept = 0)
-  
-## We observe that for the 1st step prediction, the model performs
-## somewhat poorly (~1% worse than persistence forecasting), but
-## as we increase the time horizon, the estimation improves
-## significantly (on average, 20% relative improvement)
-
-
-##################################################
-##################################################
-##################################################
-##################################################
-##################################################
-##################################################
-
+Tsamp <- 50
 dfn_list <- df_list %>% 
   lapply(function(x) {
     x %>%
@@ -172,72 +68,16 @@ dfn_list <- df_list %>%
       return()
   })
 
-dfn_list[[1]] %>% dim()
-dfn_list[[1]] %>% apply(2,mean)  
-dfn_list[[1]] %>% apply(2,var)  
 
+Y_forecast <- list()
+for(i in 1:length(df_list)) {
+  
+  Y_forecast[[i]] <- df_list[[i]][-(1:Tsamp),] %>% 
+    tibble() %>%
+    dplyr::select(-sub,-t) %>% 
+    as.matrix() 
 
-modelM50 <- multivar::constructModel(data = dfn_list, lassotype = "standard")
-fitM50 <- multivar::cv.multivar(modelM50)
-fitM50$mats %>% str()
-B_estM50_list <- (fitM50$mats)$total
-str(fitM50)
-
-dim(fitM50$MSFE)
-str(fitM50)
-
-((eval_forecast(Y_forecast, B_estM50_list, range = 100, horizon = 10) -
-    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
-    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) %>% 
-  plot(breaks = 10)
-
-
-((eval_forecast(Y_forecast, B_estM50_list, range = 100, horizon = 10) -
-    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
-    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) %>% 
-  apply(1, mean) %>%
-  plot()
-
-
-
-## Benefits compared to persistent forecasting.
-rfeM50 <- ((eval_forecast(Y_forecast, B_estM50_list, range = 100, horizon = 10) -
-    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
-    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) 
-p1 <- rfeM50 %>% 
-  t() %>% as.data.frame() %>%
-  tibble() %>% 
-  pivot_longer(cols = msfe_step1:msfe_step10,
-               names_to = "StepNo",
-               names_prefix = "msfe_step",
-               values_to = "error") %>%
-  mutate(StepNo = factor(StepNo, levels = 1:10, ordered = TRUE)) %>%
-  ggplot(aes(x = StepNo, y = error)) +
-  geom_boxplot() +
-  geom_hline(yintercept = 0) +
-  ggtitle("Multi VAR")
-
-## Benefits compared to persistent forecasting.
-rfeVAR <- (eval_forecast(Y_forecast, B_est_list, range = 100, horizon = 10) -
-    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)) /
-    eval_forecast(Y_forecast, B_est_list2, range = 100, horizon = 10)
-p2 <- rfeVAR %>% 
-  t() %>% as.data.frame() %>%
-  tibble() %>% 
-  pivot_longer(cols = msfe_step1:msfe_step10,
-               names_to = "StepNo",
-               names_prefix = "msfe_step",
-               values_to = "error") %>%
-  mutate(StepNo = factor(StepNo, levels = 1:10, ordered = TRUE)) %>%
-  ggplot(aes(x = StepNo, y = error)) +
-  geom_boxplot() +
-  geom_hline(yintercept = 0) +
-  ggtitle("VAR")
-
-
-
-grid.arrange(p1, p2, ncol = 2)
-
+}
 
 
 ##################################################
@@ -247,30 +87,16 @@ grid.arrange(p1, p2, ncol = 2)
 ##################################################
 ##################################################
 ## MOD-VAR with only individual structure:
-Rcpp::sourceCpp("041_modvar/matrix_fista.cpp")
-source("041_modvar/auxfunct.r")
-source("041_modvar/adaweights.r")
-source("041_modvar/bic.modvar.r")
-source("041_modvar/cv.modvar.r")
-source("041_modvar/ada.modvar.r")
+Rcpp::sourceCpp("../042_modvar/matrix_fista.cpp")
+source("../042_modvar/auxfunct.r")
+source("../042_modvar/adaweights.r")
+source("../042_modvar/bic.modvar.r")
+source("../042_modvar/cv.modvar.r")
+source("../042_modvar/ada.modvar.r")
 
 
-#lambdas1  <- 10^(seq(3, 0, length.out = 10)) ## Surprisingly good!
-# ratios    <- 10^(seq(2, -2, length.out = 10))
-
-# lambdas1  <- 10^(seq(2, -1, length.out = 10)) # Improved early prediction,
-# ratios    <- 10^(seq(2, -2, length.out = 10)) # worsen later prediction. 
-
-# lambdas1  <- 10^(seq(2, -1, length.out = 10)) # Best so far!
-# ratios    <- 10^(seq(2, 0, length.out = 10)) 
-
-# lambdas1  <- 10^(seq(3, -3, length.out = 50)) # Bad! WTF
-# ratios    <- 10^(seq(3, -3, length.out = 50)) 
-
-
-
-lambdas1  <- 10^(seq(2, -2, length.out = 30))
-ratios    <- 10^(seq(2, 0, length.out = 30))
+lambdas1  <- 10^(seq(0, -5, length.out = 30))
+ratios    <- 10^(seq(2, -2, length.out = 30))
 cv.model <- dfn_list %>% 
   lapply(function(x) {
     x <- as.matrix(x)
@@ -278,24 +104,136 @@ cv.model <- dfn_list %>%
     return(x)
   }) %>%
   cv.modvar(
-    X = NULL,
+    X = as.matrix(lcdf_norm),
     lambdas1 = lambdas1,
     ratios = ratios,
-    multi = TRUE,
-    cv.type = "rolling")
+    multi = FALSE,
+    cv.type = "bysubject",
+    nfolds = 6)
 
 
-save.image("BrainNetworksGeneData/102_Data.RData")
-rm(list = ls())
+save.image("711_Data.RData")
 ##################################################
 ##################################################
-load("BrainNetworksGeneData/102_Data.RData")
+load("711_Data.RData")
 
+
+library(tseries)
+library(MTS)
+library(ppcor)
+library(TSA)
+library(forecast)
+library(ggplot2)
+
+library(magrittr)
+library(readxl)
+library(tidyverse)
+library(plot.matrix)
+
+## Model fitting packages:
+library(glmnet)
+library(mvtnorm)
+library(multivar)
+library(BigVAR)
+library(expm)
+library(gridExtra)
 
 par(mfrow = c(1,2),
     mar = c(5.1, 4.1, 4.1, 4.1))
 plot(log(cv.model$eval.mat, 10), breaks = 30)
 plot(cv.model$eval.mat == min(cv.model$eval.mat))
+cv.model$lambda1
+cv.model$ratios
+
+cv.model$idiographic_coeffs
+par(mfrow = c(2,2))
+1:4 %>% 
+  lapply(function(i) {
+    network <- abs(cv.model$moderator_coeffs[[i]])
+    name <- names(lcdf)[i+1]
+    
+    plot(network, main = name)
+  })
+
+summary(lcdf_norm)
+
+
+
+cv.model$moderator_coeffs[[1]]
+
+colnames(dfn_list[[1]])
+
+mod_coeffs <- lapply(
+  cv.model$moderator_coeffs, 
+  function(x) {
+    colnames(x) <- colnames(dfn_list[[1]])
+    rownames(x) <- colnames(dfn_list[[1]])
+    return(x)
+  }
+)
+
+cv.model$joint_coeffs
+
+joint_coeffs <- cv.model$joint_coeffs
+colnames(joint_coeffs) <- colnames(dfn_list[[1]])
+rownames(joint_coeffs) <- colnames(dfn_list[[1]])
+
+mat_list <- list(
+  joint = joint_coeffs,
+  mod_age = mod_coeffs[[1]],
+  mod_gender = mod_coeffs[[2]],
+  mod_lcvol = mod_coeffs[[3]],
+  mod_cnr = mod_coeffs[[4]])
+
+
+# Save each matrix as a CSV named after the list element
+for (nm in names(mat_list)) {
+  write.csv(
+    mat_list[[nm]],
+    file = file.path(paste0("600_AggregatedDataReal/modmat_all/711_",nm, ".csv")),
+    row.names = TRUE
+  )
+}
+
+
+mod_coeffs[[1]] ## AGE EFFECTS
+## SN_AnteriorInsula  --> FPN_dlPFC           (-)
+## SN_AnteriorInsula  --> DMN_mPFC            (-)
+## DMN_IPL            --> SN_AnteriorInsula   (+)
+
+mod_coeffs[[2]] ## GENDER EFFECTS:
+## NONE
+
+mod_coeffs[[3]] ## LC VOLUME EFFECTS:
+## DMN_MTL            --> DMN_PCC_Precuneus   (-)
+## DMN_MTL            --> DMN_IPL             (-)
+## DMN_IPL            --> DMN_MTL             (+)
+## FPN_dACC_preSMA    --> DMN_MTL             (-)
+
+mod_coeffs[[4]] ## CNR EFFECTS:
+## FPN_PPC            --> DMN_MTL             (+)
+## FPN_PPC            --> DMN_IPL             (+)
+## DMN_mPFC           --> DMN_PCC_Precuneus   (-)
+## DMN_PCC_Precuneus  --> DMN_IPL             (+)
+## DMN_MTL            --> FPN_PPC             (-)
+
+## Gene coding:
+# 1) "FPN_dlPFC"
+# 2) "FPN_PPC"
+# 3) "FPN_dACC_preSMA"
+# 4) "DMN_mPFC"
+# 5) "DMN_PCC_Precuneus"
+# 6) "DMN_IPL"
+# 7) "DMN_MTL"
+# 8) "SN_AnteriorInsula"
+# 9) "SN_ACC" 
+
+
+length(df_list)
+
+
+cv.model$moderator_coeffs[[1]]
+
 
 
 cv.model$eval.mat
@@ -321,6 +259,15 @@ cv.model$bysubject_coeffs[[1]] == cv.model$idiographic_coeffs[[1]]
 
 
 B_estMOD50_list <- cv.model$bysubject_coeffs
+B_est_list2 <- rep(ncol(df) - 2, length(df_list)) %>%
+  lapply(function(x) {return(diag(x))})
+
+
+
+apply(
+  eval_forecast(Y_forecast, B_estMOD50_list, range = 100, horizon = 10),
+  1, 
+  mean)
 
 str(B_estMOD50_list)
 
