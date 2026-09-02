@@ -118,7 +118,7 @@ CreateParameters <- function(id_task, runtype = c(1, 2, 3)) {
     nsim          = ifelse(
                       runtype == 1, 
                       1, 
-                      ifelse(runtype == 2, 2, 5)),  ## nsim     : no of simulation repetitions.
+                      ifelse(runtype == 2, 2, 10)),  ## nsim     : no of simulation repetitions.
     sigma2        = c(0.1),                         ## sigma2   : variance o VAR error term.
     n             = c(15, 20, 25),                  ## n        : No. of individuals
     T             = c(30, 60, 90),                  ## T        : timepoints per individual.
