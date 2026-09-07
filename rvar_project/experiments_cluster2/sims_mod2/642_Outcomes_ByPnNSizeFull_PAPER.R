@@ -20,8 +20,8 @@ cbPalette <- c("#999999", "#E69F00", "#56B4E9",
                "#D55E00", "#CC79A7")
 
 ###################### Parameter table:
-runtype       <- 2 # FOR EXPERIMENT RUNS
-#runtype       <- 3 # FOR FULL RUNS
+#runtype       <- 2 # FOR EXPERIMENT RUNS
+runtype       <- 3 # FOR FULL RUNS
 index_old     <- 1 # run index to use
 sim_par_table <- expand.grid(
   running_days  = 2,
@@ -68,7 +68,7 @@ attach(sim_par_table)
 
 
 ###################### Creating folders:
-subfolder_new        <- paste0("500_AggregatedDataExperiments/")
+subfolder_new        <- paste0("600_AggregatedDataFull/")
 subfolder_data_new   <- paste0(subfolder_new, "data_all/")
 subfolder_plots_new  <- paste0(subfolder_new, "paper_plots_all/")
 
