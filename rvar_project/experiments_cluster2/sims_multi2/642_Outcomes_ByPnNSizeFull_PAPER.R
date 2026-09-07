@@ -95,17 +95,17 @@ method_names <- c(
 method_names_clean <- c(
     "VAR",          
     "Multi-VAR: Standard", "Multi-VAR: Adaptive",
-    "MOD-VAR: RWCV","Adap. MOD-VAR: CV")
+    "MOD-VAR","Adap. MOD-VAR")
 method_lookup <- setNames(method_names_clean, method_names)
 
 highlight_methods <- c(
-    "MOD-VAR: RWCV","Adap. MOD-VAR: CV")
+    "MOD-VAR","Adap. MOD-VAR")
 method_colors <- c(
   "VAR" = cbPalette[2],
   "Multi-VAR: Standard" = cbPalette[3],
   "Multi-VAR: Adaptive" = cbPalette[4],
-  "MOD-VAR: RWCV" = "#000000",
-  "Adap. MOD-VAR: CV" = "#D55E00"
+  "MOD-VAR" = "#000000",
+  "Adap. MOD-VAR" = "#D55E00"
 )
 
 # transparency for all ribbons; change this value to make ribbons darker or lighter
