@@ -93,15 +93,15 @@ method_names <- c(
   "modvar_cv_bsubj", "modvar_ada.cv")
 method_names_clean <- c(
   "VAR",
-  "M-VAR: Standard", "M-VAR: Adaptive",
+  "Multi-VAR: Standard", "Multi-VAR: Adaptive",
   "MOD-VAR: CV", "Adap. MOD-VAR: CV")
 method_lookup <- setNames(method_names_clean, method_names)
 
 highlight_methods <- c("MOD-VAR: CV", "Adap. MOD-VAR: CV")
 method_colors <- c(
   "VAR" = cbPalette[2],
-  "M-VAR: Standard" = cbPalette[3],
-  "M-VAR: Adaptive" = cbPalette[4],
+  "Multi-VAR: Standard" = cbPalette[3],
+  "Multi-VAR: Adaptive" = cbPalette[4],
   "MOD-VAR: CV" = "#000000",
   "Adap. MOD-VAR: CV" = "#D55E00"
 )
@@ -192,7 +192,7 @@ for(sigma2_val in c(0.1)) {
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
       ylab("Mean TPR") +
-      theme(legend.position = "bottom")
+      theme(legend.position = "bottom", legend.title = element_blank())
     print(p1)
     dev.off()
 
@@ -213,7 +213,7 @@ for(sigma2_val in c(0.1)) {
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
       ylab("Mean FPR") +
-      theme(legend.position = "bottom")
+      theme(legend.position = "bottom", legend.title = element_blank())
     print(p2)
     dev.off()
 
@@ -234,7 +234,7 @@ for(sigma2_val in c(0.1)) {
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
       ylab(expression(E[l1])) +
-      theme(legend.position = "bottom")
+      theme(legend.position = "bottom", legend.title = element_blank())
     print(p3)
     dev.off()
 
@@ -255,7 +255,7 @@ for(sigma2_val in c(0.1)) {
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
       ylab(expression(E[F])) +
-      theme(legend.position = "bottom")
+      theme(legend.position = "bottom", legend.title = element_blank())
     print(p4)
     dev.off()
 
@@ -280,7 +280,7 @@ for(sigma2_val in c(0.1)) {
       annotate("text", x = 55 * 0.93, y = 2.15, label = "1 h", size = 2.5) +
       facet_grid(p_name ~ pc_name + n_name, scales = "free_x", labeller = label_parsed) +
       scale_colour_manual(values = method_colors) +
-      theme(legend.position = "bottom")
+      theme(legend.position = "bottom", legend.title = element_blank())
     print(p5)
     dev.off()
 
@@ -300,7 +300,7 @@ for(sigma2_val in c(0.1)) {
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
       ylab("RMSFE") +
-      theme(legend.position = "bottom")
+      theme(legend.position = "bottom", legend.title = element_blank())
     print(p6)
     dev.off()
 
@@ -319,7 +319,7 @@ for(sigma2_val in c(0.1)) {
       facet_grid(p_name ~ pc_name + n_name, scales = "free_x", labeller = label_parsed) +
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
-      theme(legend.position = "bottom")
+      theme(legend.position = "bottom", legend.title = element_blank())
     print(p7)
     dev.off()
 
@@ -338,7 +338,7 @@ for(sigma2_val in c(0.1)) {
       facet_grid(p_name ~ pc_name + n_name, scales = "free_x", labeller = label_parsed) +
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
-      theme(legend.position = "bottom")
+      theme(legend.position = "bottom", legend.title = element_blank())
     print(p8)
     dev.off()
 
@@ -358,7 +358,7 @@ for(sigma2_val in c(0.1)) {
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
       ylab("Mean Sensitivity") +
-      theme(legend.position = "bottom")
+      theme(legend.position = "bottom", legend.title = element_blank())
     print(p9)
     dev.off()
 
@@ -379,7 +379,7 @@ for(sigma2_val in c(0.1)) {
       scale_colour_manual(values = method_colors) +
       scale_fill_manual(values = method_colors) +
       ylab("Mean Specificity") +
-      theme(legend.position = "bottom")
+      theme(legend.position = "bottom", legend.title = element_blank())
     print(p10)
     dev.off()
 
