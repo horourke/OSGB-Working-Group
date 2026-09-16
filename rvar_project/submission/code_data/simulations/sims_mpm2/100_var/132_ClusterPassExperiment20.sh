@@ -1,7 +1,5 @@
 #!/bin/sh
 #SBATCH --job-name=var2
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=josesa@ucr.edu
 #SBATCH --cpus-per-task=1
 #SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=2gb
