@@ -177,25 +177,32 @@ group_by(id) %>%
   mutate(t = row_number()) %>%
   ungroup()
 
-# subset data to contain only id, t, and Y vars
 
+# subset data to contain only id, t, and Y vars
+ls(ari_data)
 yvars <- c("depression", "anxiety", "distress", "somatization",
            "agreeableness", "conscientiousness", "emotional_stability", "openness",
            "workingmem", "attn_intensity", "attn_consistency", "exec_fn",
            "hrv", "hrv_deep", "o2_mean", 
-           "sleep_time", "rem_prop", "deep_prop", "time_awake", "subjective_sleep")
+           "sleep_time", "rem_prop", "deep_prop", "awake_time", "subjective_sleep")
+
+#Create list of matrices for Y's (outcomes)
+# just sleep and bio
+yvars <- c("hrv", "hrv_deep", "o2_mean", 
+           "sleep_time", "rem_prop", "deep_prop", "awake_time", "subjective_sleep")
+
+# cog and mood
+yvars <- c("depression", "anxiety", "distress", "somatization",
+           "workingmem", "attn_intensity", "attn_consistency", "exec_fn")
 
 ari_y <- ari_time %>%
-  select(id, t, depression, anxiety, subjective_sleep)
-head(ari_y)
+  select(id, t, yvars)
+ls(ari_y)
 
 # Select complete cases only
 
 ari_y_complete <- ari_y[complete.cases(ari_y), ]
-head(ari_y_complete)
-
-
-#Create list of matrices for Y's (outcomes)
+glimpse(ari_y_complete)
 
 id_vec <- unique(ari_y_complete$id)
 
@@ -210,14 +217,17 @@ ari_y_list <- lapply(
   data = ari_y_complete
 )
 
+# check length of each complete dataset
+map_int(ari_y_list, nrow)
+
 #MOD-VAR using gender + employment
-
-
 library(glmnet)
 library(plot.matrix)
 
+# d: number of Y vars
+# p: number of X vars
 cd_var_output <- cv.solve_rvar_glmnet_vectorized(
-  d = 3, p = 2,
+  d = 8, p = 2,
   Y_list = ari_y_list, 
   X = ari_x,
   #### TUNE LAMBDA AND PENALTY FACTOR
@@ -235,6 +245,7 @@ library("psych")
 layout(mat = matrix(c(1,1,2,3,4,5), nrow = 3, ncol = 2, byrow = TRUE))
 par(mar = c(5.1, 4.1, 4.1, 3.1)) 
 
+# max absolute value of main effect and moderator coefficients
 ymax <- max(abs(cd_var_output$rvar_opt_coeffs[, - (1:3)]))
 
 rwb <- colorRampPalette(colors = c("red", "white", "blue")) 
@@ -252,9 +263,12 @@ pwg <- colorRampPalette(colors = c("deeppink1", "white", "darkgreen"))
 pwg_vec <- pwg(12)
 
 # According to Jose: rows "var" are y_t, columns are y_t-1
-one <- as.matrix(cd_var_output$rvar_opt_coeffs[, -c(1:3)][1:3]) 
-two <- as.matrix(cd_var_output$rvar_opt_coeffs[, -c(1:3)][7:9])
-three <- as.matrix(cd_var_output$rvar_opt_coeffs[, -c(1:3)][4:6])
+# c(1:3)] removes 1st 3 which are not coeffs we need
+one <- as.matrix(cd_var_output$rvar_opt_coeffs[, -c(1:3)][1:8]) 
+two <- as.matrix(cd_var_output$rvar_opt_coeffs[, -c(1:3)][9:16])
+three <- as.matrix(cd_var_output$rvar_opt_coeffs[, -c(1:3)][17:24])
+
+par(mfrow = c(2, 2)) 
 
 ymax <- max(abs(rbind(
     one,
