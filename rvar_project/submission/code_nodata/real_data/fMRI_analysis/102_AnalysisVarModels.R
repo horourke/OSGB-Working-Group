@@ -113,7 +113,6 @@ eval_forecast(Y_forecast, B_est_list, range = 100, horizon = 10) %>%
 ## Generating trivial prediction model (persistence model):
 B_est_list2 <- rep(ncol(df) - 2, length(df_list)) %>%
   lapply(function(x) {return(diag(x))})
-results %>% lapply(function(x) {})
 
 
 ## Relative error of VAR compared to persistence model:
@@ -172,6 +171,9 @@ modelM50 <- multivar::constructModel(data = dfn_list, lassotype = "standard")
 fitM50 <- multivar::cv.multivar(modelM50)
 fitM50$mats %>% str()
 B_estM50_list <- (fitM50$mats)$total
+
+
+
 
 ## Relative error of Multi-VAR compared to persistence model:
 ((eval_forecast(Y_forecast, B_estM50_list, range = 100, horizon = 10) -
@@ -233,12 +235,12 @@ grid.arrange(p1, p2, ncol = 2)
 ##################################################
 ##################################################
 
-Rcpp::sourceCpp("041_modvar/matrix_fista.cpp")
-source("041_modvar/auxfunct.r")
-source("041_modvar/adaweights.r")
-source("041_modvar/bic.modvar.r")
-source("041_modvar/cv.modvar.r")
-source("041_modvar/ada.modvar.r")
+Rcpp::sourceCpp("../041_modvar/matrix_fista.cpp")
+source("../041_modvar/auxfunct.r")
+source("../041_modvar/adaweights.r")
+source("../041_modvar/bic.modvar.r")
+source("../041_modvar/cv.modvar.r")
+source("../041_modvar/ada.modvar.r")
 
 
 ## Model fitting:
@@ -258,11 +260,11 @@ cv.model <- dfn_list %>%
     cv.type = "rolling")
 
 
-save.image("BrainNetworksGeneData/102_Data.RData")
+save.image("102_Data.RData")
 rm(list = ls())
 ##################################################
 ##################################################
-load("BrainNetworksGeneData/102_Data.RData")
+load("102_Data.RData")
 
 
 ## Optimization landscape:
@@ -418,12 +420,12 @@ ggplot(perf_data, aes(x = factor(StepNo), y = error, fill = type)) +
 ##################################################
 
 ## ALL OPTIONS OF MOD-VAR MODELS:
-Rcpp::sourceCpp("041_modvar/matrix_fista.cpp")
-source("041_modvar/auxfunct.r")
-source("041_modvar/adaweights.r")
-source("041_modvar/bic.modvar.r")
-source("041_modvar/cv.modvar.r")
-source("041_modvar/ada.modvar.r")
+Rcpp::sourceCpp("../041_modvar/matrix_fista.cpp")
+source("../041_modvar/auxfunct.r")
+source("../041_modvar/adaweights.r")
+source("../041_modvar/bic.modvar.r")
+source("../041_modvar/cv.modvar.r")
+source("../041_modvar/ada.modvar.r")
 
 
 ## Fitting MOD-VAR with
@@ -479,12 +481,12 @@ MI.model <- dfn_list %>%
     cv.type = "rolling")
 
 
-save.image("BrainNetworksGeneData/102_Data.RData")
+save.image("102_Data.RData")
 rm(list = ls())
 ##################################################
 ##################################################
 ## Visualizations before comparison:
-load("BrainNetworksGeneData/102_Data.RData")
+load("102_Data.RData")
 
 ## Verifying correct fit conditions:
 str(MO.model$idiographic_coeffs)

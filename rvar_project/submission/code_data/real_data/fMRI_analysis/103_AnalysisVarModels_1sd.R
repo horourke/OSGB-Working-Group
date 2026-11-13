@@ -19,12 +19,12 @@ library(BigVAR)
 library(expm)
 library(gridExtra)
 
-Rcpp::sourceCpp("042_modvar/matrix_fista.cpp")
-source("042_modvar/auxfunct.r")
-source("042_modvar/adaweights.r")
-source("042_modvar/bic.modvar.r")
-source("042_modvar/cv.modvar.r")
-source("042_modvar/ada.modvar.r")
+Rcpp::sourceCpp("../042_modvar/matrix_fista.cpp")
+source("../042_modvar/auxfunct.r")
+source("../042_modvar/adaweights.r")
+source("../042_modvar/bic.modvar.r")
+source("../042_modvar/cv.modvar.r")
+source("../042_modvar/ada.modvar.r")
 
 load("101_Data.RData")
 
@@ -495,6 +495,12 @@ ggplot(perf_data, aes(x = factor(StepNo), y = error, fill = type)) +
 ##################################################
 ##################################################
 
+Rcpp::sourceCpp("../042_modvar/matrix_fista.cpp")
+source("../042_modvar/auxfunct.r")
+source("../042_modvar/adaweights.r")
+source("../042_modvar/bic.modvar.r")
+source("../042_modvar/cv.modvar.r")
+source("../042_modvar/ada.modvar.r")
 
 
 lcdf_norm <- lcdf_norm %>% 
