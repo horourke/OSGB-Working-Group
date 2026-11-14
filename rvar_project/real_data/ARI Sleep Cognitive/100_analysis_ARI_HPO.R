@@ -52,6 +52,17 @@ ari_data <- ari_data %>%
 
 ls(ari_data)
 
+# standardize variables on all data
+ari_stdall <- ari_data |>
+  mutate(across(where(is.numeric) & !id & !gender & !gpa & !employed, \(x) as.numeric(scale(x))))
+head(ari_stdall)
+
+# standardize variables on individual data
+ari_stdid <- ari_data |>
+  group_by(id) |> 
+  mutate(across(where(is.numeric) & !gender & !gpa & !employed, \(x) as.numeric(scale(x)))) 
+head(ari_stdid)
+
 # Aggregate data at individual level
 ind <- ari_data %>%
   group_by(id) %>%
@@ -170,8 +181,11 @@ ari_x <- ari_x %>%
 # Check date codes; they do not code time points
 table(ari_data$true_date)
 
+# select which standardized dataset 
+ari_working <- ari_stdid
+
 # Code time as variable t 
-ari_time <- ari_data %>%
+ari_time <- ari_working %>%
   arrange(id, true_date) %>% # It's good practice to arrange by ID and Time first
 group_by(id) %>%
   mutate(t = row_number()) %>%
@@ -179,7 +193,6 @@ group_by(id) %>%
 
 
 # subset data to contain only id, t, and Y vars
-ls(ari_data)
 yvars <- c("depression", "anxiety", "distress", "somatization",
            "agreeableness", "conscientiousness", "emotional_stability", "openness",
            "workingmem", "attn_intensity", "attn_consistency", "exec_fn",
@@ -231,8 +244,8 @@ cd_var_output <- cv.solve_rvar_glmnet_vectorized(
   Y_list = ari_y_list, 
   X = ari_x,
   #### TUNE LAMBDA AND PENALTY FACTOR
-  lambda.seq = 10^seq(-12, 0, length.out = 50), 
-  penalty.factor = 10^seq(-15, 15, length.out = 50),  
+  lambda.seq = 10^seq(-5, 0, length.out = 20), 
+  penalty.factor = 10^seq(-5, 3, length.out = 20),  
   ####
   nfolds = 3, 
   verbose = T)
@@ -264,41 +277,84 @@ pwg_vec <- pwg(12)
 
 # According to Jose: rows "var" are y_t, columns are y_t-1
 # c(1:3)] removes 1st 3 which are not coeffs we need
+# one = baseline coeffs 
+# two = gender effects
+# three = employment effects
 one <- as.matrix(cd_var_output$rvar_opt_coeffs[, -c(1:3)][1:8]) 
 two <- as.matrix(cd_var_output$rvar_opt_coeffs[, -c(1:3)][9:16])
 three <- as.matrix(cd_var_output$rvar_opt_coeffs[, -c(1:3)][17:24])
 
-par(mfrow = c(2, 2)) 
+# removing exec fn just from plots
+one <- as.matrix(cd_var_output$rvar_opt_coeffs[-c(8), -c(1:3)][1:7]) 
+two <- as.matrix(cd_var_output$rvar_opt_coeffs[-c(8), -c(1:3)][9:15])
+three <- as.matrix(cd_var_output$rvar_opt_coeffs[-c(8), -c(1:3)][17:23])
+
+# create row and column names
+# rows are y_t, columns are y_t-1
+# also removes exex fn, could just be "yvars"
+rownames(one) <- yvars[1:7]
+colnames(one) <- paste0(yvars[1:7], "-1")
+
+dimnames(plot2) <- dimnames(one)
+dimnames(plot3) <- dimnames(one)
+dimnames(plot4) <- dimnames(one)
+
+# Copy names to the derived matrices so they carry over
+# one + three = "employed female"
+# one + two = "unemployed male"
+# one + three + two = "employed male"
+plot1 <- one
+plot2 <- one + three
+plot3 <- one + two
+plot4 <- one + three + two
+
+par(mfrow = c(2, 2),  mar = c(5.1, 7, 4.1, 4.5)) 
 
 ymax <- max(abs(rbind(
-    one,
-    one + two,
-    one + three,
-    one + two + three)))
+    one, plot2, plot3, plot4)))
 
-one %>%
-  plot(main = "Unemployed female", 
-        breaks = seq(-ymax,ymax, length.out = 12), col = pwg_vec, 
-       digits = 2, text.cell = list(cex=1))
+brks <- seq(-ymax, ymax, length.out = 12)
 
-plot2 <- one + three
+plots <- c("plot1", "plot2", "plot3", "plot4")
+titles <- c("Unemployed female", "Employed female", "Unemployed male", "Employed male")
+
+for (i in seq_along(plots)) {
+  mat <- get(plots[i])
+  
+  plot(mat,
+    main = titles[i], 
+       labels = rownames(mat),
+        breaks =brks, col = pwg_vec, 
+       digits = 2, 
+       text.cell = list(cex = 1),
+       axis.row = list(las = 1),
+       axis.col = list(las = 2),
+       xlab = "",
+       ylab = ""
+       )
+}
 
 plot2 %>%
-  plot(main = "Unemployed male", 
-        breaks = seq(-ymax,ymax, length.out = 12), col = pwg_vec, 
-       digits = 2, text.cell = list(cex=1))
-
-plot3 <- one + two 
-
-plot3  %>%
   plot(main = "Employed female", 
         breaks = seq(-ymax,ymax, length.out = 12), col = pwg_vec, 
        digits = 2, text.cell = list(cex=1))
 
-plot4 <- one + three + two
+plot3  %>%
+  plot(main = "Unemployed male", 
+        breaks = seq(-ymax,ymax, length.out = 12), col = pwg_vec, 
+       digits = 2, text.cell = list(cex=1))
 
 plot4  %>%
   plot(main = "Employed male", 
         breaks = seq(-ymax,ymax, length.out = 12), col = pwg_vec, 
        digits = 2, text.cell = list(cex=1))
+
+# plots of difference effects
+ymax <- max(abs(rbind(two,three)))
+
+par(mfrow = c(2,1))
+plot(two, breaks = seq(-ymax,ymax, length.out = 12), col = pwg_vec, 
+     digits = 2, text.cell = list(cex=1))
+plot(three, breaks = seq(-ymax,ymax, length.out = 12), col = pwg_vec, 
+     digits = 2, text.cell = list(cex=1))
 

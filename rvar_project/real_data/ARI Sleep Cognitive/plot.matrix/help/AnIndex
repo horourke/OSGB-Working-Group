@@ -1,0 +1,14 @@
+air.pvalue	air.pvalue
+as.assoc	as.cor
+as.cor	as.cor
+as.pvalue	as.cor
+assignColors	assignColors
+bfi.2	bfi.2
+fmt	fmt
+plot	plot.matrix
+plot.assoc	plot.assoc
+plot.cor	plot.cor
+plot.loadings	plot.loadings
+plot.matrix	plot.matrix
+plot.pvalue	plot.pvalue
+Titanic.cramer	Titanic.cramer

@@ -1,0 +1,37 @@
+Package: lobstr
+Title: Visualize R Data Structures with Trees
+Version: 1.2.2
+Authors@R: c(
+    person("Hadley", "Wickham", , "hadley@posit.co", role = c("aut", "cre")),
+    person("Posit Software, PBC", role = c("cph", "fnd"))
+  )
+Description: A set of tools for inspecting and understanding R data
+    structures inspired by str(). Includes ast() for visualizing abstract
+    syntax trees, ref() for showing shared references, cst() for showing
+    call stack trees, and obj_size() for computing object sizes.
+License: MIT + file LICENSE
+URL: https://lobstr.r-lib.org/, https://github.com/r-lib/lobstr
+BugReports: https://github.com/r-lib/lobstr/issues
+Depends: R (>= 3.6.0)
+Imports: crayon, methods, prettyunits, rlang (>= 1.0.0)
+Suggests: covr, pillar, pkgdown, testthat (>= 3.0.0)
+LinkingTo: cpp11 (>= 0.4.2)
+Config/build/compilation-database: true
+Config/Needs/website: tidyverse/tidytemplate
+Config/roxygen2/version: 8.1.0
+Config/testthat/edition: 3
+Encoding: UTF-8
+NeedsCompilation: yes
+Packaged: 2026-08-31 23:00:22 UTC; hadleywickham
+Author: Hadley Wickham [aut, cre],
+  Posit Software, PBC [cph, fnd]
+Maintainer: Hadley Wickham <hadley@posit.co>
+Repository: CRAN
+Date/Publication: 2026-09-01 02:20:10 UTC
+Built: R 4.5.3; x86_64-w64-mingw32; 2026-11-11 02:45:48 UTC; windows
+Archs: x64
+RemoteType: standard
+RemotePkgRef: lobstr
+RemoteRef: lobstr
+RemoteRepos: https://cran.rstudio.com
+RemoteSha.Version: 1.2.2

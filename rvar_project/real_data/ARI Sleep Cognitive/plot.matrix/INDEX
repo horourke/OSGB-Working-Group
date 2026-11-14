@@ -1,0 +1,11 @@
+Titanic.cramer          Survival of passengers on the Titanic
+air.pvalue              New York Air Quality Measurements
+as.cor                  as.XXX conversion functions
+assignColors            assignColors
+bfi.2                   25 Personality items representing 5 factors
+fmt                     fmt
+plot.assoc              plot.assoc
+plot.cor                plot.cor
+plot.loadings           plot.loadings
+plot.matrix             plot.matrix
+plot.pvalue             plot.pvalue
