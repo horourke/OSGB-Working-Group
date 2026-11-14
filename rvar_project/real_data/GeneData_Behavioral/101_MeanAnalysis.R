@@ -396,7 +396,7 @@ df_sel <- df %>%
 
 
 
-df_list <- subj_ids[1:16] %>%
+df_list <- subj_ids %>%
   lapply(function(x) { df_sel[df_sel$id == x, -1] }) %>%
   
   lapply(function(x) {
@@ -430,7 +430,7 @@ cov_list <- lapply(df_list, cov)
 library(corrplot)
 par(mfrow = c(4,4),
     mar = c(3.1, 3.1, 3.1, 5.1))
-lapply(cor_list, corrplot)
+lapply(cor_list[-c(20,22,31,33,50)], corrplot)
 cov_list %>%
   lapply(
     function(x) {

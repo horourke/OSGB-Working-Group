@@ -5,8 +5,8 @@ library(tidyverse)
 
 
 
-df <- read.csv("BrainNetworksGeneData_Systematic/reduced_network_signals_data.csv")
-lcdf <- read_xlsx("BrainNetworksGeneData_Systematic/LC_CNRs_for_Fox_Controls.xlsx")
+df <- read.csv("reduced_network_signals_data.csv")
+lcdf <- read_xlsx("LC_CNRs_for_Fox_Controls.xlsx")
 
 dim(df)
 colnames(df)
